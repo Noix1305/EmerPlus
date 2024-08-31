@@ -1,0 +1,7 @@
+{
+  "name": "EmerPlus",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
