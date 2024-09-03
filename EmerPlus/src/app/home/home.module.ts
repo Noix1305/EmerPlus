@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { HomePage } from './home.page';
 import { HomePageRoutingModule } from './home-routing.module';
-import { LoginModalComponent } from '../login-modal/login-modal.component'; // Importación correcta del componente
 
 @NgModule({
   imports: [
@@ -15,8 +14,7 @@ import { LoginModalComponent } from '../login-modal/login-modal.component'; // I
     HomePageRoutingModule
   ],
   declarations: [
-    HomePage,
-    LoginModalComponent  // Declaración del componente modal
+    HomePage
   ]
 })
 export class HomePageModule {}

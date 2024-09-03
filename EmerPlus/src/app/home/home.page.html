@@ -3,11 +3,40 @@
     <ion-title>
       EmerPlus
     </ion-title>
+    <ion-buttons slot="end">
+      <ion-button expand="block" class="boton" id="open-modal">Ingresar</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div class="container">
-    <ion-button expand="block" (click)="openLoginModal()">Ingreso</ion-button>
-  </div>
+<ion-content>
+  <!-- Trigger del modal -->
+  <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
+    <ng-template>
+      <!-- Contenido del modal -->
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Login</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancel()">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-wrapper">
+        <ion-list>
+          <ion-item>
+            <ion-label position="floating">Username</ion-label>
+            <ion-input type="text"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Password</ion-label>
+            <ion-input type="password"></ion-input>
+          </ion-item>
+        </ion-list>
+        <ion-button expand="block">Login</ion-button>
+        <ion-button expand="block" class="boton" (click)="cancel()">Cancelar</ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>
