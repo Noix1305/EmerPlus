@@ -1,6 +1,6 @@
 /* Define la clase personalizada para el botón azul */
 .blue-button {
-  --background: linear-gradient(#1233eb, #72b0e9, #5aacdb);
+  --background: linear-gradient(#1233eb, #3790e2, #1233eb);
   /* Cambia el color de fondo a azul */
   --background-activated: #a04c53;
   /* Color al hacer clic (opcional) */
@@ -11,14 +11,13 @@
 }
 
 .custom-text {
-  font-family: 'Arial Black', sans-serif;
+  font-family: 'Georgia', cursive;
+  font-weight:bold;
+  font-weight: 2.5rem;
+  color: #db188d;
 
-}
-
-.header {
-  --background: linear-gradient(#db89b6, #feb47b, #e7cfbc);
 }
 
 .new-background-color{
-  --background: linear-gradient(#db89b6, #feb47b, #e7cfbc);
+  --background: linear-gradient(45deg, #ccbfc7, #eeacca);
 }
