@@ -34,4 +34,18 @@
 
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
-@import "@ionic/angular/css/palettes/dark.system.css";
+
+
+ion-content {
+    --background: linear-gradient(#db89b6, #feb47b, #e7cfbc);
+    ;
+    /* Cambia a tu color deseado */
+}
+
+ion-header {
+    --background: #ff7e5f; /* Cambia a tu color deseado */
+  }
+
+body {
+    font-family: Arial, sans-serif;
+  }

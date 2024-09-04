@@ -1,7 +1,7 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
+<ion-header>
+  <ion-toolbar class="new-background-color">
     <ion-title>
-      EmerPlus
+      <p class="custom-text">EmerPlus</p>
     </ion-title>
     <ion-buttons slot="end">
       <ion-button expand="block" class="blue-button" id="open-modal">Ingresar</ion-button>
@@ -15,7 +15,7 @@
     <ng-template>
       <!-- Contenido del modal -->
       <ion-header>
-        <ion-toolbar>
+        <ion-toolbar class="new-background-color">
           <ion-title>Login</ion-title>
           <ion-buttons slot="end">
             <ion-button (click)="cancel()">Close</ion-button>
@@ -25,11 +25,11 @@
 
       <ion-content class="modal-wrapper">
         <ion-list>
-          <ion-item>
+          <ion-item class="new-background-color">
             <ion-label position="floating">Username</ion-label>
             <ion-input type="text"></ion-input>
           </ion-item>
-          <ion-item>
+          <ion-item class="new-background-color">
             <ion-label position="floating">Password</ion-label>
             <ion-input type="password"></ion-input>
           </ion-item>

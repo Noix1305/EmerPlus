@@ -1,34 +1,24 @@
-.modal-content {
-  max-width: 600px;
-  margin: auto;
-  padding: 16px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  overflow: hidden;
-  /* Asegura que el contenido no se salga del área */
-}
-
-/* Ajuste del modal completo */
-.small-modal .modal-wrapper {
-  max-width: 90vw;
-  /* Usar un ancho relativo para evitar el corte */
-  max-height: auto;
-  /* Controla la altura para evitar que se corte */
-  margin: auto;
-  border-radius: 8px;
-  overflow: auto;
-  /* Permite el desplazamiento si el contenido es mayor */
-  padding: 16px;
-  /* Ajusta padding para una buena visualización */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
 /* Define la clase personalizada para el botón azul */
 .blue-button {
-  --background: #007bff; /* Cambia el color de fondo a azul */
-  --background-activated: #0056b3; /* Color al hacer clic (opcional) */
-  --background-hover: #0056b3; /* Color al pasar el cursor (opcional) */
-  color: #ffffff; /* Color del texto */
+  --background: linear-gradient(#1233eb, #72b0e9, #5aacdb);
+  /* Cambia el color de fondo a azul */
+  --background-activated: #a04c53;
+  /* Color al hacer clic (opcional) */
+  --background-hover: #e48890;
+  /* Color al pasar el cursor (opcional) */
+  color: #ffffff;
+  /* Color del texto */
+}
+
+.custom-text {
+  font-family: 'Arial Black', sans-serif;
+
+}
+
+.header {
+  --background: linear-gradient(#db89b6, #feb47b, #e7cfbc);
+}
+
+.new-background-color{
+  --background: linear-gradient(#db89b6, #feb47b, #e7cfbc);
 }
