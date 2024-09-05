@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { IonModal } from '@ionic/angular';
 
 import { OverlayEventDetail } from '@ionic/core/components';
+import { LoginService } from '../services/loginService/login.service';
 
 
 @Component({
@@ -12,10 +13,14 @@ import { OverlayEventDetail } from '@ionic/core/components';
 export class HomePage {
   @ViewChild(IonModal) modal!: IonModal;
 
-  constructor() { }
+  constructor(private _loginService:LoginService) { }
 
   name!: string;
   message = 'Ingresar Credenciales';
+
+  mostrarUsuarios(){
+    this._loginService.mostrarUsuarios();
+  }
 
   cancel() {
     this.modal.dismiss(null, 'cancel');

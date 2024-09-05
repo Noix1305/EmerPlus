@@ -1,10 +1,11 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>
+    <ion-title class="toolbar-title">
       <p class="custom-text">EmerPlus</p>
     </ion-title>
-    <ion-buttons slot="end">
-      <ion-button expand="block" class="blue-button" id="open-modal">Ingresar</ion-button>
+    <ion-buttons slot="end" class="button-group">
+      <ion-button class="blue-button" id="open-modal">Ingresar</ion-button>
+      <ion-button class="blue-button" (click)="mostrarUsuarios()">Mostrar Usuarios</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
