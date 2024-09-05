@@ -9,8 +9,27 @@
   </ion-toolbar>
 </ion-header>
 
+
+
 <ion-content>
-  <!-- Trigger del modal -->
+  <div class="image-wrapper">
+    <p class="title">Servicios</p>
+    <div class="image-container">
+      <img src="assets/imgs/Ambulancia.png" alt="Descripción de la imagen">
+      <img src="assets/imgs/Incendio.png" alt="Descripción de la imagen">
+      <img src="assets/imgs/Policia.png" alt="Descripción de la imagen">
+      <img src="assets/imgs/Location.png" alt="Descripción de la imagen">
+    </div>
+  </div>
+</ion-content>
+
+<footer class="footer">
+  <p>&copy; 2024 Mi Empresa. Todos los derechos reservados.</p>
+</footer>
+
+
+<!-- Trigger del modal -->
+
   <ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
     <ng-template>
       <!-- Contenido del modal -->
@@ -39,4 +58,3 @@
       </ion-content>
     </ng-template>
   </ion-modal>
-</ion-content>

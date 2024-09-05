@@ -12,12 +12,92 @@
 
 .custom-text {
   font-family: 'Georgia', cursive;
-  font-weight:bold;
+  font-weight: bold;
   font-weight: 2.5rem;
   color: #db188d;
 
 }
 
-.new-background-color{
+.modal-wrapper{
+  height: auto;
+}
+
+.new-background-color {
   --background: linear-gradient(45deg, #ccbfc7, #eeacca);
+}
+
+ion-content {
+  /* Opcional: establece el color de fondo */
+  --background: linear-gradient(45deg, #ccbfc7, #eeacca);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  /* Ocupa toda la altura de la ventana del navegador */
+}
+
+.image-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: auto;
+  /* Permite que el contenedor ajuste su altura según el contenido */
+  padding: 20px;
+  /* Añade espacio alrededor del contenido */
+}
+
+.title {
+  font-family: 'Georgia', cursive;
+  font-weight: bold;
+  font-size: 3rem;
+  /* Hace el texto en negrita */
+  margin-bottom: 20px;
+  /* Espacio entre el texto y el contenedor de imágenes */
+  text-align: center;
+  /* Centra el texto horizontalmente */
+}
+
+.image-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  /* Espacio entre las imágenes */
+}
+
+.image-container img {
+  width: 100px;
+  /* Ajusta el tamaño según lo necesites */
+  height: 100px;
+  /* Ajusta el tamaño según lo necesites */
+  object-fit: cover;
+  /* Mantiene la proporción de la imagen sin distorsionarla */
+  border-radius: 8px;
+  /* Opcional: añade bordes redondeados */
+}
+
+.footer {
+  background-color: #f8f8f8;
+  /* Color de fondo del footer */
+  text-align: center;
+  /* Centra el texto horizontalmente */
+  padding: 10px 0;
+  /* Espacio alrededor del texto */
+  position: absolute;
+  /* Fija el footer en la parte inferior */
+  bottom: 0;
+  width: 100%;
+  /* Asegura que el footer ocupe todo el ancho de la pantalla */
+  border-top: 1px solid #ddd;
+  /* Añade una línea superior */
+}
+
+.footer p {
+  margin: 0;
+  /* Elimina el margen por defecto del párrafo */
+  color: #333;
+  /* Color del texto */
+  font-size: 14px;
+  /* Tamaño de la fuente */
 }
