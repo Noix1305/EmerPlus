@@ -1,0 +1,104 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-grid>
+      <ion-row class="ion-align-items-center">
+        <!-- Botón Home alineado a la izquierda -->
+        <ion-col size="6" class="ion-text-start">
+          <ion-button color="primary" [routerLink]="['/home']">Home</ion-button>
+        </ion-col>
+
+        <!-- Botones Agregar Contacto y Agregar Usuario alineados a la derecha -->
+        <ion-col size="6" class="ion-text-end">
+          <!-- Botón para agregar contacto de emergencia (usuario normal) -->
+          <ion-button color="primary" id="agregarContactoEmergencia">Agregar Contacto Emergencia</ion-button>
+
+          <!-- Botón para agregar usuario (admin) -->
+          <ion-button color="primary" id="agregarUser">Agregar Usuario</ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <!-- Tabla con la información del usuario -->
+  <ion-grid>
+    <ion-row>
+      <ion-col><strong>RUT</strong></ion-col>
+      <ion-col>12345678-9</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col><strong>Nombre</strong></ion-col>
+      <ion-col>ejemploNombre</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col><strong>Primer Apellido</strong></ion-col>
+      <ion-col>EjemApepa</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col><strong>Segundo Apellido</strong></ion-col>
+      <ion-col>EjemApema</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col><strong>Comuna</strong></ion-col>
+      <ion-col>Santiago</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col><strong>Región</strong></ion-col>
+      <ion-col>Metropolitana</ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col><strong>Tipo de Usuario</strong></ion-col>
+      <ion-col>Admin</ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Modal para agregar contacto de emergencia -->
+  <ion-modal trigger="abrirModal_AgregegarContacoEmepergia">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Agregar Contacto de Emergencia</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancel()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-item>
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input placeholder="Nombre del contacto"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Teléfono</ion-label>
+          <ion-input placeholder="Teléfono del contacto"></ion-input>
+        </ion-item>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Modal para agregar usuario (admin) -->
+  <ion-modal trigger="abrirModal_AgregarUser">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Agregar Usuario</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cancel()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-item>
+          <ion-label position="floating">RUT</ion-label>
+          <ion-input placeholder="RUT del usuario"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input placeholder="Nombre del usuario"></ion-input>
+        </ion-item>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+</ion-content>
