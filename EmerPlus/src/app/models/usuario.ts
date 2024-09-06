@@ -1,7 +1,9 @@
 import { Rol } from "./rol";
 
 export interface Usuario{
-    username: string;
+    rut: string;
     password: string
     rol: Rol[];
 }
+
+

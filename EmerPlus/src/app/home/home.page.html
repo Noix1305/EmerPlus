@@ -46,15 +46,15 @@
       <ion-content class="modal-wrapper">
         <ion-list>
           <ion-item class="new-background-color">
-            <ion-label position="floating">Username</ion-label>
-            <ion-input type="text"></ion-input>
+            <ion-label position="floating"  >Username</ion-label>
+            <ion-input type="text" [(ngModel)]="user.rut"></ion-input>
           </ion-item>
           <ion-item class="new-background-color">
-            <ion-label position="floating">Password</ion-label>
-            <ion-input type="password"></ion-input>
+            <ion-label position="floating"  >Password</ion-label>
+            <ion-input type="password" [(ngModel)]="user.password"></ion-input>
           </ion-item>
         </ion-list>
-        <ion-button expand="block" class="blue-button">Login</ion-button>
+        <ion-button expand="block" class="blue-button" (click)="login()">Login</ion-button>
         <ion-button expand="block" class="blue-button" (click)="cancel()">Cancelar</ion-button>
       </ion-content>
     </ng-template>
