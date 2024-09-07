@@ -2,17 +2,11 @@
   <ion-toolbar>
     <ion-grid>
       <ion-row class="ion-align-items-center">
-        <!-- Botón Home alineado a la izquierda -->
         <ion-col size="6" class="ion-text-start">
-          <ion-button color="primary" [routerLink]="['/home']">Home</ion-button>
+          <ion-button color="primary">Home</ion-button>
         </ion-col>
-
-        <!-- Botones Agregar Contacto y Agregar Usuario alineados a la derecha -->
         <ion-col size="6" class="ion-text-end">
-          <!-- Botón para agregar contacto de emergencia (usuario normal) -->
-          <ion-button color="primary" id="agregarContactoEmergencia">Agregar Contacto Emergencia</ion-button>
-
-          <!-- Botón para agregar usuario (admin) -->
+          <ion-button color="primary" id="agregarContactoEmergencia">Editar </ion-button>
           <ion-button color="primary" id="agregarUser">Agregar Usuario</ion-button>
         </ion-col>
       </ion-row>
@@ -20,48 +14,24 @@
   </ion-toolbar>
 </ion-header>
 
-
 <ion-content>
-  <!-- Tabla con la información del usuario -->
+  <!-- Contenido de la tabla con la información del usuario -->
   <ion-grid>
     <ion-row>
       <ion-col><strong>RUT</strong></ion-col>
       <ion-col>12345678-9</ion-col>
     </ion-row>
-    <ion-row>
-      <ion-col><strong>Nombre</strong></ion-col>
-      <ion-col>ejemploNombre</ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col><strong>Primer Apellido</strong></ion-col>
-      <ion-col>EjemApepa</ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col><strong>Segundo Apellido</strong></ion-col>
-      <ion-col>EjemApema</ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col><strong>Comuna</strong></ion-col>
-      <ion-col>Santiago</ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col><strong>Región</strong></ion-col>
-      <ion-col>Metropolitana</ion-col>
-    </ion-row>
-    <ion-row>
-      <ion-col><strong>Tipo de Usuario</strong></ion-col>
-      <ion-col>Admin</ion-col>
-    </ion-row>
+    <!-- Otros datos del usuario -->
   </ion-grid>
 
   <!-- Modal para agregar contacto de emergencia -->
-  <ion-modal trigger="abrirModal_AgregegarContacoEmepergia">
+  <ion-modal #modalContacto trigger="agregarContactoEmergencia" (willDismiss)="onWillDismiss($event)" id="modalContacto">
     <ng-template>
       <ion-header>
         <ion-toolbar>
-          <ion-title>Agregar Contacto de Emergencia</ion-title>
+          <ion-title>Editar Perfil</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="cancel()">Cerrar</ion-button>
+            <ion-button (click)="closeModal(modalContacto)">Cerrar</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
@@ -78,14 +48,14 @@
     </ng-template>
   </ion-modal>
 
-  <!-- Modal para agregar usuario (admin) -->
-  <ion-modal trigger="abrirModal_AgregarUser">
+  <!-- Modal para agregar usuario -->
+  <ion-modal #modalUser trigger="agregarUser" (willDismiss)="onWillDismiss($event)" id="modalUser">
     <ng-template>
       <ion-header>
         <ion-toolbar>
           <ion-title>Agregar Usuario</ion-title>
           <ion-buttons slot="end">
-            <ion-button (click)="cancel()">Cerrar</ion-button>
+            <ion-button (click)="closeModal(modalUser)">Cerrar</ion-button>
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
