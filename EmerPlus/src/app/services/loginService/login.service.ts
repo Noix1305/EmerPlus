@@ -12,77 +12,92 @@ export class LoginService {
   lista_de_usuarios: Usuario[] = [
     {
       rut: "17799487-1",
-      password: "usuario123",
+      password: "u#f0a&tsu#f0a&t!a%i&ri#m0e%so#b%e&r123",
       nombre: "Nombre",
-      pApellido: "Primer Apellido",
-      sApellido: "Segundo apellido",
+      pApellido: "Pino",
+      sApellido: "Araya",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
-      contactoEmergencia: 947421590,
-      rol: [this.rolService.getRolById(2)!]
+      contactoEmergencia: {
+        rut_usuario:"17799487-1",
+        nombre: "Juan Pérez",
+        telefono: 912345678,
+        correo:"juanperez@gmail.com",
+        relacion: "Amigo"
+      },
+      rol: [this.rolService.getRolByIds([2])[0]!]
     },
     {
       rut: "admin",
-      password: "admin123",
+      password: "!a%i&dmi#m0e%sn123",
       nombre: "Nombre",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
-      contactoEmergencia: 947421590,
-      rol: [this.rolService.getRolById(1)!]
+      contactoEmergencia: undefined,
+      rol: [this.rolService.getRolByIds([1])[0]!]
     },
     {
       rut: "bombero",
-      password: "bombero123",
+      password: "bo#b%e&rmbe#n=t0e!r%ro#b%e&r123",
       nombre: "Nombre",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
-      contactoEmergencia: 947421590,
-      rol: [this.rolService.getRolById(3)!]
+      contactoEmergencia: undefined,
+      rol: [this.rolService.getRolByIds([3])[0]!]
     },
     {
       rut: "policia",
-      password: "policia123",
+      password: "po#b%e&rli#m0e%sci#m0e%s!a%i&123",
       nombre: "Jose",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
-      contactoEmergencia: 947421590,
-      rol: [this.rolService.getRolById(4)!]
+      contactoEmergencia: undefined,
+      rol: [this.rolService.getRolByIds([4])[0]!]
     },
     {
       rut: "ambulancia",
-      password: "ambulancia123",
+      password: "!a%i&mbu#f0a&tl!a%i&nci#m0e%s!a%i&123",
       nombre: "Nombre",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
-      contactoEmergencia: 947421590,
-      rol: [this.rolService.getRolById(5)!]
+      contactoEmergencia: undefined,
+      rol: [this.rolService.getRolByIds([5])[0]!]
     },
   ];
 
 
   constructor(private rolService: RolService, private router: Router) { }
 
-  agregarRolAUsuarioPorId(rut: string, rolId: number): void {
-    // Obtener el rol por su ID desde el servicio
-    const rol = this.rolService.getRolById(rolId);
+  agregarUsuario(usuario: Usuario): void {
+    this.lista_de_usuarios.push(usuario);
+    console.log('Usuario agregado:', usuario);
+  }
 
-    if (!rol) {
+  agregarRolAUsuarioPorId(rut: string, rolId: number) {
+    // Obtener el rol por su ID desde el servicio
+    const roles = this.rolService.getRolByIds([rolId]); // Esto retorna un arreglo de roles
+
+    // Verificar si se encontró al menos un rol
+    if (!roles || roles.length === 0) {
       console.error('Rol no encontrado');
       return;
     }
+
+    // Extraer el primer rol del arreglo (asumiendo que solo necesitas uno)
+    const rol = roles[0];
 
     // Buscar el usuario en la lista
     const usuario = this.lista_de_usuarios.find((u) => u.rut === rut);
@@ -95,6 +110,7 @@ export class LoginService {
       console.error('Usuario no encontrado');
     }
   }
+
 
   mostrarUsuarios() {
     // Recorre cada usuario dentro de la lista_de_usuarios
@@ -133,5 +149,29 @@ export class LoginService {
     return this.lista_de_usuarios.some(usuario => usuario.rut === rut);
   }
 
+  encryptText(texto: string) {
+    let encryptedText = "";
+    if (texto != "") {
+      // Reemplazar cada letra según las reglas de encriptación
+      encryptedText = texto.replace(/e/g, 'e#n=t0e!r%')
+        .replace(/i/g, 'i#m0e%s')
+        .replace(/a/g, '!a%i&')
+        .replace(/o/g, 'o#b%e&r')
+        .replace(/u/g, 'u#f0a&t');
+    }
+    return encryptedText;
+  }
 
+  decryptText(inputText:string) {
+    let decryptedText = "";
+    if (inputText != "") {
+        // Reemplazar cada código encriptado con su letra correspondiente
+         decryptedText = inputText.replace(/e#n=t0e!r%/g, 'e')
+          .replace(/i#m0e%s/g, 'i')
+          .replace(/!a%i&/g, 'a')
+          .replace(/o#b%e&r/g, 'o')
+          .replace(/u#f0a&t/g, 'u');
+    }
+    return decryptedText;
+  }
 }

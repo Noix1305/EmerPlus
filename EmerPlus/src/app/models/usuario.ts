@@ -1,3 +1,4 @@
+import { Contacto } from "./contacto";
 import { Rol } from "./rol";
 
 
@@ -10,6 +11,6 @@ export interface Usuario {
   telefono?: number;
   region?:string;
   comuna?:string;
-  contactoEmergencia?:number;
+  contactoEmergencia?:Contacto;
   rol: Rol[]; // Cada usuario puede tener múltiples roles
 }

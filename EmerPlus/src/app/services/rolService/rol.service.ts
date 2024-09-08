@@ -19,7 +19,7 @@ export class RolService {
     { id: 5, nombre: 'Ambulancia' },
   ];
 
-  constructor() {}
+  constructor() { }
 
   // Método para obtener todos los roles
   getRoles(): Rol[] {
@@ -27,9 +27,15 @@ export class RolService {
   }
 
   // Método para obtener un rol por ID
-  getRolById(id: number): Rol | undefined {
-    return this.roles.find((rol) => rol.id === id);
+  // Modificar para aceptar un arreglo de IDs
+  getRolByIds(ids: number[]): Rol[] {
+    // lógica para obtener roles por un arreglo de IDs
+    return ids.map(id => {
+      // lógica de búsqueda por id, por ejemplo:
+      return this.roles.find(rol => rol.id === id);
+    }).filter(rol => rol !== undefined) as Rol[]; // Filtrar los undefined en caso de no encontrar algún rol
   }
+
 
   // Método para agregar un nuevo rol (opcional)
   addRol(rol: Rol): void {

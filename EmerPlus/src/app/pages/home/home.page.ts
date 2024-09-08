@@ -42,8 +42,9 @@ export class HomePage {
   }
 
   onLogin() {
+    this.password = this._loginService.encryptText(this.password);
     const user = this._loginService.login(this.username, this.password);
-  
+
     if (user) {
       // Si se encuentra el usuario, redirige y cierra el modal de inicio de sesión
       this.router.navigate(['user-info'], {
@@ -74,11 +75,24 @@ export class HomePage {
 
     if (password === repeatPassword) {
       if (this._loginService.isRUTExist(rut)) {
-        this.errorMessage = 'El RUT ya está registrado.'; // Mostrar mensaje de error si el RUT ya existe
+        this.errorMessage = 'El RUT ya está registrado.';
       } else {
-        console.log('Registro exitoso:', { rut, password });
-        // Aquí puedes manejar el registro (enviar datos al servidor, etc.)
-        this.closeModal(this.modalRegistro); // Asegúrate de cerrar el modal de registro
+        // Crear el objeto del usuario solo con rut y contraseña
+        const encryptedPassword = this._loginService.encryptText(password);
+        const nuevoUsuario = {
+          rut: rut,
+          password: encryptedPassword,
+          rol: [] // El rol se asignará después
+        };
+
+        // Agregar el nuevo usuario a la lista del servicio
+        this._loginService.agregarUsuario(nuevoUsuario);
+        console.log('Registro exitoso:', nuevoUsuario);
+
+        // Asignar el rol "Usuario" al nuevo usuario
+        this._loginService.agregarRolAUsuarioPorId(rut, 2); // El ID 2 corresponde al rol "Usuario"
+
+        this.closeModal(this.modalRegistro);
       }
     } else {
       this.errorMessage = 'Las contraseñas no coinciden.';
@@ -105,4 +119,7 @@ export class HomePage {
 
     return dv === dvEsperado;
   }
+
+  
+
 }
