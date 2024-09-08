@@ -2,7 +2,9 @@ import { Component, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, IonModal } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
+import { Contacto } from 'src/app/models/contacto';
 import { Usuario } from 'src/app/models/usuario';
+import { LoginService } from 'src/app/services/loginService/login.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
 
 @Component({
@@ -12,10 +14,32 @@ import { RolService } from 'src/app/services/rolService/rol.service';
 })
 export class UserInfoPage {
   @ViewChild('modalContacto', { static: false }) modalContacto!: IonModal;
-  usuario: Usuario | undefined;
-  rolUsuario: string | undefined;
+  @ViewChild('modalAddUser', { static: false }) modalAddUser!: IonModal;
+  @ViewChild('modalEditUser', { static: false }) modalEditUser!: IonModal;
+  @ViewChild('modalEditContact', { static: false }) modalEditContact!: IonModal;
 
-  constructor(private router: Router, private _rolService: RolService, private alertController: AlertController) { }
+  usuario: Usuario = {
+    rut: '',
+    password: '',
+    nombre: '',
+    pApellido: '',
+    sApellido: '',
+    telefono: 0,
+    comuna: '',
+    region: '',
+    rol: [],
+    contactoEmergencia: undefined
+  };
+  rolUsuario: string | undefined;
+  contacto: Contacto = {
+    rut_usuario: "",
+    nombre: "",
+    telefono: 0,
+    correo: "",
+    relacion: ""
+  }
+
+  constructor(private router: Router, private alertController: AlertController, private _rolService: RolService, private _loginService: LoginService) { }
 
   ngOnInit() {
     // Accede al state pasado desde el LoginComponent
@@ -66,4 +90,124 @@ export class UserInfoPage {
   closeModal() {
     this.modalContacto.dismiss();
   }
+
+  openAddUserModal() {
+    this.modalAddUser.present();
+  }
+
+  closeAddUserModal() {
+    this.modalAddUser.dismiss();
+  }
+
+  async handleAddUserSubmit(event: Event) {
+    const success = await this._loginService.handleAddUserSubmit(event);
+
+    // Si el usuario fue agregado correctamente, cierra el modal de registro
+    if (success) {
+      this.closeAddUserModal()
+    }
+
+  }
+
+  openEditUserModal() {
+    this.modalEditUser.present();
+  }
+
+  closeEditUserModal() {
+    this.modalEditUser.dismiss();
+  }
+
+  async handleEditUserSubmit(event: Event) {
+    event.preventDefault(); // Prevenir el envío por defecto del formulario
+
+    if (!this.usuario) {
+      console.error('No hay usuario logueado para editar');
+      return;
+    }
+
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const telefonoString = formData.get('telefono') as string;
+    const telefono = parseInt(telefonoString, 10);
+
+    if (isNaN(telefono)) {
+      console.error('El teléfono ingresado no es válido.');
+      return;
+    }
+
+    const updatedUser = {
+      nombre: formData.get('nombre') as string,
+      pApellido: formData.get('pApellido') as string,
+      sApellido: formData.get('sApellido') as string,
+      telefono: telefono,
+      comuna: formData.get('comuna') as string,
+      region: formData.get('region') as string,
+      // No se incluye `rut` aquí porque se toma del usuario logueado
+    };
+
+    const success = await this._loginService.updateUser(this.usuario.rut, updatedUser);
+
+    if (success) {
+      this.usuario = { ...this.usuario, ...updatedUser };
+      this.closeEditUserModal();
+    } else {
+      // Manejar fallo en la actualización
+    }
+  }
+
+  openEditContactModal() {
+    this.modalEditContact.present();
+  }
+
+  closeEditContactModal() {
+    this.modalEditContact.dismiss();
+  }
+
+  async handleEditContactSubmit(event: Event) {
+    event.preventDefault(); // Prevenir el envío por defecto del formulario
+
+    // Extraer los detalles del contacto del formulario
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    // Extraer y convertir el teléfono a número
+    const telefonoString = formData.get('telefono') as string;
+    const telefono = parseInt(telefonoString, 10);
+
+    // Validar si el teléfono es un número válido
+    if (isNaN(telefono)) {
+      console.error('El teléfono ingresado no es válido.');
+      return;
+    }
+
+    // Crear el objeto actualizado de contacto
+    const updatedContact: Contacto = {
+      rut_usuario: this.usuario!.rut, // RUT del usuario logueado
+      nombre: formData.get('nombre') as string,
+      telefono: telefono, // Usar el número convertido
+      correo: formData.get('correo') as string,
+      relacion: formData.get('relacion') as string,
+    };
+
+    // Asegurarse de que `rut` está definido antes de actualizar `this.usuario`
+    if (!this.usuario?.rut) {
+      console.error('El RUT del usuario no está definido.');
+      return;
+    }
+
+    // Actualizar el contacto usando el servicio
+    const success = this._loginService.updateContact(this.usuario!.rut, updatedContact);
+
+    if (success) {
+      this.usuario = {
+        ...this.usuario,
+        contactoEmergencia: updatedContact,
+      };
+      this.closeEditContactModal();
+    } else {
+      // Manejar fallo en la actualización
+      console.error('Error al actualizar el contacto de emergencia.');
+    }
+  }
 }
+

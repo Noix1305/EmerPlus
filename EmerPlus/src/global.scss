@@ -57,3 +57,15 @@ body {
     z-index: 1000;
     /* Asegura que esté por encima de otros elementos */
 }
+
+ion-item {
+    --padding-start: 0;
+    /* Ajusta el espaciado si es necesario */
+    --inner-padding-end: 0;
+    /* Ajusta el espaciado del lado del botón */
+}
+
+ion-buttons {
+    margin-left: auto;
+    /* Empuja el botón hacia el extremo derecho */
+}

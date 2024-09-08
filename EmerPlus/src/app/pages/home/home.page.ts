@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonModal } from '@ionic/angular';
+import { AlertController, IonModal } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
 
 import { Router } from '@angular/router';
@@ -13,6 +13,7 @@ import { LoginService } from '../../services/loginService/login.service';
 export class HomePage {
   @ViewChild('modalRegistro', { static: false }) modalRegistro!: IonModal; // Captura el modal de registro específicamente
   @ViewChild('loginModal', { static: false }) loginModal!: IonModal;
+  
   username: string = '';
   password: string = '';
 
@@ -24,16 +25,14 @@ export class HomePage {
 
   closeModal(modal: IonModal) {
     if (modal) {
+      // Limpia los campos de entrada
+      this.username = '';
+      this.password = '';
+
+      // Cierra el modal
       modal.dismiss(null, 'cancel');
     } else {
       console.error('El modal no está disponible para cerrar.');
-    }
-  }
-
-  onWillDismiss(event: Event) {
-    const ev = event as CustomEvent<OverlayEventDetail<string>>;
-    if (ev.detail.role === 'confirm') {
-      console.log('Modal cerrado con confirmación');
     }
   }
 
@@ -52,7 +51,7 @@ export class HomePage {
           usuario: user // Asegúrate de que 'usuario' tenga los datos correctos
         }
       });
-      this.loginModal.dismiss(); // Asegúrate de que se cierra el modal correcto
+      this.closeModal(this.loginModal); // Asegúrate de que se cierra el modal correcto
     } else {
       this.errorMessage = 'Credenciales incorrectas';
       console.error('Credenciales incorrectas');
@@ -60,66 +59,14 @@ export class HomePage {
   }
 
   // Método para manejar el formulario de registro
-  handleRegistroSubmit(event: Event) {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const rut = formData.get('rut') as string;
-    const password = formData.get('password') as string;
-    const repeatPassword = formData.get('repeatPassword') as string;
-
-    if (!this.validateRUT(rut)) {
-      this.errorMessage = 'RUT inválido';
-      return;
-    }
-
-    if (password === repeatPassword) {
-      if (this._loginService.isRUTExist(rut)) {
-        this.errorMessage = 'El RUT ya está registrado.';
-      } else {
-        // Crear el objeto del usuario solo con rut y contraseña
-        const encryptedPassword = this._loginService.encryptText(password);
-        const nuevoUsuario = {
-          rut: rut,
-          password: encryptedPassword,
-          rol: [] // El rol se asignará después
-        };
-
-        // Agregar el nuevo usuario a la lista del servicio
-        this._loginService.agregarUsuario(nuevoUsuario);
-        console.log('Registro exitoso:', nuevoUsuario);
-
-        // Asignar el rol "Usuario" al nuevo usuario
-        this._loginService.agregarRolAUsuarioPorId(rut, 2); // El ID 2 corresponde al rol "Usuario"
-
-        this.closeModal(this.modalRegistro);
-      }
-    } else {
-      this.errorMessage = 'Las contraseñas no coinciden.';
-    }
-  }
-
-  validateRUT(rut: string): boolean {
-    rut = rut.replace(/[^0-9Kk]/g, '').toUpperCase();
-    if (!/^\d{7,8}[Kk\d]$/.test(rut)) return false;
-
-    const cuerpo = rut.slice(0, -1);
-    const dv = rut.slice(-1);
-
-    let suma = 0;
-    let multiplicador = 2;
-
-    for (let i = cuerpo.length - 1; i >= 0; i--) {
-      suma += parseInt(cuerpo.charAt(i), 10) * multiplicador;
-      multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
-    }
-
-    const dvCalculado = 11 - (suma % 11);
-    const dvEsperado = dvCalculado === 11 ? '0' : dvCalculado === 10 ? 'K' : dvCalculado.toString();
-
-    return dv === dvEsperado;
-  }
-
+  async handleRegistroSubmit(event: Event) {
+    // Espera a que se complete la función handleAddUserSubmit y captura su resultado
+    const success = await this._loginService.handleAddUserSubmit(event);
   
-
+    // Si el usuario fue agregado correctamente, cierra el modal de registro
+    if (success) {
+      this.closeModal(this.modalRegistro);
+    }
+  }
+  
 }

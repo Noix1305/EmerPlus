@@ -5,16 +5,17 @@
       <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>
     <ion-buttons slot="end">
-      <ion-button *ngIf="rolUsuario === 'Administrador'" class="blue-button-gl" id="agregarUser">Agregar Usuario</ion-button>
+      <ion-button *ngIf="rolUsuario === 'Administrador'" class="blue-button-gl" id="agregarUser"
+        (click)="openAddUserModal()">Agregar Usuario</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <p class="perfil-titulo">PERFIL DEL USUARIO</p>
   <ion-card class="transparent-card" style="border: none;">
     <ion-grid>
       <ion-row class="gridStyle">
-        <p style="font-weight: bold; font-size: 2rem;">PERFIL DEL USUARIO</p>
         <ion-col>
           <ion-list [inset]="true">
             <!-- Fila para el nombre del usuario -->
@@ -51,7 +52,10 @@
         </ion-col>
       </ion-row>
       <div class="button-container">
-        <ion-button class="blue-button-gl" id="agregarContactoEmergencia">Editar</ion-button>
+        <ion-button class="blue-button-gl" id="agregarContactoEmergencia" (click)="openEditUserModal()">Editar
+          Usuario</ion-button>
+        <ion-button class="blue-button-gl" id="editarContactoEmergencia" (click)="openEditContactModal()">Editar
+          Contacto</ion-button>
       </div>
     </ion-grid>
   </ion-card>
@@ -82,6 +86,138 @@
           <ion-label><strong>Relación:</strong> {{ usuario?.contactoEmergencia?.relacion }}</ion-label>
         </ion-item>
       </ion-list>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Modal para agregar usuario -->
+<ion-modal #modalAddUser>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Agregar Usuario</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeAddUserModal()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <form (ngSubmit)="handleAddUserSubmit($event)">
+        <ion-list>
+          <ion-item>
+            <ion-label position="floating">RUT</ion-label>
+            <ion-input name="rut" type="text" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input name="password" type="password" required>
+              <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            </ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Repetir Contraseña</ion-label>
+            <ion-input name="repeatPassword" type="password" required>
+              <ion-input-password-toggle slot="end" style="--background: black"></ion-input-password-toggle>
+            </ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label>Rol</ion-label>
+            <ion-select name="rol" placeholder="Seleccione un rol">
+              <ion-select-option value="1">Administrador</ion-select-option>
+              <ion-select-option value="2">Usuario</ion-select-option>
+              <ion-select-option value="3">Bombero</ion-select-option>
+              <ion-select-option value="4">Policia</ion-select-option>
+              <ion-select-option value="5">Ambulancia</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+        <ion-button expand="full" type="submit">Registrar</ion-button>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<!-- Modal para editar usuario -->
+<ion-modal #modalEditUser>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Editar Usuario</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeEditUserModal()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <form (ngSubmit)="handleEditUserSubmit($event)">
+        <ion-list>
+          <ion-item>
+            <ion-label position="floating">Nombre</ion-label>
+            <ion-input name="nombre" type="text" [(ngModel)]="usuario.nombre" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Apellidos</ion-label>
+            <ion-input name="pApellido" type="text" [(ngModel)]="usuario.pApellido" required></ion-input>
+            <ion-input name="sApellido" type="text" [(ngModel)]="usuario.sApellido" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Teléfono</ion-label>
+            <ion-input name="telefono" type="text" [(ngModel)]="usuario.telefono" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Comuna</ion-label>
+            <ion-input name="comuna" type="text" [(ngModel)]="usuario.comuna" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Región</ion-label>
+            <ion-input name="region" type="text" [(ngModel)]="usuario.region" required></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-buttons slot="start">
+              <ion-button (click)="openEditContactModal()">Editar Contacto de
+                Emergencia</ion-button>
+            </ion-buttons>
+          </ion-item>
+        </ion-list>
+        <ion-button expand="full" type="submit">Guardar Cambios</ion-button>
+      </form>
+    </ion-content>
+  </ng-template>
+</ion-modal>
+
+<ion-modal #modalEditContact>
+  <ng-template>
+    <ion-header>
+      <ion-toolbar>
+        <ion-title>Editar Contacto de Emergencia</ion-title>
+        <ion-buttons slot="end">
+          <ion-button (click)="closeEditContactModal()">Cerrar</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content>
+      <form (ngSubmit)="handleEditContactSubmit($event)">
+        <ion-item>
+          <ion-label position="floating">Nombre</ion-label>
+          <ion-input [(ngModel)]="contacto.nombre" name="nombre" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Teléfono</ion-label>
+          <ion-input [(ngModel)]="contacto.telefono" name="telefono" type="tel" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Correo</ion-label>
+          <ion-input [(ngModel)]="contacto.correo" name="correo" type="email" required></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Relación</ion-label>
+          <ion-input [(ngModel)]="contacto.relacion" name="relacion" required></ion-input>
+        </ion-item>
+        <ion-footer>
+          <ion-button expand="full" type="submit">Guardar</ion-button>
+        </ion-footer>
+      </form>
     </ion-content>
   </ng-template>
 </ion-modal>

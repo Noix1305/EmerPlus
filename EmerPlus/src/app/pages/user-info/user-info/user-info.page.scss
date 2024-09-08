@@ -8,7 +8,7 @@ ion-row {
 }
 
 .blue-button-gl {
-    @extend .blue-button !optional;
+  @extend .blue-button !optional;
   // Otros estilos específicos del componente
 }
 
@@ -28,9 +28,18 @@ ion-row {
 }
 
 .transparent-background {
-  background-color: transparent !important; /* Fondo transparente */
+  background-color: transparent !important;
+  /* Fondo transparente */
 }
 
 .transparent-card {
-  --background: transparent !important; /* Fondo del card transparente */
+  --background: transparent !important;
+  /* Fondo del card transparente */
+}
+
+.perfil-titulo {
+  font-weight: bold;
+  font-size: 2rem;
+  text-align: center;
+  /* Centra el texto */
 }
