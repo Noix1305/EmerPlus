@@ -37,19 +37,19 @@
         <form (submit)="handleRegistroSubmit($event)">
           <ion-item>
             <ion-label position="floating">RUT</ion-label>
-            <ion-input name="rut" type="text" placeholder="Ingrese su RUT"></ion-input>
+            <ion-input name="rut" type="text" placeholder=""></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Contraseña</ion-label>
-            <ion-input name="password" type="password" placeholder="Ingrese su contraseña"></ion-input>
+            <ion-input name="password" type="password" placeholder=""></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Repetir Contraseña</ion-label>
-            <ion-input name="repeatPassword" type="password" placeholder="Repita su contraseña"></ion-input>
+            <ion-input name="repeatPassword" type="password" placeholder=""></ion-input>
           </ion-item>
           <!-- Mensaje de error -->
           <ion-text color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-text>
-          <ion-button expand="full" type="submit">Registrar</ion-button>
+          <ion-button class="blue-button-gl" expand="block" type="submit">Registrar</ion-button>
         </form>
       </ion-content>
     </ng-template>
@@ -79,8 +79,8 @@
             <ion-label position="floating">Password</ion-label>
             <ion-input [(ngModel)]="password" type="password"></ion-input>
           </ion-item>
-          <ion-button expand="full" class="blue-button" (click)="onLogin()">Login</ion-button>
-          <ion-button expand="block" class="blue-button" (click)="closeModal(loginModal)">Cancelar</ion-button>
+          <ion-button expand="block" class="blue-button-gl" (click)="onLogin()">Login</ion-button>
+          <ion-button expand="block" class="blue-button-gl" (click)="closeModal(loginModal)">Cancelar</ion-button>
         </ion-list>
       </ion-content>
     </ng-template>

@@ -44,4 +44,16 @@ ion-content {
 
 body {
     font-family: Arial, sans-serif;
-  }
+}
+
+.blue-button {
+    --background: #007bff;
+    /* Color de fondo azul */
+    --color: #fff;
+    /* Color del texto blanco */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    /* Asegura que esté por encima de otros elementos */
+}
