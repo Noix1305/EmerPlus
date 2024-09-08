@@ -1,59 +1,92 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>
-      <p class="custom-text">EmerPlus</p>
+      <p class="custom-text">Siguiente: Logica crear Usuario y Editar Perfil</p>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button expand="block" class="blue-button" id="open-modal">Ingresar</ion-button>
-      <!-- <ion-button expand="block" class="blue-button" (click)="mostrarUsuarios()">Mostrar Usuarios</ion-button> -->
+      <ion-button expand="block" class="blue-button-gl" id="loginModal">Ingreso</ion-button>
+      <!-- <ion-button expand="block" class="blue-button-gl" (click)="mostrarUsuarios()">Mostrar Usuarios</ion-button> -->
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="image-wrapper">
-    <p class="title">Servicios</p>
-    <div class="image-container">
-      <img src="assets/imgs/Ambulancia.png" alt="Descripción de la imagen">
-      <img src="assets/imgs/Incendio.png" alt="Descripción de la imagen">
-      <img src="assets/imgs/Policia.png" alt="Descripción de la imagen">
-      <img src="assets/imgs/Location.png" alt="Descripción de la imagen">
+<ion-content class="centered-content">
+  <div class="hero-text">
+    <h1>EmerPlus</h1>
+    <img src="/assets/imgs/911.jpg" alt="EmerPlus Logo" class="hero-image" style="border-radius: 5%;" />
+    <p>Conectándote con la ayuda que necesitas, cuando la necesitas.</p>
+    <!-- Botón para abrir el modal -->
+    <div class="button-container">
+      <ion-button class="blue-button-gl" id="modalRegistro">Registrarse</ion-button>
     </div>
   </div>
+
+
+  <!-- Modal para registro -->
+  <ion-modal #modalRegistro trigger="modalRegistro">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Registro</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeModal(modalRegistro)">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <form (submit)="handleRegistroSubmit($event)">
+          <ion-item>
+            <ion-label position="floating">RUT</ion-label>
+            <ion-input name="rut" type="text" placeholder="Ingrese su RUT"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Contraseña</ion-label>
+            <ion-input name="password" type="password" placeholder="Ingrese su contraseña"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Repetir Contraseña</ion-label>
+            <ion-input name="repeatPassword" type="password" placeholder="Repita su contraseña"></ion-input>
+          </ion-item>
+          <!-- Mensaje de error -->
+          <ion-text color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-text>
+          <ion-button expand="full" type="submit">Registrar</ion-button>
+        </form>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <!-- Trigger del modal -->
+
+  <ion-modal #loginModal trigger="loginModal" (willDismiss)="onWillDismiss($event)">
+    <ng-template>
+      <!-- Contenido del modal -->
+      <ion-header>
+        <ion-toolbar class="new-background-color">
+          <ion-title>Ingresar</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="closeModal(loginModal)">Close</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <ion-content class="modal-wrapper">
+        <ion-list>
+          <ion-item>
+            <ion-label position="floating">Username</ion-label>
+            <ion-input [(ngModel)]="username" type="text"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Password</ion-label>
+            <ion-input [(ngModel)]="password" type="password"></ion-input>
+          </ion-item>
+          <ion-button expand="full" class="blue-button" (click)="onLogin()">Login</ion-button>
+          <ion-button expand="block" class="blue-button" (click)="closeModal(loginModal)">Cancelar</ion-button>
+        </ion-list>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+  <footer class="footer">
+    <p>&copy; 2024 Mi Empresa. Todos los derechos reservados.</p>
+  </footer>
 </ion-content>
-
-<footer class="footer">
-  <p>&copy; 2024 Mi Empresa. Todos los derechos reservados.</p>
-</footer>
-
-
-<!-- Trigger del modal -->
-
-<ion-modal trigger="open-modal" (willDismiss)="onWillDismiss($event)">
-  <ng-template>
-    <!-- Contenido del modal -->
-    <ion-header>
-      <ion-toolbar class="new-background-color">
-        <ion-title>Ingresar</ion-title>
-        <ion-buttons slot="end">
-          <ion-button (click)="cancel()">Close</ion-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content class="modal-wrapper">
-      <ion-list>
-        <ion-item>
-          <ion-label position="floating">Username</ion-label>
-          <ion-input [(ngModel)]="username" type="text"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating">Password</ion-label>
-          <ion-input [(ngModel)]="password" type="password"></ion-input>
-        </ion-item>
-        <ion-button expand="full" class="blue-button" (click)="onLogin()">Login</ion-button>
-        <ion-button expand="block" class="blue-button" (click)="cancel()">Cancelar</ion-button>
-      </ion-list>
-    </ion-content>
-  </ng-template>
-</ion-modal>

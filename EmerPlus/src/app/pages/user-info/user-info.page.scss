@@ -1,4 +1,36 @@
+@import 'src/global';
+
 ion-row {
-    border-bottom: 1px solid #ccc; /* Línea de separación */
-    padding: 10px 0; /* Espaciado dentro de las filas */
-  }
+  border-bottom: 1px solid #ccc;
+  /* Línea de separación */
+  padding: 10px 0;
+  /* Espaciado dentro de las filas */
+}
+
+.blue-button-gl {
+  @extend .blue-button;
+  // Otros estilos específicos del componente
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  /* Centra horizontalmente */
+  align-items: center;
+  /* Centra verticalmente si es necesario */
+  height: 100%;
+  /* Asegura que el contenedor ocupe todo el espacio disponible */
+}
+
+.gridStyle {
+  border: none;
+  border-radius: 10px;
+}
+
+.transparent-background {
+  background-color: transparent !important; /* Fondo transparente */
+}
+
+.transparent-card {
+  --background: transparent !important; /* Fondo del card transparente */
+}

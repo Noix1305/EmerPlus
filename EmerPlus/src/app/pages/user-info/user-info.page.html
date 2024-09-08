@@ -1,74 +1,57 @@
 <ion-header>
+
   <ion-toolbar>
-    <ion-grid>
-      <ion-row class="ion-align-items-center">
-        <ion-col size="6" class="ion-text-start">
-          <ion-button color="primary">Home</ion-button>
-        </ion-col>
-        <ion-col size="6" class="ion-text-end">
-          <ion-button color="primary" id="agregarContactoEmergencia">Editar </ion-button>
-          <ion-button color="primary" id="agregarUser">Agregar Usuario</ion-button>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button class="blue-button-gl" id="agregarUser">Agregar Usuario</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <!-- Contenido de la tabla con la información del usuario -->
-  <ion-grid>
-    <ion-row>
-      <ion-col><strong>RUT</strong></ion-col>
-      <ion-col>12345678-9</ion-col>
-    </ion-row>
-    <!-- Otros datos del usuario -->
-  </ion-grid>
-
-  <!-- Modal para agregar contacto de emergencia -->
-  <ion-modal #modalContacto trigger="agregarContactoEmergencia" (willDismiss)="onWillDismiss($event)" id="modalContacto">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Editar Perfil</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeModal(modalContacto)">Cerrar</ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content>
-        <ion-item>
-          <ion-label position="floating">Nombre</ion-label>
-          <ion-input placeholder="Nombre del contacto"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating">Teléfono</ion-label>
-          <ion-input placeholder="Teléfono del contacto"></ion-input>
-        </ion-item>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
-
-  <!-- Modal para agregar usuario -->
-  <ion-modal #modalUser trigger="agregarUser" (willDismiss)="onWillDismiss($event)" id="modalUser">
-    <ng-template>
-      <ion-header>
-        <ion-toolbar>
-          <ion-title>Agregar Usuario</ion-title>
-          <ion-buttons slot="end">
-            <ion-button (click)="closeModal(modalUser)">Cerrar</ion-button>
-          </ion-buttons>
-        </ion-toolbar>
-      </ion-header>
-      <ion-content>
-        <ion-item>
-          <ion-label position="floating">RUT</ion-label>
-          <ion-input placeholder="RUT del usuario"></ion-input>
-        </ion-item>
-        <ion-item>
-          <ion-label position="floating">Nombre</ion-label>
-          <ion-input placeholder="Nombre del usuario"></ion-input>
-        </ion-item>
-      </ion-content>
-    </ng-template>
-  </ion-modal>
+  <ion-card class="transparent-card" style="border: none;">
+    <ion-grid>
+      <ion-row class="gridStyle">
+        <ion-col>
+          <ion-list [inset]="true">
+            <!-- Fila para el nombre del usuario -->
+            <ion-item>
+              <ion-label><strong>Nombre</strong></ion-label>
+              <ion-label>{{ usuario?.nombre }}</ion-label>
+            </ion-item>
+            <!-- Fila para los apellidos del usuario -->
+            <ion-item>
+              <ion-label><strong>Apellidos</strong></ion-label>
+              <ion-label>{{ usuario?.pApellido}} {{usuario?.sApellido }}</ion-label>
+            </ion-item>
+            <!-- Fila para el teléfono del usuario -->
+            <ion-item>
+              <ion-label><strong>Teléfono</strong></ion-label>
+              <ion-label>{{ usuario?.telefono }}</ion-label>
+            </ion-item>
+            <!-- Fila para la comuna del usuario -->
+            <ion-item>
+              <ion-label><strong>Comuna</strong></ion-label>
+              <ion-label>{{ usuario?.comuna }}</ion-label>
+            </ion-item>
+            <!-- Fila para la región del usuario -->
+            <ion-item>
+              <ion-label><strong>Región</strong></ion-label>
+              <ion-label>{{ usuario?.region }}</ion-label>
+            </ion-item>
+            <!-- Fila para el contacto de emergencia del usuario -->
+            <ion-item>
+              <ion-label><strong>Contacto Emergencia</strong></ion-label>
+              <ion-label>{{ usuario?.contactoEmergencia }}</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <div class="button-container">
+        <ion-button class="blue-button-gl" id="agregarContactoEmergencia">Editar</ion-button>
+      </div>
+    </ion-grid>
+  </ion-card>
 </ion-content>

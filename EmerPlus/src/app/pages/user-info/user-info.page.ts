@@ -14,9 +14,10 @@ export class UserInfoPage {
 
   constructor(private router: Router) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     // Accede al state pasado desde el LoginComponent
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['user']
+    console.info(this.router.getCurrentNavigation())
+    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario']
 
     if (this.usuario) {
       console.log('Usuario logueado:', this.usuario);

@@ -1,14 +1,4 @@
-/* Define la clase personalizada para el botón azul */
-.blue-button {
-  --background: linear-gradient(#1233eb, #3790e2, #1233eb);
-  /* Cambia el color de fondo a azul */
-  --background-activated: #a04c53;
-  /* Color al hacer clic (opcional) */
-  --background-hover: #e48890;
-  /* Color al pasar el cursor (opcional) */
-  color: #ffffff;
-  /* Color del texto */
-}
+@import 'src/global';
 
 .custom-text {
   font-family: 'Georgia', cursive;
@@ -16,6 +6,11 @@
   font-weight: 2.5rem;
   color: #db188d;
 
+}
+
+.blue-button-gl {
+  @extend .blue-button;
+  // Otros estilos específicos del componente
 }
 
 .modal-wrapper{
@@ -100,4 +95,54 @@ ion-content {
   /* Color del texto */
   font-size: 14px;
   /* Tamaño de la fuente */
+}
+//Quitar
+ion-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.primary-button {
+  --background: #3880ff;
+  --color: #fff;
+  --border-radius: 8px;
+}
+
+p {
+  font-size: 16px;
+  color: #333;
+}
+
+.centered-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  padding: 16px;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem; /* Tamaño del título */
+  margin-bottom: 16px;
+}
+
+.hero-text p {
+  font-size: 1.2rem; /* Tamaño del lema */
+}
+
+.hero-image {
+  max-width: 80%; /* Ajusta el tamaño de la imagen según sea necesario */
+  height: auto;
+  margin-bottom: 16px; /* Espacio entre la imagen y el texto */
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  /* Centra horizontalmente */
+  align-items: center;
+  /* Centra verticalmente si es necesario */
+  height: 100%;
+  /* Asegura que el contenedor ocupe todo el espacio disponible */
 }

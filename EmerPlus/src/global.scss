@@ -38,10 +38,30 @@
 
 ion-content {
     --background: linear-gradient(#db89b6, #feb47b, #e7cfbc);
-    ;
     /* Cambia a tu color deseado */
 }
 
 body {
     font-family: Arial, sans-serif;
-  }
+}
+
+.blue-button {
+    --background: linear-gradient(#1233eb, #3790e2, #1233eb);
+    /* Cambia el color de fondo a azul */
+    --background-activated: #a04c53;
+    /* Color al hacer clic (opcional) */
+    --background-hover: #e48890;
+    /* Color al pasar el cursor (opcional) */
+    color: #ffffff;
+    /* Color del texto */
+}
+
+ion-item{
+    --background: transparent;
+}
+
+ion-label{
+    --background: rgba(255, 255, 255, 0) !important;
+}
+              
+

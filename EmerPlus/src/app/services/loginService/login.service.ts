@@ -11,28 +11,63 @@ export class LoginService {
   // Define la lista de usuarios con roles asignados
   lista_de_usuarios: Usuario[] = [
     {
-      username: "usuario",
+      rut: "17799487-1",
       password: "usuario123",
-      rol: [this.rolService.getRolById(2)!] // Ajusta el rol según tu definición de Rol
+      nombre: "Nombre",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
+      rol: [this.rolService.getRolById(2)!]
     },
     {
-      username: "admin",
+      rut: "admin",
       password: "admin123",
+      nombre: "Nombre",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
       rol: [this.rolService.getRolById(1)!]
     },
     {
-      username: "bombero",
+      rut: "bombero",
       password: "bombero123",
+      nombre: "Nombre",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
       rol: [this.rolService.getRolById(3)!]
     },
     {
-      username: "policia",
+      rut: "policia",
       password: "policia123",
+      nombre: "Jose",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
       rol: [this.rolService.getRolById(4)!]
     },
     {
-      username: "ambulancia",
+      rut: "ambulancia",
       password: "ambulancia123",
+      nombre: "Nombre",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
       rol: [this.rolService.getRolById(5)!]
     },
   ];
@@ -40,7 +75,7 @@ export class LoginService {
 
   constructor(private rolService: RolService, private router: Router) { }
 
-  agregarRolAUsuarioPorId(username: string, rolId: number): void {
+  agregarRolAUsuarioPorId(rut: string, rolId: number): void {
     // Obtener el rol por su ID desde el servicio
     const rol = this.rolService.getRolById(rolId);
 
@@ -50,12 +85,12 @@ export class LoginService {
     }
 
     // Buscar el usuario en la lista
-    const usuario = this.lista_de_usuarios.find((u) => u.username === username);
+    const usuario = this.lista_de_usuarios.find((u) => u.rut === rut);
 
     if (usuario) {
       // Agregar el rol al usuario
       usuario.rol.push(rol);
-      console.log(`Rol ${rol.nombre} agregado al usuario ${username}`);
+      console.log(`Rol ${rol.nombre} agregado al usuario ${rut}`);
     } else {
       console.error('Usuario no encontrado');
     }
@@ -69,8 +104,17 @@ export class LoginService {
       const rolesNombres = usuario.rol.map((rol) => rol.nombre).join(', ');
 
       // Imprime en la consola los detalles del usuario
-      // Muestra el nombre de usuario, la contraseña y los nombres de los roles
-      console.log(`Username: ${usuario.username}, Password: ${usuario.password}, Rol: ${rolesNombres}`);
+      console.log(`Username: ${usuario.rut}, 
+        Password: ${usuario.password}, 
+        Nombre: ${usuario.nombre}, 
+        Primer Apellido: ${usuario.pApellido}, 
+        Segundo Apellido: ${usuario.sApellido}, 
+        Teléfono: ${usuario.telefono}, 
+        Región: ${usuario.region}, 
+        Comuna: ${usuario.comuna}, 
+        Contacto de Emergencia: ${usuario.contactoEmergencia}, 
+        Rol: ${rolesNombres}`);
+
     });
   }
 
@@ -78,11 +122,15 @@ export class LoginService {
   login(username: string, password: string): Usuario | undefined {
     // Busca el usuario en la lista comparando username y password
     const usuarioEncontrado = this.lista_de_usuarios.find(
-      (usuario) => usuario.username === username && usuario.password === password
+      (usuario) => usuario.rut === username && usuario.password === password
     );
 
     // Retorna el usuario encontrado o undefined si no se encontró
     return usuarioEncontrado;
+  }
+
+  isRUTExist(rut: string): boolean {
+    return this.lista_de_usuarios.some(usuario => usuario.rut === rut);
   }
 
 
