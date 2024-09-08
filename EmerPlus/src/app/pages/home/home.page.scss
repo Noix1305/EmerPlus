@@ -1,27 +1,4 @@
-/* Define la clase personalizada para el botón azul */
-.toolbar-title {
-  flex: 1;
-  /* Permite que el título tome el espacio disponible */
-  text-align: left;
-  /* Alinea el título a la izquierda */
-}
-
-.button-group {
-  display: flex;
-  gap: 8px;
-  /* Añade espacio entre los botones */
-}
-
-.blue-button {
-  flex-shrink: 0;
-  --background: linear-gradient(#1233eb, #3790e2, #1233eb);
-  /* Evita que los botones se reduzcan demasiado */
-  max-width: 120px;
-  padding: 0 8px;
-  /* Ajusta el padding para reducir el espacio */
-  font-size: 12px;
-  /* Limita el ancho máximo del botón */
-}
+@import 'src/global';
 
 .custom-text {
   font-family: 'Georgia', cursive;
@@ -31,7 +8,11 @@
 
 }
 
-.modal-wrapper {
+.blue-button-gl {
+  @extend .blue-button !optional;
+}
+
+.modal-wrapper{
   height: auto;
 }
 
@@ -114,11 +95,53 @@ ion-content {
   font-size: 14px;
   /* Tamaño de la fuente */
 }
+//Quitar
+ion-card {
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-@media (max-width: 600px) {
-  .toolbar-title .custom-text {
-    font-size: 14px;
-    /* Ajusta el tamaño del texto del título en pantallas pequeñas */
-  }
+.primary-button {
+  --background: #3880ff;
+  --color: #fff;
+  --border-radius: 8px;
+}
 
+p {
+  font-size: 16px;
+  color: #333;
+}
+
+.centered-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 100%;
+  padding: 16px;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem; /* Tamaño del título */
+  margin-bottom: 16px;
+}
+
+.hero-text p {
+  font-size: 1.2rem; /* Tamaño del lema */
+}
+
+.hero-image {
+  max-width: 80%; /* Ajusta el tamaño de la imagen según sea necesario */
+  height: auto;
+  margin-bottom: 16px; /* Espacio entre la imagen y el texto */
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  /* Centra horizontalmente */
+  align-items: center;
+  /* Centra verticalmente si es necesario */
+  height: 100%;
+  /* Asegura que el contenedor ocupe todo el espacio disponible */
 }

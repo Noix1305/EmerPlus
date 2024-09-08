@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Rol } from 'src/app/models/rol';
- // Asegúrate de que la ruta sea correcta
+
+// Define la interfaz Rol, ajusta según tu estructura si es necesario
+export interface Rol {
+  id: number;
+  nombre: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -29,7 +33,12 @@ export class RolService {
 
   // Método para agregar un nuevo rol (opcional)
   addRol(rol: Rol): void {
-    this.roles.push(rol);
+    // Puedes agregar validaciones antes de agregar el rol, como verificar que el ID no se repita
+    const exists = this.roles.some((existingRol) => existingRol.id === rol.id);
+    if (!exists) {
+      this.roles.push(rol);
+    } else {
+      console.error('El rol con este ID ya existe');
+    }
   }
-  
 }

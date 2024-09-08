@@ -1,0 +1,57 @@
+<ion-header>
+
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button class="blue-button-gl" id="agregarUser">Agregar Usuario</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card class="transparent-card" style="border: none;">
+    <ion-grid>
+      <ion-row class="gridStyle">
+        <ion-col>
+          <ion-list [inset]="true">
+            <!-- Fila para el nombre del usuario -->
+            <ion-item>
+              <ion-label><strong>Nombre</strong></ion-label>
+              <ion-label>{{ usuario?.nombre }}</ion-label>
+            </ion-item>
+            <!-- Fila para los apellidos del usuario -->
+            <ion-item>
+              <ion-label><strong>Apellidos</strong></ion-label>
+              <ion-label>{{ usuario?.pApellido}} {{usuario?.sApellido }}</ion-label>
+            </ion-item>
+            <!-- Fila para el teléfono del usuario -->
+            <ion-item>
+              <ion-label><strong>Teléfono</strong></ion-label>
+              <ion-label>{{ usuario?.telefono }}</ion-label>
+            </ion-item>
+            <!-- Fila para la comuna del usuario -->
+            <ion-item>
+              <ion-label><strong>Comuna</strong></ion-label>
+              <ion-label>{{ usuario?.comuna }}</ion-label>
+            </ion-item>
+            <!-- Fila para la región del usuario -->
+            <ion-item>
+              <ion-label><strong>Región</strong></ion-label>
+              <ion-label>{{ usuario?.region }}</ion-label>
+            </ion-item>
+            <!-- Fila para el contacto de emergencia del usuario -->
+            <ion-item>
+              <ion-label><strong>Contacto Emergencia</strong></ion-label>
+              <ion-label>{{ usuario?.contactoEmergencia }}</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-col>
+      </ion-row>
+      <div class="button-container">
+        <ion-button class="blue-button-gl" id="agregarContactoEmergencia">Editar</ion-button>
+      </div>
+    </ion-grid>
+  </ion-card>
+</ion-content>

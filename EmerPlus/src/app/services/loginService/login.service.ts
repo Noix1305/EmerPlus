@@ -1,56 +1,99 @@
 import { Injectable } from '@angular/core';
-import { Usuario } from '../../models/usuario';
+import { Usuario } from 'src/app/models/usuario';
 import { RolService } from '../rolService/rol.service';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
-  private currentUser: Usuario | null = null;
-  private passEncriptada: string = "";
 
+  // Define la lista de usuarios con roles asignados
   lista_de_usuarios: Usuario[] = [
     {
-      rut: "usuario",
-      password: "ufatsufatairimesober123",
-      rol: [this._rolService.getRolById(2)!]
+      rut: "17799487-1",
+      password: "usuario123",
+      nombre: "Nombre",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
+      rol: [this.rolService.getRolById(2)!]
     },
     {
       rut: "admin",
-      password: "aidmimesn123",
-      rol: [this._rolService.getRolById(1)!]
+      password: "admin123",
+      nombre: "Nombre",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
+      rol: [this.rolService.getRolById(1)!]
     },
     {
       rut: "bombero",
-      password: "bobermbenterrober123",
-      rol: [this._rolService.getRolById(3)!]
+      password: "bombero123",
+      nombre: "Nombre",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
+      rol: [this.rolService.getRolById(3)!]
     },
     {
       rut: "policia",
       password: "policia123",
-      rol: [this._rolService.getRolById(4)!]
+      nombre: "Jose",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
+      rol: [this.rolService.getRolById(4)!]
     },
     {
       rut: "ambulancia",
-      password: "poberlimescimesai123",
-      rol: [this._rolService.getRolById(5)!],
+      password: "ambulancia123",
+      nombre: "Nombre",
+      pApellido: "Primer Apellido",
+      sApellido: "Segundo apellido",
+      telefono: 947421590,
+      region: "Region",
+      comuna: "Comuna",
+      contactoEmergencia: 947421590,
+      rol: [this.rolService.getRolById(5)!]
     },
-
   ];
 
-  constructor(private _rolService: RolService) { }
 
+  constructor(private rolService: RolService, private router: Router) { }
 
-  encontrar_usuario(rut: string, password: string): Usuario | undefined {
-    this.passEncriptada= this.encryptText(password);
-    for (let i = 0; i < this.lista_de_usuarios.length; i++) {
-      if (this.lista_de_usuarios[i].rut === rut && this.lista_de_usuarios[i].password === this.passEncriptada) {
-        this.currentUser = this.lista_de_usuarios[i];
-        console.log(this.currentUser);
-        return this.currentUser;
-      }
+  agregarRolAUsuarioPorId(rut: string, rolId: number): void {
+    // Obtener el rol por su ID desde el servicio
+    const rol = this.rolService.getRolById(rolId);
+
+    if (!rol) {
+      console.error('Rol no encontrado');
+      return;
     }
-    return undefined;
+
+    // Buscar el usuario en la lista
+    const usuario = this.lista_de_usuarios.find((u) => u.rut === rut);
+
+    if (usuario) {
+      // Agregar el rol al usuario
+      usuario.rol.push(rol);
+      console.log(`Rol ${rol.nombre} agregado al usuario ${rut}`);
+    } else {
+      console.error('Usuario no encontrado');
+    }
   }
 
   mostrarUsuarios() {
@@ -61,21 +104,34 @@ export class LoginService {
       const rolesNombres = usuario.rol.map((rol) => rol.nombre).join(', ');
 
       // Imprime en la consola los detalles del usuario
-      // Muestra el nombre de usuario, la contraseña y los nombres de los roles
-      console.log(`Username: ${usuario.rut}, Password: ${usuario.password}, Rol: ${rolesNombres}`);
+      console.log(`Username: ${usuario.rut}, 
+        Password: ${usuario.password}, 
+        Nombre: ${usuario.nombre}, 
+        Primer Apellido: ${usuario.pApellido}, 
+        Segundo Apellido: ${usuario.sApellido}, 
+        Teléfono: ${usuario.telefono}, 
+        Región: ${usuario.region}, 
+        Comuna: ${usuario.comuna}, 
+        Contacto de Emergencia: ${usuario.contactoEmergencia}, 
+        Rol: ${rolesNombres}`);
+
     });
   }
 
-  encryptText(password: string): string {
-    // Reemplaza cada letra según las reglas de encriptación
-    const encryptedText = password
-      .replace(/e/g, 'enter')
-      .replace(/i/g, 'imes')
-      .replace(/a/g, 'ai')
-      .replace(/o/g, 'ober')
-      .replace(/u/g, 'ufat');
-  
-    return encryptedText;
-  }
-}  
+  // Función de inicio de sesión
+  login(username: string, password: string): Usuario | undefined {
+    // Busca el usuario en la lista comparando username y password
+    const usuarioEncontrado = this.lista_de_usuarios.find(
+      (usuario) => usuario.rut === username && usuario.password === password
+    );
 
+    // Retorna el usuario encontrado o undefined si no se encontró
+    return usuarioEncontrado;
+  }
+
+  isRUTExist(rut: string): boolean {
+    return this.lista_de_usuarios.some(usuario => usuario.rut === rut);
+  }
+
+
+}
