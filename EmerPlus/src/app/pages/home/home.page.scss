@@ -17,12 +17,12 @@
 }
 
 .new-background-color {
-  --background: linear-gradient(45deg, #ccbfc7, #eeacca);
+  --background: linear-gradient(45deg, #e4e0e2, #eeebec);
 }
 
 ion-content {
   /* Opcional: establece el color de fondo */
-  --background: linear-gradient(45deg, #ccbfc7, #eeacca);
+  --background: linear-gradient(45deg, #ddd9dc, #f1eef0);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -144,4 +144,10 @@ p {
   /* Centra verticalmente si es necesario */
   height: 100%;
   /* Asegura que el contenedor ocupe todo el espacio disponible */
+}
+
+.error-message {
+  color: red; /* Ajusta el color según tus necesidades */
+  font-size: 16px;
+  margin-top: 10px;
 }

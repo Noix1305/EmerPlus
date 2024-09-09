@@ -1,6 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { AlertController, IonModal } from '@ionic/angular';
-import { OverlayEventDetail } from '@ionic/core/components';
+import {  IonModal } from '@ionic/angular';
 
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/loginService/login.service';
@@ -28,6 +27,7 @@ export class HomePage {
       // Limpia los campos de entrada
       this.username = '';
       this.password = '';
+      this.errorMessage = '',
 
       // Cierra el modal
       modal.dismiss(null, 'cancel');
@@ -41,22 +41,36 @@ export class HomePage {
   }
 
   onLogin() {
+    // Encripta la contraseña antes de enviar al servicio de login
     this.password = this._loginService.encryptText(this.password);
-    const user = this._loginService.login(this.username, this.password);
-
-    if (user) {
-      // Si se encuentra el usuario, redirige y cierra el modal de inicio de sesión
-      this.router.navigate(['user-info'], {
-        state: {
-          usuario: user // Asegúrate de que 'usuario' tenga los datos correctos
-        }
-      });
-      this.closeModal(this.loginModal); // Asegúrate de que se cierra el modal correcto
-    } else {
-      this.errorMessage = 'Credenciales incorrectas';
-      console.error('Credenciales incorrectas');
+  
+    // Intenta autenticar al usuario
+    try {
+      const user = this._loginService.login(this.username, this.password);
+  
+      if (user) {
+        // Si el usuario es encontrado, redirige y cierra el modal
+        this.router.navigate(['user-info'], {
+          state: { usuario: user }
+        }).then(() => {
+          this.closeModal(this.loginModal);
+        }).catch(error => {
+          // Maneja errores de redirección aquí
+          console.error('Error al redirigir:', error);
+          this.errorMessage = 'No se pudo redirigir al usuario. Inténtalo de nuevo.';
+        });
+      } else {
+        // Si las credenciales son incorrectas, muestra un mensaje de error
+        this.errorMessage = 'Credenciales incorrectas';
+        console.error('Credenciales incorrectas');
+      }
+    } catch (error) {
+      // Maneja cualquier error que pueda ocurrir en el proceso de login
+      console.error('Error durante el proceso de login:', error);
+      this.errorMessage = 'Ocurrió un error inesperado. Inténtalo de nuevo.';
     }
   }
+  
 
   // Método para manejar el formulario de registro
   async handleRegistroSubmit(event: Event) {

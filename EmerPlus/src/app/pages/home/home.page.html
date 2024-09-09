@@ -5,7 +5,7 @@
     </ion-title>
     <ion-buttons slot="end">
       <ion-button expand="block" class="blue-button-gl" id="loginModal">Ingreso</ion-button>
-      <ion-button expand="block" class="blue-button-gl" (click)="mostrarUsuarios()">Mostrar Usuarios</ion-button>
+      <!-- <ion-button expand="block" class="blue-button-gl" (click)="mostrarUsuarios()">Mostrar Usuarios</ion-button> -->
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -87,6 +87,9 @@
           </ion-item>
           <ion-button expand="block" class="blue-button-gl" (click)="onLogin()">Login</ion-button>
           <ion-button expand="block" class="blue-button-gl" (click)="closeModal(loginModal)">Cancelar</ion-button>
+          <div>
+            <p *ngIf="errorMessage" class="error-message" style="--background: transparent;">{{errorMessage}}</p>
+          </div>
         </ion-list>
       </ion-content>
     </ng-template>
