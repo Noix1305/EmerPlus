@@ -13,16 +13,16 @@ export class LoginService {
   // Define la lista de usuarios con roles asignados
   lista_de_usuarios: Usuario[] = [
     {
-      rut: "17799487-1",
+      rut: "usuario",
       password: "u#f0a&tsu#f0a&t!a%i&ri#m0e%so#b%e&r123",
       nombre: "Nombre",
-      pApellido: "Pino",
-      sApellido: "Araya",
+      pApellido: "1er Apellido",
+      sApellido: "2do Apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
       contactoEmergencia: {
-        rut_usuario: "17799487-1",
+        rut_usuario: "Usuario",
         nombre: "Juan Pérez",
         telefono: 912345678,
         correo: "juanperez@gmail.com",
@@ -33,7 +33,7 @@ export class LoginService {
     {
       rut: "admin",
       password: "!a%i&dmi#m0e%sn123",
-      nombre: "Admin",
+      nombre: "Administrador",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
@@ -45,7 +45,7 @@ export class LoginService {
     {
       rut: "bombero",
       password: "bo#b%e&rmbe#n=t0e!r%ro#b%e&r123",
-      nombre: "Nombre",
+      nombre: "Bombero",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
@@ -57,7 +57,7 @@ export class LoginService {
     {
       rut: "policia",
       password: "po#b%e&rli#m0e%sci#m0e%s!a%i&123",
-      nombre: "Jose",
+      nombre: "Policia",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
@@ -69,7 +69,7 @@ export class LoginService {
     {
       rut: "ambulancia",
       password: "!a%i&mbu#f0a&tl!a%i&nci#m0e%s!a%i&123",
-      nombre: "Nombre",
+      nombre: "Ambulancia",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
