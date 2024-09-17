@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import {  IonModal } from '@ionic/angular';
+import {  IonModal, MenuController } from '@ionic/angular';
 
 import { Router } from '@angular/router';
 import { LoginService } from '../../services/loginService/login.service';
@@ -20,7 +20,7 @@ export class HomePage {
   message = 'Ingresar Credenciales';
   errorMessage: string = '';
 
-  constructor(private _loginService: LoginService, private router: Router) { }
+  constructor(private _loginService: LoginService, private router: Router, private menu: MenuController) { }
 
   closeModal(modal: IonModal) {
     if (modal) {
