@@ -10,7 +10,8 @@ const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
-  },  {
+  },
+  {
     path: 'user-info',
     loadChildren: () => import('./pages/user-info/user-info/user-info.module').then( m => m.UserInfoPageModule)
   },

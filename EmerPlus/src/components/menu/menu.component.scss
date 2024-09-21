@@ -1,0 +1,16 @@
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Esto centra verticalmente si el contenedor tiene altura */
+  }
+  
+  ion-menu ion-item {
+    transition: all 0.3s ease; /* Transición suave */
+  }
+  
+  ion-menu ion-item:hover {
+    background-color: rgba(128, 128, 128, 0.3) !important; /* Fondo gris al pasar el mouse */
+    color: gray !important; /* Cambia el color del texto */
+    font-size: 1.1rem !important; /* Aumenta el tamaño de la fuente */
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3) !important; /* Sombra de texto */
+  }

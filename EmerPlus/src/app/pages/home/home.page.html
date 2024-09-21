@@ -1,24 +1,6 @@
 <ion-app>
   <!-- Menú lateral -->
-  <ion-menu contentId="main-content">
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Menu Content</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content class="ion-padding">
-      <ion-list>
-        <ion-item routerLink="/home">
-          <ion-icon slot="start" name="home"></ion-icon>
-          <ion-label>Home</ion-label>
-        </ion-item>
-        <ion-item>
-          <ion-button  expand="block" class="blue-button-gl" id="loginModal">Ingreso</ion-button>
-        </ion-item>
-      </ion-list>
-    </ion-content>
-  </ion-menu>
-
+  <app-menu></app-menu>
   <!-- Contenido principal -->
   <ion-router-outlet id="main-content">
     <ion-header>
@@ -35,82 +17,11 @@
         <h1>EmerPlus</h1>
         <img src="/assets/imgs/911.jpg" alt="EmerPlus Logo" class="hero-image" style="border-radius: 5%;" />
         <p>Conectándote con la ayuda que necesitas, cuando la necesitas.</p>
-        <!-- Botón para abrir el modal -->
+        <!-- Botón para abrir el modal de Registro -->
         <div class="button-container">
-          <ion-button class="blue-button-gl" id="modalRegistro">Registrarse</ion-button>
+          <ion-button (click)="openRegistroModal()">Registrar</ion-button>
         </div>
       </div>
-
-      <!-- Modal para registro -->
-      <ion-modal #modalRegistro trigger="modalRegistro">
-        <ng-template>
-          <ion-header>
-            <ion-toolbar>
-              <ion-title>Registro</ion-title>
-              <ion-buttons slot="end">
-                <ion-button (click)="closeModal(modalRegistro)">Cerrar</ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content>
-            <form (submit)="handleRegistroSubmit($event)">
-              <ion-item>
-                <ion-label position="floating">RUT</ion-label>
-                <ion-input name="rut" type="text" placeholder=""></ion-input>
-              </ion-item>
-              <ion-item>
-                <ion-label position="floating">Contraseña</ion-label>
-                <ion-input name="password" type="password" placeholder="">
-                  <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-                </ion-input>
-              </ion-item>
-              <ion-item>
-                <ion-label position="floating">Repetir Contraseña</ion-label>
-                <ion-input name="repeatPassword" type="password" placeholder="">
-                  <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-                </ion-input>
-              </ion-item>
-              <!-- Mensaje de error -->
-              <ion-text color="danger" *ngIf="errorMessage">{{ errorMessage }}</ion-text>
-              <ion-button class="blue-button-gl" expand="block" type="submit">Registrar</ion-button>
-            </form>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-
-      <!-- Modal de login -->
-      <ion-modal #loginModal trigger="loginModal">
-        <ng-template>
-          <ion-header>
-            <ion-toolbar class="new-background-color">
-              <ion-title>Ingresar</ion-title>
-              <ion-buttons slot="end">
-                <ion-button (click)="closeModal(loginModal)">Close</ion-button>
-              </ion-buttons>
-            </ion-toolbar>
-          </ion-header>
-          <ion-content class="modal-wrapper">
-            <ion-list>
-              <ion-item>
-                <ion-label position="floating">Username</ion-label>
-                <ion-input [(ngModel)]="username" type="text"></ion-input>
-              </ion-item>
-              <ion-item>
-                <ion-label position="floating">Password</ion-label>
-                <ion-input [(ngModel)]="password" type="password">
-                  <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-                </ion-input>
-              </ion-item>
-              <ion-button expand="block" class="blue-button-gl" (click)="onLogin()">Login</ion-button>
-              <ion-button expand="block" class="blue-button-gl" (click)="closeModal(loginModal)">Cancelar</ion-button>
-              <div>
-                <p *ngIf="errorMessage" class="error-message" style="--background: transparent;">{{errorMessage}}</p>
-              </div>
-            </ion-list>
-          </ion-content>
-        </ng-template>
-      </ion-modal>
-
       <footer class="footer">
         <p>&copy; 2024 Mi Empresa. Todos los derechos reservados.</p>
       </footer>

@@ -46,6 +46,45 @@ body {
     font-family: Arial, sans-serif;
 }
 
+ion-content {
+    --background: linear-gradient(135deg, rgba(240, 174, 207, 0.8), rgba(180, 230, 243, 0.8));
+    /* Cambia los colores y ángulo según tus preferencias */
+}
+
+ion-item {
+    --padding-start: 0;
+    /* Ajusta el espaciado si es necesario */
+    --inner-padding-end: 0;
+    --background: transparent;
+    /* Ajusta el espaciado del lado del botón */
+}
+
+ion-buttons {
+    margin-left: auto;
+    /* Empuja el botón hacia el extremo derecho */
+}
+
+ion-toolbar {
+    --background: linear-gradient(135deg, rgba(240, 174, 207, 0.8), rgba(180, 230, 243, 0.8));
+    /* Cambia los colores y ángulo según tus preferencias */
+}
+
+ion-menu{
+    background-color: transparent !important;
+}
+
+ion-list{
+    background-color: transparent !important;
+}
+
+ion-card{
+    background-color: transparent !important;
+}
+
+ion-input{
+    text-align:start;
+}
+
 .blue-button {
     --background: #007bff;
     /* Color de fondo azul */
@@ -58,14 +97,3 @@ body {
     /* Asegura que esté por encima de otros elementos */
 }
 
-ion-item {
-    --padding-start: 0;
-    /* Ajusta el espaciado si es necesario */
-    --inner-padding-end: 0;
-    /* Ajusta el espaciado del lado del botón */
-}
-
-ion-buttons {
-    margin-left: auto;
-    /* Empuja el botón hacia el extremo derecho */
-}

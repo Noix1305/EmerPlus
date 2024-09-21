@@ -1,0 +1,45 @@
+
+  <ion-menu contentId="main-content">
+    <ion-header>
+      <ion-toolbar>
+        <ion-title color="secondary">Menu de Inicio</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content class="ion-padding transparent-bg">
+      <ion-list>
+        <ion-item routerLink="/home">
+          <ion-icon slot="start" name="home" color="secondary"></ion-icon>
+          <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+          <ion-label>Inicio</ion-label>
+        </ion-item>
+        <ion-item (click)="openLoginModal()">
+          <ion-icon slot="start" name="log-in" color="secondary"></ion-icon>
+          <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+          <ion-label>Ingresar</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" name="person" color="secondary"></ion-icon>
+          <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+          <ion-label>Perfil</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" name="location" color="secondary"></ion-icon>
+          <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+          <ion-label>Ubicación</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" name="settings" color="secondary"></ion-icon>
+          <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+          <ion-label>Configuración</ion-label>
+        </ion-item>
+        <ion-item>
+          <ion-icon slot="start" name="log-out" color="secondary"></ion-icon>
+          <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+          <ion-label>Cerrar Sesión</ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-content>
+    <div class="footer">
+      <em style="font-size: 0.75rem;">Powered by Ionic - Version 0.0.1 - 2024</em>
+    </div>
+  </ion-menu>

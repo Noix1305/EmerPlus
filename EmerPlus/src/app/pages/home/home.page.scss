@@ -16,13 +16,8 @@
   height: auto;
 }
 
-.new-background-color {
-  --background: linear-gradient(45deg, #e4e0e2, #eeebec);
-}
-
 ion-content {
   /* Opcional: establece el color de fondo */
-  --background: linear-gradient(45deg, #ddd9dc, #f1eef0);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -72,20 +67,16 @@ ion-content {
 }
 
 .footer {
-  background-color: #f8f8f8;
-  /* Color de fondo del footer */
-  text-align: center;
-  /* Centra el texto horizontalmente */
-  padding: 10px 0;
-  /* Espacio alrededor del texto */
-  position: absolute;
-  /* Fija el footer en la parte inferior */
+  position: fixed;
   bottom: 0;
+  left: 0;
   width: 100%;
-  /* Asegura que el footer ocupe todo el ancho de la pantalla */
-  border-top: 1px solid #ddd;
-  /* Añade una línea superior */
+  text-align: center;
+  padding: 10px;
+  background-color: transparent;
+  border-top: 1px solid #e7e7e7;
 }
+
 
 .footer p {
   margin: 0;
@@ -99,6 +90,20 @@ ion-content {
 ion-card {
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+ion-content {
+  --background: linear-gradient(135deg, rgba(240, 174, 207, 0.5), rgba(180, 230, 243, 0.5)); /* Fondo semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+ion-card {
+  width: 80%;
+  max-width: 400px;
+  background: white; /* Fondo blanco para la card */
+  border-radius: 10px;
 }
 
 .primary-button {
@@ -151,4 +156,13 @@ p {
   font-size: 16px;
   margin-top: 10px;
 }
+
+.custom-modal {
+  --width: 90%; /* Ancho del modal */
+  --max-width: 600px; /* Ancho máximo */
+  --height: auto; /* Altura automática */
+}
+
+
+
 
