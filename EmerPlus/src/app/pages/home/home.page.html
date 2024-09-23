@@ -6,6 +6,8 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="end">
+          <ion-icon name="person" color="secondary"></ion-icon>
+          <ion-button (click)="presentLoginModal()">Ingresar</ion-button>
           <ion-menu-button></ion-menu-button>
         </ion-buttons>
         <ion-title class="custom-text">Emerplus</ion-title>
@@ -19,7 +21,7 @@
         <p>Conectándote con la ayuda que necesitas, cuando la necesitas.</p>
         <!-- Botón para abrir el modal de Registro -->
         <div class="button-container">
-          <ion-button (click)="openRegistroModal()">Registrar</ion-button>
+          <ion-button (click)="openRegistroModal()">Registrarse</ion-button>
         </div>
       </div>
       <footer class="footer">

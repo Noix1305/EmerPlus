@@ -21,6 +21,7 @@ export class LoginService {
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"usuario@gmail.com",
       contactoEmergencia: {
         rut_usuario: "Usuario",
         nombre: "Juan Pérez",
@@ -39,6 +40,7 @@ export class LoginService {
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"admin@gmail.com",
       contactoEmergencia: undefined,
       rol: [this._rolService.getRolByIds([1])[0]!]
     },
@@ -51,6 +53,7 @@ export class LoginService {
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"bombero@gmail.com",
       contactoEmergencia: undefined,
       rol: [this._rolService.getRolByIds([3])[0]!]
     },
@@ -63,6 +66,7 @@ export class LoginService {
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"policia@gmail.com",
       contactoEmergencia: undefined,
       rol: [this._rolService.getRolByIds([4])[0]!]
     },
@@ -75,6 +79,7 @@ export class LoginService {
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"ambulancia@gmail.com",
       contactoEmergencia: undefined,
       rol: [this._rolService.getRolByIds([5])[0]!]
     },
@@ -171,6 +176,7 @@ export class LoginService {
         Teléfono: ${usuario.telefono}, 
         Región: ${usuario.region}, 
         Comuna: ${usuario.comuna}, 
+        Correo:${usuario.correo},
         Contacto de Emergencia: ${usuario.contactoEmergencia}, 
         Rol: ${rolesNombres}`);
     });
@@ -193,6 +199,15 @@ export class LoginService {
     // Retorna true si el RUT ya está registrado, de lo contrario retorna false.
 
     return this.lista_de_usuarios.some(usuario => usuario.rut === rut);
+  }
+
+  getUserByRUT(rut: string) {
+    return this.lista_de_usuarios.find(user => user.rut === rut);
+  }
+
+  verifarEmailConRUT(rut: string, email: string): boolean {
+    const user = this.getUserByRUT(rut);
+    return user ? user.correo === email : false;
   }
 
   encryptText(texto: string) {
