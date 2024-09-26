@@ -1,9 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
-import { AlertController, IonModal } from '@ionic/angular';
-import { OverlayEventDetail } from '@ionic/core/components';
-
-import { Router } from '@angular/router';
+import { Component } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { LoginService } from '../../services/loginService/login.service';
+import { RegistroModalComponent } from '../../../components/registro-modal/registro-modal.component';
+import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -11,62 +10,50 @@ import { LoginService } from '../../services/loginService/login.service';
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
-  @ViewChild('modalRegistro', { static: false }) modalRegistro!: IonModal; // Captura el modal de registro específicamente
-  @ViewChild('loginModal', { static: false }) loginModal!: IonModal;
-  
-  username: string = '';
-  password: string = '';
+  placeholderVisible: boolean = true;
 
-  name!: string;
-  message = 'Ingresar Credenciales';
-  errorMessage: string = '';
+  constructor(private _loginService: LoginService, private modalController: ModalController) { }
 
-  constructor(private _loginService: LoginService, private router: Router) { }
+  // Abrir el modal de registro
 
-  closeModal(modal: IonModal) {
+
+
+  async openRegistroModal() {
+    const modal = await this.modalController.create({
+      component: RegistroModalComponent,
+    });
+    return await modal.present();
+  }
+
+  // Abrir el modal de login
+  async openLoginModal() {
+    const modal = await this.modalController.create({
+      component: LoginModalComponent,
+    });
+    return await modal.present();
+  }
+
+  // Mostrar usuarios del servicio de login
+  mostrarUsuarios() {
+    this._loginService.mostrarUsuarios();
+  }
+
+  // Método de cierre para cualquier modal
+  async closeModal(modal: HTMLIonModalElement) {
     if (modal) {
-      // Limpia los campos de entrada
-      this.username = '';
-      this.password = '';
-
-      // Cierra el modal
-      modal.dismiss(null, 'cancel');
+      await modal.dismiss();
     } else {
       console.error('El modal no está disponible para cerrar.');
     }
   }
 
-  mostrarUsuarios() {
-    this._loginService.mostrarUsuarios();
+  async presentLoginModal() {
+    const modal = await this.modalController.create({
+      component: LoginModalComponent,
+      componentProps: {
+        openRegistroModal: this.openRegistroModal.bind(this) // Asegúrate de que esta función está enlazada
+      }
+    });
+    return await modal.present();
   }
-
-  onLogin() {
-    this.password = this._loginService.encryptText(this.password);
-    const user = this._loginService.login(this.username, this.password);
-
-    if (user) {
-      // Si se encuentra el usuario, redirige y cierra el modal de inicio de sesión
-      this.router.navigate(['user-info'], {
-        state: {
-          usuario: user // Asegúrate de que 'usuario' tenga los datos correctos
-        }
-      });
-      this.closeModal(this.loginModal); // Asegúrate de que se cierra el modal correcto
-    } else {
-      this.errorMessage = 'Credenciales incorrectas';
-      console.error('Credenciales incorrectas');
-    }
-  }
-
-  // Método para manejar el formulario de registro
-  async handleRegistroSubmit(event: Event) {
-    // Espera a que se complete la función handleAddUserSubmit y captura su resultado
-    const success = await this._loginService.handleAddUserSubmit(event);
-  
-    // Si el usuario fue agregado correctamente, cierra el modal de registro
-    if (success) {
-      this.closeModal(this.modalRegistro);
-    }
-  }
-  
 }

@@ -13,16 +13,17 @@ export class LoginService {
   // Define la lista de usuarios con roles asignados
   lista_de_usuarios: Usuario[] = [
     {
-      rut: "17799487-1",
+      rut: "usuario",
       password: "u#f0a&tsu#f0a&t!a%i&ri#m0e%so#b%e&r123",
       nombre: "Nombre",
-      pApellido: "Pino",
-      sApellido: "Araya",
+      pApellido: "1er Apellido",
+      sApellido: "2do Apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"usuario@gmail.com",
       contactoEmergencia: {
-        rut_usuario: "17799487-1",
+        rut_usuario: "Usuario",
         nombre: "Juan Pérez",
         telefono: 912345678,
         correo: "juanperez@gmail.com",
@@ -33,48 +34,52 @@ export class LoginService {
     {
       rut: "admin",
       password: "!a%i&dmi#m0e%sn123",
-      nombre: "Admin",
+      nombre: "Administrador",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"admin@gmail.com",
       contactoEmergencia: undefined,
       rol: [this._rolService.getRolByIds([1])[0]!]
     },
     {
       rut: "bombero",
       password: "bo#b%e&rmbe#n=t0e!r%ro#b%e&r123",
-      nombre: "Nombre",
+      nombre: "Bombero",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"bombero@gmail.com",
       contactoEmergencia: undefined,
       rol: [this._rolService.getRolByIds([3])[0]!]
     },
     {
       rut: "policia",
       password: "po#b%e&rli#m0e%sci#m0e%s!a%i&123",
-      nombre: "Jose",
+      nombre: "Policia",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"policia@gmail.com",
       contactoEmergencia: undefined,
       rol: [this._rolService.getRolByIds([4])[0]!]
     },
     {
       rut: "ambulancia",
       password: "!a%i&mbu#f0a&tl!a%i&nci#m0e%s!a%i&123",
-      nombre: "Nombre",
+      nombre: "Ambulancia",
       pApellido: "Primer Apellido",
       sApellido: "Segundo apellido",
       telefono: 947421590,
       region: "Region",
       comuna: "Comuna",
+      correo:"ambulancia@gmail.com",
       contactoEmergencia: undefined,
       rol: [this._rolService.getRolByIds([5])[0]!]
     },
@@ -88,24 +93,24 @@ export class LoginService {
   async updateUser(rut: string, updatedUser: Partial<Usuario>): Promise<boolean> {
     // Buscar el usuario en la lista usando el RUT proporcionado
     const usuario = this.lista_de_usuarios.find((u) => u.rut === rut);
-  
+
     if (!usuario) {
       console.error('Usuario no encontrado');
       return false;
     }
-  
+
     // Actualizar los detalles del usuario encontrado con los datos proporcionados
     Object.assign(usuario, updatedUser);
-  
+
     console.log(`Usuario con RUT ${rut} actualizado`, usuario);
-  
+
     return true;
   }
 
   updateContact(rut: string, updatedContact: Contacto): boolean {
     // Busca al usuario en la lista utilizando el RUT
     const usuario = this.lista_de_usuarios.find(u => u.rut === rut);
-  
+
     if (usuario) {
       // Actualiza el contacto de emergencia del usuario
       usuario.contactoEmergencia = updatedContact;
@@ -116,8 +121,8 @@ export class LoginService {
       return false; // Indica que la actualización falló
     }
   }
-  
-  
+
+
 
   agregarUsuario(usuario: Usuario) {
     // Agrega un nuevo usuario a la lista de usuarios y lo muestra en la consola.
@@ -171,6 +176,7 @@ export class LoginService {
         Teléfono: ${usuario.telefono}, 
         Región: ${usuario.region}, 
         Comuna: ${usuario.comuna}, 
+        Correo:${usuario.correo},
         Contacto de Emergencia: ${usuario.contactoEmergencia}, 
         Rol: ${rolesNombres}`);
     });
@@ -193,6 +199,15 @@ export class LoginService {
     // Retorna true si el RUT ya está registrado, de lo contrario retorna false.
 
     return this.lista_de_usuarios.some(usuario => usuario.rut === rut);
+  }
+
+  getUserByRUT(rut: string) {
+    return this.lista_de_usuarios.find(user => user.rut === rut);
+  }
+
+  verifarEmailConRUT(rut: string, email: string): boolean {
+    const user = this.getUserByRUT(rut);
+    return user ? user.correo === email : false;
   }
 
   encryptText(texto: string) {
@@ -230,19 +245,26 @@ export class LoginService {
   }
 
   async handleAddUserSubmit(event: Event) {
-    // Maneja la lógica de agregar un nuevo usuario al sistema desde un formulario.
-    // Verifica la coincidencia de contraseñas, valida el RUT, comprueba si el RUT ya está registrado,
-    // encripta la contraseña y crea el usuario con el rol indicado o uno por defecto.
-    // Muestra alertas en caso de error o éxito.
-
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
     const rut = formData.get('rut') as string;
     let password = formData.get('password') as string;
     const repeatPassword = formData.get('repeatPassword') as string;
-    const rolId = parseInt(formData.get('rol') as string, 10) || this.defaultRoleId; // Obtiene el rol del formulario, usa el por defecto si no se especifica
+    const rolId = parseInt(formData.get('rol') as string, 10) || this.defaultRoleId; // Usa el rol por defecto si no se especifica.
 
+    // Validar que el campo de contraseña no esté vacío
+    if (!password || !repeatPassword) {
+      const alert = await this.alertController.create({
+        header: 'Error',
+        message: 'La contraseña no puede estar vacía.',
+        buttons: ['OK']
+      });
+      await alert.present();
+      return;
+    }
+
+    // Validar que las contraseñas coincidan
     if (password !== repeatPassword) {
       const alert = await this.alertController.create({
         header: 'Error',
@@ -306,6 +328,7 @@ export class LoginService {
     await alert.present();
     return true;
   }
+
 
   validateRUT(rut: string): boolean {
     // Valida si un RUT es correcto utilizando la fórmula de verificación del dígito verificador.

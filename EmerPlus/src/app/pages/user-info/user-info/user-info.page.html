@@ -13,7 +13,7 @@
 
 <ion-content>
   <p class="perfil-titulo">PERFIL DEL USUARIO</p>
-  <ion-card class="transparent-card" style="border: none;">
+  <ion-card style="border: none;">
     <ion-grid>
       <ion-row class="gridStyle">
         <ion-col>
@@ -153,24 +153,24 @@
         <ion-list>
           <ion-item>
             <ion-label position="floating">Nombre</ion-label>
-            <ion-input name="nombre" type="text" [(ngModel)]="usuario.nombre" required></ion-input>
+            <ion-input name="nombre" type="text" [(ngModel)]="usuario.nombre"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Apellidos</ion-label>
-            <ion-input name="pApellido" type="text" [(ngModel)]="usuario.pApellido" required></ion-input>
-            <ion-input name="sApellido" type="text" [(ngModel)]="usuario.sApellido" required></ion-input>
+            <ion-input name="pApellido" type="text" [(ngModel)]="usuario.pApellido"></ion-input>
+            <ion-input name="sApellido" type="text" [(ngModel)]="usuario.sApellido"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Teléfono</ion-label>
-            <ion-input name="telefono" type="text" [(ngModel)]="usuario.telefono" required></ion-input>
+            <ion-input name="telefono" type="text" [(ngModel)]="usuario.telefono"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Comuna</ion-label>
-            <ion-input name="comuna" type="text" [(ngModel)]="usuario.comuna" required></ion-input>
+            <ion-input name="comuna" type="text" [(ngModel)]="usuario.comuna"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Región</ion-label>
-            <ion-input name="region" type="text" [(ngModel)]="usuario.region" required></ion-input>
+            <ion-input name="region" type="text" [(ngModel)]="usuario.region"></ion-input>
           </ion-item>
           <ion-item>
             <ion-buttons slot="start">
