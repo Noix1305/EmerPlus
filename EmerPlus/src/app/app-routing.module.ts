@@ -15,6 +15,14 @@ const routes: Routes = [
     path: 'user-info',
     loadChildren: () => import('./pages/user-info/user-info/user-info.module').then( m => m.UserInfoPageModule)
   },
+  {
+    path: 'login',
+    loadChildren: () => import('./pages/login/login.module').then( m => m.LoginPageModule)
+  },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./pages/dashboard/dashboard.module').then( m => m.DashboardPageModule)
+  },
 
 ];
 
