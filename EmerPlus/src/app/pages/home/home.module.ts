@@ -9,6 +9,7 @@ import { MenuComponent } from 'src/components/menu/menu.component';
 import { RegistroModalComponent } from 'src/components/registro-modal/registro-modal.component';
 import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.component';
 
+
 @NgModule({
   imports: [
     CommonModule,

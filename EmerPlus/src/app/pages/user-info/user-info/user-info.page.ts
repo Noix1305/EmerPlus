@@ -145,14 +145,9 @@ export class UserInfoPage {
       // No se incluye `rut` aquí porque se toma del usuario logueado
     };
 
-    const success = await this._loginService.updateUser(this.usuario.rut, updatedUser);
+    
 
-    if (success) {
-      this.usuario = { ...this.usuario, ...updatedUser };
-      this.closeEditUserModal();
-    } else {
-      // Manejar fallo en la actualización
-    }
+    
   }
 
   openEditContactModal() {
@@ -196,18 +191,8 @@ export class UserInfoPage {
     }
 
     // Actualizar el contacto usando el servicio
-    const success = this._loginService.updateContact(this.usuario!.rut, updatedContact);
 
-    if (success) {
-      this.usuario = {
-        ...this.usuario,
-        contactoEmergencia: updatedContact,
-      };
-      this.closeEditContactModal();
-    } else {
-      // Manejar fallo en la actualización
-      console.error('Error al actualizar el contacto de emergencia.');
-    }
+    
   }
 }
 

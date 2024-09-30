@@ -4,8 +4,8 @@
 
 export const environment = {
   production: false,
-  supabaseUrl: 'https://tu-supabase-url.supabase.co',
-  supabaseKey: 'tu-supabase-api-key',
+  supabaseUrl: 'https://ndmnmgusnnmndqwigiyp.supabase.co',
+  supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kbW5tZ3Vzbm5tbmRxd2lnaXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjczOTExNzEsImV4cCI6MjA0Mjk2NzE3MX0.ESF_jBHTyESdtYoCWIHv9uo-hX4caAtGiCbstBf3ITc'
 };
 
 /*

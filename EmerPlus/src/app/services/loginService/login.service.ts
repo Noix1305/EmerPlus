@@ -4,211 +4,102 @@ import { RolService } from '../rolService/rol.service';
 import { Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { Contacto } from 'src/app/models/contacto';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoginService {
 
-  // Define la lista de usuarios con roles asignados
-  lista_de_usuarios: Usuario[] = [
-    {
-      rut: "usuario",
-      password: "u#f0a&tsu#f0a&t!a%i&ri#m0e%so#b%e&r123",
-      nombre: "Nombre",
-      pApellido: "1er Apellido",
-      sApellido: "2do Apellido",
-      telefono: 947421590,
-      region: "Region",
-      comuna: "Comuna",
-      correo:"usuario@gmail.com",
-      contactoEmergencia: {
-        rut_usuario: "Usuario",
-        nombre: "Juan Pérez",
-        telefono: 912345678,
-        correo: "juanperez@gmail.com",
-        relacion: "Amigo"
-      },
-      rol: [this._rolService.getRolByIds([2])[0]!]
-    },
-    {
-      rut: "admin",
-      password: "!a%i&dmi#m0e%sn123",
-      nombre: "Administrador",
-      pApellido: "Primer Apellido",
-      sApellido: "Segundo apellido",
-      telefono: 947421590,
-      region: "Region",
-      comuna: "Comuna",
-      correo:"admin@gmail.com",
-      contactoEmergencia: undefined,
-      rol: [this._rolService.getRolByIds([1])[0]!]
-    },
-    {
-      rut: "bombero",
-      password: "bo#b%e&rmbe#n=t0e!r%ro#b%e&r123",
-      nombre: "Bombero",
-      pApellido: "Primer Apellido",
-      sApellido: "Segundo apellido",
-      telefono: 947421590,
-      region: "Region",
-      comuna: "Comuna",
-      correo:"bombero@gmail.com",
-      contactoEmergencia: undefined,
-      rol: [this._rolService.getRolByIds([3])[0]!]
-    },
-    {
-      rut: "policia",
-      password: "po#b%e&rli#m0e%sci#m0e%s!a%i&123",
-      nombre: "Policia",
-      pApellido: "Primer Apellido",
-      sApellido: "Segundo apellido",
-      telefono: 947421590,
-      region: "Region",
-      comuna: "Comuna",
-      correo:"policia@gmail.com",
-      contactoEmergencia: undefined,
-      rol: [this._rolService.getRolByIds([4])[0]!]
-    },
-    {
-      rut: "ambulancia",
-      password: "!a%i&mbu#f0a&tl!a%i&nci#m0e%s!a%i&123",
-      nombre: "Ambulancia",
-      pApellido: "Primer Apellido",
-      sApellido: "Segundo apellido",
-      telefono: 947421590,
-      region: "Region",
-      comuna: "Comuna",
-      correo:"ambulancia@gmail.com",
-      contactoEmergencia: undefined,
-      rol: [this._rolService.getRolByIds([5])[0]!]
-    },
-  ];
 
   // ID del rol por defecto (Usuario)
   defaultRoleId: number = 2;
 
-  constructor(private alertController: AlertController, private _rolService: RolService, private router: Router) { }
-
-  async updateUser(rut: string, updatedUser: Partial<Usuario>): Promise<boolean> {
-    // Buscar el usuario en la lista usando el RUT proporcionado
-    const usuario = this.lista_de_usuarios.find((u) => u.rut === rut);
-
-    if (!usuario) {
-      console.error('Usuario no encontrado');
-      return false;
-    }
-
-    // Actualizar los detalles del usuario encontrado con los datos proporcionados
-    Object.assign(usuario, updatedUser);
-
-    console.log(`Usuario con RUT ${rut} actualizado`, usuario);
-
-    return true;
+  constructor(private alertController: AlertController, private _rolService: RolService, private router: Router) {
+    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
   }
 
-  updateContact(rut: string, updatedContact: Contacto): boolean {
-    // Busca al usuario en la lista utilizando el RUT
-    const usuario = this.lista_de_usuarios.find(u => u.rut === rut);
+  private supabase: SupabaseClient;
 
-    if (usuario) {
-      // Actualiza el contacto de emergencia del usuario
-      usuario.contactoEmergencia = updatedContact;
-      console.log(`Contacto de emergencia actualizado para el usuario ${rut}`);
-      return true; // Indica que la actualización fue exitosa
+
+  // Ejemplo de método para obtener datos
+  async getData() {
+    // Obtener todas las regiones
+    const { data: regiones, error: errorRegiones } = await this.supabase
+      .from('regiones')
+      .select('id, nombre, comunas(id, nombre)'); // Suponiendo que tienes una relación entre regiones y comunas
+
+    if (errorRegiones) {
+      console.error('Error al obtener regiones:', errorRegiones);
+    }
+
+    return regiones; // Devuelve las regiones con sus comunas
+  }
+
+  //async updateUser(rut: string, updatedUser: Partial<Usuario>): Promise<boolean> 
+
+  //updateContact(rut: string, updatedContact: Contacto): boolean { }
+
+
+
+  //agregarUsuario(usuario: Usuario) {}
+
+  //agregarRolAUsuarioPorId(rut: string, rolId: number) {}
+
+  mostrarUsuarios() {}
+
+  async login(rut: string, password: string): Promise<Usuario | undefined> {
+    // Verificar si el RUT existe en la base de datos
+    const { data: usuarioData, error: fetchError } = await this.supabase
+      .from('usuarios') // Nombre de tu tabla de usuarios
+      .select('*')
+      .eq('rut', rut)
+      .single();
+
+    if (fetchError) {
+      console.error('Error al obtener el usuario:', fetchError);
+      return undefined; // Manejar error
+    }
+
+    if (!usuarioData) {
+      console.error('Usuario no encontrado');
+      return undefined; // Manejar caso donde no se encuentra el usuario
+    }
+
+    // Verificar contraseña (esto depende de cómo almacenes la contraseña)
+    if (usuarioData.password === password) {
+      return usuarioData; // Retorna el usuario encontrado
     } else {
-      console.error('Usuario no encontrado');
-      return false; // Indica que la actualización falló
+      console.error('Contraseña incorrecta');
+      return undefined; // Contraseña incorrecta
     }
   }
 
+  async isRUTExist(rut: string): Promise<boolean> {
+  // Verifica si un RUT ya existe en la base de datos de Supabase.
+  // Retorna true si el RUT ya está registrado, de lo contrario retorna false.
 
+  const { data, error } = await this.supabase
+    .from('usuarios') // Nombre de tu tabla de usuarios
+    .select('rut')
+    .eq('rut', rut)
+    .single(); // Obtiene un único registro
 
-  agregarUsuario(usuario: Usuario) {
-    // Agrega un nuevo usuario a la lista de usuarios y lo muestra en la consola.
-    this.lista_de_usuarios.push(usuario);
-    console.log('Usuario agregado:', usuario);
+  if (error) {
+    console.error('Error al verificar el RUT:', error);
+    return false; // Maneja el error según tus necesidades
   }
 
-  agregarRolAUsuarioPorId(rut: string, rolId: number) {
-    // Agrega un rol a un usuario específico utilizando su RUT.
-    // Obtiene el rol usando su ID, verifica si el rol existe, y luego lo añade al usuario correspondiente.
+  return !!data; // Devuelve true si hay datos, false si no
+}
 
-    // Obtener el rol por su ID desde el servicio
-    const roles = this._rolService.getRolByIds([rolId]); // Esto retorna un arreglo de roles
-
-    // Verificar si se encontró al menos un rol
-    if (!roles || roles.length === 0) {
-      console.error('Rol no encontrado');
-      return;
-    }
-
-    // Extraer el primer rol del arreglo (asumiendo que solo necesitas uno)
-    const rol = roles[0];
-
-    // Buscar el usuario en la lista
-    const usuario = this.lista_de_usuarios.find((u) => u.rut === rut);
-
-    if (usuario) {
-      // Agregar el rol al usuario
-      usuario.rol.push(rol);
-      console.log(`Rol ${rol.nombre} agregado al usuario ${rut}`);
-    } else {
-      console.error('Usuario no encontrado');
-    }
-  }
-
-  mostrarUsuarios() {
-    // Muestra en la consola la lista completa de usuarios, incluyendo sus detalles y roles asignados.
-
-    // Recorre cada usuario dentro de la lista_de_usuarios
-    this.lista_de_usuarios.forEach((usuario) => {
-      // Extrae los nombres de los roles del usuario y los convierte en una cadena separada por comas
-      // usuario.rol es un array de roles, y map() toma cada rol y extrae su nombre
-      const rolesNombres = usuario.rol.map((rol) => rol.nombre).join(', ');
-
-      // Imprime en la consola los detalles del usuario
-      console.log(`Username: ${usuario.rut}, 
-        Password: ${usuario.password}, 
-        Nombre: ${usuario.nombre}, 
-        Primer Apellido: ${usuario.pApellido}, 
-        Segundo Apellido: ${usuario.sApellido}, 
-        Teléfono: ${usuario.telefono}, 
-        Región: ${usuario.region}, 
-        Comuna: ${usuario.comuna}, 
-        Correo:${usuario.correo},
-        Contacto de Emergencia: ${usuario.contactoEmergencia}, 
-        Rol: ${rolesNombres}`);
-    });
-  }
-
-  login(username: string, password: string): Usuario | undefined {
-    // Función de inicio de sesión que busca el usuario en la lista comparando el username y la contraseña.
-    // Retorna el usuario encontrado o undefined si no se encuentra.
-
-    const usuarioEncontrado = this.lista_de_usuarios.find(
-      (usuario) => usuario.rut === username && usuario.password === password
-    );
-
-    // Retorna el usuario encontrado o undefined si no se encontró
-    return usuarioEncontrado;
-  }
-
-  isRUTExist(rut: string): boolean {
-    // Verifica si un RUT ya existe en la lista de usuarios.
-    // Retorna true si el RUT ya está registrado, de lo contrario retorna false.
-
-    return this.lista_de_usuarios.some(usuario => usuario.rut === rut);
-  }
 
   getUserByRUT(rut: string) {
-    return this.lista_de_usuarios.find(user => user.rut === rut);
+    
   }
 
-  verifarEmailConRUT(rut: string, email: string): boolean {
-    const user = this.getUserByRUT(rut);
-    return user ? user.correo === email : false;
-  }
+  //verifarEmailConRUT(rut: string, email: string): boolean {}
 
   encryptText(texto: string) {
     // Encripta el texto dado utilizando reglas de reemplazo específicas para las vocales.
@@ -287,7 +178,7 @@ export class LoginService {
     }
 
     // Verificar si el RUT ya está registrado
-    if (this.isRUTExist(rut)) {
+    if (await this.isRUTExist(rut)) {
       const alert = await this.alertController.create({
         header: 'Error',
         message: 'El RUT ya está registrado.',
@@ -318,7 +209,6 @@ export class LoginService {
     };
 
     // Agregar el usuario a la lista
-    this.agregarUsuario(usuario);
 
     const alert = await this.alertController.create({
       header: 'Registro Completado',

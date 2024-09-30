@@ -42,19 +42,7 @@ export class LoginModalComponent {
   }
 
   async handlePasswordRecovery(event: Event) {
-    event.preventDefault(); // Evita que el formulario se envíe por defecto
-
-    this.errorMessage = ''; // Reinicia el mensaje de error
-
-    if (this._loginService.verifarEmailConRUT(this.username, this.emailInput)) {
-      // Si el correo coincide
-      console.log('El correo coincide con el RUT ingresado.');
-      this.msgContrasenaOlvidada = 'Recibira un correo con una nueva contraseña en unos pocos minutos.'
-      // Aquí puedes continuar con la lógica para recuperar la contraseña
-    } else {
-      this.errorMessage = 'El correo ingresado no coincide con el registrado.';
-      this.cd.detectChanges(); // Forzar la detección de cambios
-    }
+    
   }
 
   async handleLoginSubmit(event: Event) {
@@ -63,27 +51,32 @@ export class LoginModalComponent {
     this.errorMessage = ''; // Reinicia mensaje de error
     this.rutNoRegistrado = ''; // Reinicia mensaje de RUT no registrado
 
-    const encryptedPassword = this._loginService.encryptText(this.password);
+    const rut = this.username; // Usa el RUT como nombre de usuario
+    const password = this._loginService.encryptText(this.password); // Obtén la contraseña del formulario
 
-    if (this._loginService.isRUTExist(this.username)) {
+    // Verifica si el RUT existe (ahora es asíncrono)
+    const rutExists = await this._loginService.isRUTExist(rut);
+    if (rutExists) {
       try {
-        const user = await this._loginService.login(this.username, encryptedPassword);
+        const user = await this._loginService.login(rut, password); // Llama al método de Supabase para autenticar
 
         if (user) {
+          // Si el usuario se encuentra y la contraseña es correcta
           this.router.navigate(['user-info'], { state: { usuario: user } });
           this.closeModal();
         } else {
-          this.errorMessage = 'Credenciales incorrectas';
+          this.errorMessage = 'Credenciales incorrectas'; // Maneja credenciales incorrectas
         }
       } catch (error) {
         this.errorMessage = 'Ocurrió un error durante el login. Inténtalo de nuevo.';
-        console.error('Error en el login:', error);
+        console.error('Error en el login:', error); // Maneja el error
       }
     } else {
-      this.rutNoRegistrado = 'El Rut ingresado no se encuentra registrado.';
+      this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado.';
       this.cd.detectChanges(); // Forzar la detección de cambios
     }
   }
+
 
   rutNotRegistrado() {
     this.closeModal();

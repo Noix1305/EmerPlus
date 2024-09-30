@@ -1,0 +1,9 @@
+{
+    "/api": {
+      "target": "https://ndmnmgusnnmndqwigiyp.supabase.co",
+      "secure": true,
+      "changeOrigin": true,
+      "logLevel": "debug"
+    }
+  }
+  

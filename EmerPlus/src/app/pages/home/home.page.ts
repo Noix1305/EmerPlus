@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Component, ViewChild } from '@angular/core';
+import { IonSelect, ModalController } from '@ionic/angular';
 import { LoginService } from '../../services/loginService/login.service';
 import { RegistroModalComponent } from '../../../components/registro-modal/registro-modal.component';
 import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.component';
+import { Region } from 'src/app/models/region';
+import { Comuna } from 'src/app/models/comuna';
 
 @Component({
   selector: 'app-home',
@@ -14,8 +16,52 @@ export class HomePage {
 
   constructor(private _loginService: LoginService, private modalController: ModalController) { }
 
-  // Abrir el modal de registro
+  regiones: any[] = [];
+  comunas: any[] = [];
+  selectedRegion: any;
+  selectedComuna: any;
 
+  @ViewChild('regionSelect') regionSelect!: IonSelect;
+  @ViewChild('comunaSelect') comunaSelect!: IonSelect;
+
+  async ngOnInit() {
+    try {
+      const data = await this._loginService.getData();
+      this.regiones = data || []; // Asegura que regiones siempre sea un array
+    } catch (error) {
+      console.error('Error al obtener las regiones:', error);
+      this.regiones = [];
+    }
+  }
+
+  // Método para manejar la selección de la región
+  async onRegionChange() {
+    if (this.selectedRegion) {
+      const regionId = this.selectedRegion.id;
+      const regionData = this.regiones.find(region => region.id === regionId);
+      this.comunas = regionData ? regionData.comunas : [];
+      this.selectedComuna = null;
+
+      // Forzar un cambio visual para simular el cierre
+      this.regionSelect.interface = 'popover';  // Cambiar temporalmente la interfaz
+      setTimeout(() => {
+        this.regionSelect.interface = 'action-sheet';  // Restablecer la interfaz
+      }, 100);
+    } else {
+      this.comunas = [];
+      this.selectedComuna = null;
+    }
+  }
+
+  async onComunaChange() {
+    if (this.selectedComuna) {
+      // Forzar un cambio visual para simular el cierre
+      this.comunaSelect.interface = 'popover';
+      setTimeout(() => {
+        this.comunaSelect.interface = 'action-sheet';
+      }, 100);
+    }
+  }
 
 
   async openRegistroModal() {
