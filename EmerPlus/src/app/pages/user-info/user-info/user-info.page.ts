@@ -25,9 +25,10 @@ export class UserInfoPage {
     pApellido: '',
     sApellido: '',
     telefono: 0,
-    comuna: '',
-    region: '',
+    comunaid: 0,
+    regionid: 0,
     rol: [],
+    deleted_at:new Date('2023-09-30'),
     contactoEmergencia: undefined
   };
   rolUsuario: string | undefined;

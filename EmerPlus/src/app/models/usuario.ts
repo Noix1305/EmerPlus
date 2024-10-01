@@ -9,9 +9,10 @@ export interface Usuario {
   pApellido?: string;
   sApellido?: string;
   telefono?: number;
-  region?: string;
-  comuna?: string;
+  regionid?: number;
+  comunaid?: number;
   contactoEmergencia?: Contacto;
   correo?: string;
   rol: Rol[]; // Cada usuario puede tener múltiples roles
+  deleted_at: Date
 }

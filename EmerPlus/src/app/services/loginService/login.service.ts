@@ -202,10 +202,11 @@ export class LoginService {
       pApellido: '',
       sApellido: '',
       telefono: 0,
-      region: '',
-      comuna: '',
+      regionid: 0,
+      comunaid: 0,
       contactoEmergencia: undefined,
-      rol: [rol]
+      rol: [rol],
+      deleted_at:new Date('2023-09-30')
     };
 
     // Agregar el usuario a la lista

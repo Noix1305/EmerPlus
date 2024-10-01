@@ -3,8 +3,9 @@ import { IonSelect, ModalController } from '@ionic/angular';
 import { LoginService } from '../../services/loginService/login.service';
 import { RegistroModalComponent } from '../../../components/registro-modal/registro-modal.component';
 import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.component';
-import { Region } from 'src/app/models/region';
-import { Comuna } from 'src/app/models/comuna';
+import { firstValueFrom } from 'rxjs';
+import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import { Usuario } from 'src/app/models/usuario';
 
 @Component({
   selector: 'app-home',
@@ -13,8 +14,9 @@ import { Comuna } from 'src/app/models/comuna';
 })
 export class HomePage {
   placeholderVisible: boolean = true;
+  usuarios: Usuario[] = [];
 
-  constructor(private _loginService: LoginService, private modalController: ModalController) { }
+  constructor(private _loginService: LoginService, private modalController: ModalController, private _usuarioService: UsuarioService) { }
 
   regiones: any[] = [];
   comunas: any[] = [];
@@ -25,12 +27,39 @@ export class HomePage {
   @ViewChild('comunaSelect') comunaSelect!: IonSelect;
 
   async ngOnInit() {
+
+    this.obtenerUsuarios();
+
     try {
       const data = await this._loginService.getData();
       this.regiones = data || []; // Asegura que regiones siempre sea un array
     } catch (error) {
       console.error('Error al obtener las regiones:', error);
       this.regiones = [];
+    }
+  }
+
+  async obtenerUsuarios() {
+    try {
+      const response = await firstValueFrom(this._usuarioService.obtenerUsuarios())
+      console.info(response)
+      this.usuarios = response.body || [];
+    }
+    catch (error) {
+      console.error(error)
+    }
+  }
+
+  async crearUsuario(nuevoUsuario: Usuario) {
+    try {
+      console.log(nuevoUsuario);
+      const response = await firstValueFrom(this._usuarioService.crearUsuario(nuevoUsuario));
+      if(response.status){
+        
+      }
+    }
+    catch (error) {
+      console.error(error)
     }
   }
 

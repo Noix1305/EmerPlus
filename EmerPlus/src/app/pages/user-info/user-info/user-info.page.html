@@ -36,12 +36,12 @@
             <!-- Fila para la comuna del usuario -->
             <ion-item>
               <ion-label><strong>Comuna</strong></ion-label>
-              <ion-label>{{ usuario?.comuna }}</ion-label>
+              <ion-label>{{ usuario?.comunaid }}</ion-label>
             </ion-item>
             <!-- Fila para la región del usuario -->
             <ion-item>
               <ion-label><strong>Región</strong></ion-label>
-              <ion-label>{{ usuario?.region }}</ion-label>
+              <ion-label>{{ usuario?.regionid }}</ion-label>
             </ion-item>
             <!-- Fila para el contacto de emergencia del usuario -->
             <ion-item>
@@ -166,11 +166,11 @@
           </ion-item>
           <ion-item>
             <ion-label position="floating">Comuna</ion-label>
-            <ion-input name="comuna" type="text" [(ngModel)]="usuario.comuna"></ion-input>
+            <ion-input name="comuna" type="text" [(ngModel)]="usuario.comunaid"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Región</ion-label>
-            <ion-input name="region" type="text" [(ngModel)]="usuario.region"></ion-input>
+            <ion-input name="region" type="text" [(ngModel)]="usuario.regionid"></ion-input>
           </ion-item>
           <ion-item>
             <ion-buttons slot="start">
