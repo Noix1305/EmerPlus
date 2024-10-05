@@ -2,6 +2,9 @@ import { Component, ChangeDetectorRef, Input } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { LoginService } from 'src/app/services/loginService/login.service';
+import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import { Usuario } from 'src/app/models/usuario';
+import { firstValueFrom, map } from 'rxjs';
 
 @Component({
   selector: 'app-log-in-modal',
@@ -22,6 +25,7 @@ export class LoginModalComponent {
     private cd: ChangeDetectorRef,
     private modalController: ModalController,
     private _loginService: LoginService,
+    private _usuarioService: UsuarioService,
     private router: Router
   ) { }
 
@@ -42,40 +46,54 @@ export class LoginModalComponent {
   }
 
   async handlePasswordRecovery(event: Event) {
-    
+
   }
 
   async handleLoginSubmit(event: Event) {
     event.preventDefault(); // Evita que el formulario se envíe por defecto
 
-    this.errorMessage = ''; // Reinicia mensaje de error
-    this.rutNoRegistrado = ''; // Reinicia mensaje de RUT no registrado
+    this.errorMessage = ''; // Reinicia los mensajes de error
+    this.rutNoRegistrado = ''; // Reinicia el mensaje de RUT no registrado
 
     const rut = this.username; // Usa el RUT como nombre de usuario
-    const password = this._loginService.encryptText(this.password); // Obtén la contraseña del formulario
+    const password = this._loginService.encryptText(this.password); // Encripta la contraseña del formulario
 
-    // Verifica si el RUT existe (ahora es asíncrono)
-    const rutExists = await this._loginService.isRUTExist(rut);
-    if (rutExists) {
-      try {
-        const user = await this._loginService.login(rut, password); // Llama al método de Supabase para autenticar
+    try {
+      // Obtiene los usuarios activos como un observable
+      const response = await firstValueFrom(this._usuarioService.obtenerUsuarios().pipe(
+        map(res => res.body || [])
+      ));
 
-        if (user) {
-          // Si el usuario se encuentra y la contraseña es correcta
-          this.router.navigate(['user-info'], { state: { usuario: user } });
-          this.closeModal();
-        } else {
-          this.errorMessage = 'Credenciales incorrectas'; // Maneja credenciales incorrectas
-        }
-      } catch (error) {
-        this.errorMessage = 'Ocurrió un error durante el login. Inténtalo de nuevo.';
-        console.error('Error en el login:', error); // Maneja el error
+      const usuariosActivos: Usuario[] = response; // Ahora puedes acceder a usuarios activos directamente
+
+      // Usar el tipo de usuario aquí
+      const usuarioExistente = usuariosActivos.find((usuario: Usuario) => usuario.rut === rut);
+
+      if (!usuarioExistente) {
+        // Si el usuario no existe, solicita el registro
+        this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado. Por favor, regístrate.';
+        return; // Salir de la función temprano
       }
-    } else {
-      this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado.';
-      this.cd.detectChanges(); // Forzar la detección de cambios
+
+      // Ahora intenta iniciar sesión
+      const user = await this._loginService.login(rut, password); // Llama al método de inicio de sesión
+
+      if (user) {
+        // Si el usuario se encuentra y la contraseña es correcta
+        this.router.navigate(['user-info'], { state: { usuario: user } });
+        this.closeModal(); // Cierra el modal
+      } else {
+        // Si la contraseña es incorrecta
+        this.errorMessage = 'Credenciales incorrectas'; // Maneja credenciales incorrectas
+      }
+    } catch (error) {
+      // Maneja cualquier error durante el proceso de inicio de sesión
+      this.errorMessage = 'Ocurrió un error durante el login. Inténtalo de nuevo.';
+      console.error('Error en el login:', error); // Registra el error
     }
   }
+
+
 
 
   rutNotRegistrado() {

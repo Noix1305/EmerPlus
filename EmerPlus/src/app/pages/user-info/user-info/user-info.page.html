@@ -26,7 +26,7 @@
             <!-- Fila para los apellidos del usuario -->
             <ion-item>
               <ion-label><strong>Apellidos</strong></ion-label>
-              <ion-label>{{ usuario?.pApellido}} {{usuario?.sApellido }}</ion-label>
+              <ion-label>{{ usuario?.papellido}} {{usuario?.sapellido }}</ion-label>
             </ion-item>
             <!-- Fila para el teléfono del usuario -->
             <ion-item>
@@ -102,27 +102,27 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <form (ngSubmit)="handleAddUserSubmit($event)">
+      <form (ngSubmit)="formularioRegistroAdmin($event)">
         <ion-list>
           <ion-item>
             <ion-label position="floating">RUT</ion-label>
-            <ion-input name="rut" type="text" required></ion-input>
+            <ion-input [(ngModel)]="rut" name="rut" type="text" required></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Contraseña</ion-label>
-            <ion-input name="password" type="password" required>
+            <ion-input [(ngModel)]="password" name="password" type="password" required>
               <ion-input-password-toggle slot="end"></ion-input-password-toggle>
             </ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Repetir Contraseña</ion-label>
-            <ion-input name="repeatPassword" type="password" required>
+            <ion-input [(ngModel)]="repeatPassword" name="repeatPassword" type="password" required>
               <ion-input-password-toggle slot="end" style="--background: black"></ion-input-password-toggle>
             </ion-input>
           </ion-item>
           <ion-item>
             <ion-label>Rol</ion-label>
-            <ion-select name="rol" placeholder="Seleccione un rol">
+            <ion-select [(ngModel)]="roleId" name="roleId" placeholder="Seleccione un rol">
               <ion-select-option value="1">Administrador</ion-select-option>
               <ion-select-option value="2">Usuario</ion-select-option>
               <ion-select-option value="3">Bombero</ion-select-option>
@@ -149,33 +149,43 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <form (ngSubmit)="handleEditUserSubmit($event)">
+      <form (ngSubmit)="formularioEditUsuario($event)">
         <ion-list>
           <ion-item>
             <ion-label position="floating">Nombre</ion-label>
             <ion-input name="nombre" type="text" [(ngModel)]="usuario.nombre"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label position="floating">Apellidos</ion-label>
-            <ion-input name="pApellido" type="text" [(ngModel)]="usuario.pApellido"></ion-input>
-            <ion-input name="sApellido" type="text" [(ngModel)]="usuario.sApellido"></ion-input>
+            <ion-label position="floating">Primer Apellido</ion-label>
+            <ion-input name="pApellido" type="text" [(ngModel)]="usuario.papellido"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label position="floating">Segundo Apellido</ion-label>
+            <ion-input name="sApellido" type="text" [(ngModel)]="usuario.sapellido"></ion-input>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Teléfono</ion-label>
             <ion-input name="telefono" type="text" [(ngModel)]="usuario.telefono"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label position="floating">Comuna</ion-label>
-            <ion-input name="comuna" type="text" [(ngModel)]="usuario.comunaid"></ion-input>
+            <ion-label>Región</ion-label>
+            <ion-select name="region" [(ngModel)]="selectedRegion" (ionChange)="onRegionChange()">
+              <ion-select-option *ngFor="let region of regiones" [value]="region">
+                {{ region.nombre }}
+              </ion-select-option>
+            </ion-select>
           </ion-item>
           <ion-item>
-            <ion-label position="floating">Región</ion-label>
-            <ion-input name="region" type="text" [(ngModel)]="usuario.regionid"></ion-input>
+            <ion-label>Selecciona una Comuna</ion-label>
+            <ion-select name="comuna" [(ngModel)]="selectedComuna">
+              <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">
+                {{ comuna.nombre }}
+              </ion-select-option>
+            </ion-select>
           </ion-item>
           <ion-item>
             <ion-buttons slot="start">
-              <ion-button (click)="openEditContactModal()">Editar Contacto de
-                Emergencia</ion-button>
+              <ion-button (click)="openEditContactModal()">Editar Contacto de Emergencia</ion-button>
             </ion-buttons>
           </ion-item>
         </ion-list>

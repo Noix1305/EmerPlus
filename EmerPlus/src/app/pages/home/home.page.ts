@@ -3,9 +3,16 @@ import { IonSelect, ModalController } from '@ionic/angular';
 import { LoginService } from '../../services/loginService/login.service';
 import { RegistroModalComponent } from '../../../components/registro-modal/registro-modal.component';
 import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.component';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
+import { RolService } from 'src/app/services/rolService/rol.service';
+import { Rol } from 'src/app/models/rol';
+import { HttpParams, HttpResponse } from '@angular/common/http';
+import { ApiConfigService } from 'src/app/services/apiConfig/api-config.service';
+import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
+import { Region } from 'src/app/models/region';
+import { Comuna } from 'src/app/models/comuna';
 
 @Component({
   selector: 'app-home',
@@ -16,82 +23,52 @@ export class HomePage {
   placeholderVisible: boolean = true;
   usuarios: Usuario[] = [];
 
-  constructor(private _loginService: LoginService, private modalController: ModalController, private _usuarioService: UsuarioService) { }
+  constructor(private apiConfig: ApiConfigService,
+    private _loginService: LoginService,
+    private modalController: ModalController,
+    private _usuarioService: UsuarioService,
+    private _regComService:RegionComunaService) { }
 
-  regiones: any[] = [];
-  comunas: any[] = [];
+  regiones: Region[] = [];
+  comunas: Comuna[] = [];
   selectedRegion: any;
   selectedComuna: any;
+  rut: any;
+
+  roles: Rol[] = [];
+  rolDetails: Rol | undefined;
+  descripcion: string | undefined;
+
+  usuario: Usuario = {
+    rut: '',
+    password: '',
+    estado: 0,
+    rol: [0]
+  };
 
   @ViewChild('regionSelect') regionSelect!: IonSelect;
   @ViewChild('comunaSelect') comunaSelect!: IonSelect;
 
   async ngOnInit() {
+    this.regiones = await this._regComService.obtenerRegiones();
+    console.log(this.regiones)
 
-    this.obtenerUsuarios();
-
-    try {
-      const data = await this._loginService.getData();
-      this.regiones = data || []; // Asegura que regiones siempre sea un array
-    } catch (error) {
-      console.error('Error al obtener las regiones:', error);
-      this.regiones = [];
-    }
-  }
-
-  async obtenerUsuarios() {
-    try {
-      const response = await firstValueFrom(this._usuarioService.obtenerUsuarios())
-      console.info(response)
-      this.usuarios = response.body || [];
-    }
-    catch (error) {
-      console.error(error)
-    }
+    this.comunas = await this._regComService.obtenerComunas();
+    console.log(this.comunas)
   }
 
   async crearUsuario(nuevoUsuario: Usuario) {
     try {
       console.log(nuevoUsuario);
       const response = await firstValueFrom(this._usuarioService.crearUsuario(nuevoUsuario));
-      if(response.status){
-        
+      if (response.status) {
+
       }
     }
     catch (error) {
       console.error(error)
     }
   }
-
-  // Método para manejar la selección de la región
-  async onRegionChange() {
-    if (this.selectedRegion) {
-      const regionId = this.selectedRegion.id;
-      const regionData = this.regiones.find(region => region.id === regionId);
-      this.comunas = regionData ? regionData.comunas : [];
-      this.selectedComuna = null;
-
-      // Forzar un cambio visual para simular el cierre
-      this.regionSelect.interface = 'popover';  // Cambiar temporalmente la interfaz
-      setTimeout(() => {
-        this.regionSelect.interface = 'action-sheet';  // Restablecer la interfaz
-      }, 100);
-    } else {
-      this.comunas = [];
-      this.selectedComuna = null;
-    }
-  }
-
-  async onComunaChange() {
-    if (this.selectedComuna) {
-      // Forzar un cambio visual para simular el cierre
-      this.comunaSelect.interface = 'popover';
-      setTimeout(() => {
-        this.comunaSelect.interface = 'action-sheet';
-      }, 100);
-    }
-  }
-
 
   async openRegistroModal() {
     const modal = await this.modalController.create({

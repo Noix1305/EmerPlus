@@ -18,31 +18,42 @@ export class ApiConfigService {
     })
   }
 
-  private handlerError(error: HttpErrorResponse) {
+  private handleError(error: HttpErrorResponse) {
     console.log('Error', error);
     return throwError(() => error);
   }
 
   get<T>(path: string, params?: HttpParams): Observable<HttpResponse<T>> {
-    return this.httpClient.get<T>(this.urlBase + path,
+    return this.httpClient.get<T>(`${this.urlBase}/${path}`, { headers: this.getHeaders(), observe: 'response', params })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  post<T>(path: string, data: any): Observable<HttpResponse<T>> {
+    return this.httpClient.post<T>(
+      `${this.urlBase}/${path}`,
+      data,
+      {
+        headers: this.getHeaders(),
+        observe: 'response'
+      }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  patch<T>(path: string, data: any, params?: HttpParams): Observable<HttpResponse<T>> {
+    return this.httpClient.patch<T>(`${this.urlBase}/${path}`,
+      data,
       {
         headers: this.getHeaders(),
         observe: 'response',
         params
       })
       .pipe(
-        catchError(this.handlerError)
-      )
+        catchError(this.handleError)
+      );
   }
 
-  post<T>(path: string, data: any): Observable<HttpResponse<T>> {
-    return this.httpClient.post<T>(this.urlBase + path, data,
-      {
-        headers: this.getHeaders(),
-        observe: 'response'
-      })
-      .pipe(
-        catchError(this.handlerError)
-      )
-  }
 }
