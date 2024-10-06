@@ -1,18 +1,8 @@
-import { Component, ViewChild } from '@angular/core';
-import { IonSelect, ModalController } from '@ionic/angular';
-import { LoginService } from '../../services/loginService/login.service';
+import { Component } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { RegistroModalComponent } from '../../../components/registro-modal/registro-modal.component';
 import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.component';
-import { firstValueFrom, Observable } from 'rxjs';
-import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
-import { RolService } from 'src/app/services/rolService/rol.service';
-import { Rol } from 'src/app/models/rol';
-import { HttpParams, HttpResponse } from '@angular/common/http';
-import { ApiConfigService } from 'src/app/services/apiConfig/api-config.service';
-import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
-import { Region } from 'src/app/models/region';
-import { Comuna } from 'src/app/models/comuna';
 
 @Component({
   selector: 'app-home',
@@ -23,51 +13,11 @@ export class HomePage {
   placeholderVisible: boolean = true;
   usuarios: Usuario[] = [];
 
-  constructor(private apiConfig: ApiConfigService,
-    private _loginService: LoginService,
+  constructor(
     private modalController: ModalController,
-    private _usuarioService: UsuarioService,
-    private _regComService:RegionComunaService) { }
-
-  regiones: Region[] = [];
-  comunas: Comuna[] = [];
-  selectedRegion: any;
-  selectedComuna: any;
-  rut: any;
-
-  roles: Rol[] = [];
-  rolDetails: Rol | undefined;
-  descripcion: string | undefined;
-
-  usuario: Usuario = {
-    rut: '',
-    password: '',
-    estado: 0,
-    rol: [0]
-  };
-
-  @ViewChild('regionSelect') regionSelect!: IonSelect;
-  @ViewChild('comunaSelect') comunaSelect!: IonSelect;
+  ) { }
 
   async ngOnInit() {
-    this.regiones = await this._regComService.obtenerRegiones();
-    console.log(this.regiones)
-
-    this.comunas = await this._regComService.obtenerComunas();
-    console.log(this.comunas)
-  }
-
-  async crearUsuario(nuevoUsuario: Usuario) {
-    try {
-      console.log(nuevoUsuario);
-      const response = await firstValueFrom(this._usuarioService.crearUsuario(nuevoUsuario));
-      if (response.status) {
-
-      }
-    }
-    catch (error) {
-      console.error(error)
-    }
   }
 
   async openRegistroModal() {
@@ -83,11 +33,6 @@ export class HomePage {
       component: LoginModalComponent,
     });
     return await modal.present();
-  }
-
-  // Mostrar usuarios del servicio de login
-  mostrarUsuarios() {
-    this._loginService.mostrarUsuarios();
   }
 
   // Método de cierre para cualquier modal

@@ -7,7 +7,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ApiConfigService {
-  private urlBase = environment.supabaseUrl;
+  public urlBase = environment.supabaseUrl;
 
   constructor(private httpClient: HttpClient) { }
 
@@ -31,17 +31,21 @@ export class ApiConfigService {
   }
 
   post<T>(path: string, data: any): Observable<HttpResponse<T>> {
+    // Asegúrate de que solo haya una barra entre urlBase y path
+    const url = `${this.urlBase.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+    console.log('URL de la solicitud:', url);
+
     return this.httpClient.post<T>(
-      `${this.urlBase}/${path}`,
-      data,
-      {
-        headers: this.getHeaders(),
-        observe: 'response'
-      }
+        url,
+        data,
+        {
+            headers: this.getHeaders(),
+            observe: 'response'
+        }
     ).pipe(
-      catchError(this.handleError)
+        catchError(this.handleError)
     );
-  }
+}
 
   patch<T>(path: string, data: any, params?: HttpParams): Observable<HttpResponse<T>> {
     return this.httpClient.patch<T>(`${this.urlBase}/${path}`,

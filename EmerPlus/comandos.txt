@@ -1,0 +1,7 @@
+node server.js
+npm install @supabase/supabase-js
+npm install nodemailer
+npm install express nodemailer cors
+npm install dotenv
+npm install --save-dev @types/nodemailer
+npm install cors

@@ -119,6 +119,7 @@ export class UserInfoPage {
     nombre: formData.get('nombre') as string,
     papellido: formData.get('pApellido') as string,
     sapellido: formData.get('sApellido') as string,
+    correo: formData.get('correo') as string,
     telefono: Number(formData.get('telefono')),
     comunaid: this.selectedComuna ? this.selectedComuna.id : undefined, // Asegúrate de que esto sea correcto
     regionid: this.selectedRegion ? this.selectedRegion.id : undefined, // Asegúrate de que esto sea correcto

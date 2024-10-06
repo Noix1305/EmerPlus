@@ -49,6 +49,30 @@ export class LoginModalComponent {
 
   }
 
+  async onSubmitForgotPassword(event: Event): Promise<void> {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const rut = formData.get('rut') as string;
+  
+    if (!rut) {
+      console.error('RUT es requerido');
+      return;
+    }
+  
+    try {
+      await this._usuarioService.enviarContraseñaPorRut(rut);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error durante la recuperación de contraseña:', error.message);
+        alert(error.message || 'Ocurrió un error inesperado.');
+      } else {
+        console.error('Error desconocido:', error);
+        alert('Ocurrió un error inesperado.');
+      }
+    }
+  }
+
   async handleLoginSubmit(event: Event) {
     event.preventDefault(); // Evita que el formulario se envíe por defecto
 
