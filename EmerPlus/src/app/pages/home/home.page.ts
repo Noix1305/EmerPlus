@@ -56,4 +56,10 @@ export class HomePage {
     });
     return await modal.present();
   }
+
+  //obetner productos
+
+
+
+
 }
