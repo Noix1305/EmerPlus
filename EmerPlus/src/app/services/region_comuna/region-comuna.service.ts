@@ -2,7 +2,7 @@ import { HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Region } from 'src/app/models/region';
 import { ApiConfigService } from '../apiConfig/api-config.service';
-import { firstValueFrom, map, Observable } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable, throwError } from 'rxjs';
 import { Comuna } from 'src/app/models/comuna';
 
 @Injectable({
@@ -60,7 +60,28 @@ export class RegionComunaService {
   getComunaPorRegion(idRegion: number): Observable<HttpResponse<Comuna[]>> {
     const params = new HttpParams().set('region_id', `eq.${idRegion}`);
     return this.apiConfig.get<Comuna[]>(this.pathComuna, params); // Cambia Comuna a Comuna[]
-}
+  }
+
+  getComunaPorId(idComuna: number): Observable<HttpResponse<Comuna[]>> {
+    const params = new HttpParams().set('id', `eq.${idComuna}`);
+    return this.apiConfig.get<Comuna[]>(this.pathComuna, params).pipe(
+      catchError((error) => {
+        console.error('Error al obtener comuna por ID:', error);
+        return throwError(() => new Error('Error al obtener comuna por ID.'));
+      })
+    );
+  }
+
+
+  getRegionPorId(idRegion: number): Observable<HttpResponse<Region[]>> {
+    const params = new HttpParams().set('id', `eq.${idRegion}`);
+    return this.apiConfig.get<Region[]>(this.pathRegion, params).pipe(
+      catchError((error) => {
+        console.error('Error al obtener region por ID:', error);
+        return throwError(() => new Error('Error al obtener region por ID.'));
+      })
+    );
+  }
 
 
 }

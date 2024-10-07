@@ -1,9 +1,11 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AlertController, IonModal, ToastController } from '@ionic/angular';
+import { AlertController, IonModal, ModalController, ToastController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { firstValueFrom } from 'rxjs';
+import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pass.component';
 import { Comuna } from 'src/app/models/comuna';
 import { Contacto } from 'src/app/models/contacto';
 import { Region } from 'src/app/models/region';
@@ -24,19 +26,7 @@ export class UserInfoPage {
   @ViewChild('modalEditUser', { static: false }) modalEditUser!: IonModal;
   @ViewChild('modalEditContact', { static: false }) modalEditContact!: IonModal;
 
-  usuario: Usuario = {
-    rut: '',
-    password: '',
-    nombre: '',
-    papellido: '',
-    sapellido: '',
-    telefono: 0,
-    comunaid: 0,
-    regionid: 0,
-    rol: [0],
-    estado: 1,
-    contactoEmergencia: undefined
-  };
+  usuario: Usuario | null = null;
   rolUsuario: string | undefined; // Cambia a string
   contacto: Contacto = {
     rut_usuario: "",
@@ -59,6 +49,10 @@ export class UserInfoPage {
   comunasCargadas: Comuna[] = [];
   selectedRegion: Region | null = null;
   selectedComuna: Comuna | null = null;
+  comunaUsuario: Comuna | null = null; // Mantener el tipo Comuna
+  regionUsuario: Region | null = null;
+  form: FormGroup;
+  ;
 
   constructor(private router: Router,
     private alertController: AlertController,
@@ -66,84 +60,173 @@ export class UserInfoPage {
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
     private _regionComunaService: RegionComunaService,
-    private toastController: ToastController) { }
+    private toastController: ToastController,
+    private fb: FormBuilder,
+    private modalCtrl: ModalController) {
+
+    this.form = this.fb.group({
+      nombre: ['', Validators.required],
+      pApellido: ['', Validators.required],
+      sApellido: [''],
+      correo: ['', [Validators.required, Validators.email]],
+      telefono: ['', [Validators.required, Validators.pattern('^[0-9]*$')]],
+      contrasenaActual: ['', Validators.required],
+      nuevaContrasena: ['', Validators.required],
+      confirmarContrasena: ['', Validators.required]
+    });
+  }
 
   async ngOnInit() {
     this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
     this.cargarRegiones();
     this.cargarComunas();
 
-    if (this.usuario && this.usuario.rol && this.usuario.rol.length > 0) {
-      const rolId = this.usuario.rol[0]; // Obtener el primer ID del rol
-      console.log("Rol Usuario Nav: " + rolId); // Muestra solo el ID
+    if (this.usuario) {
 
-      // Llama al servicio para obtener el rol usando el ID
-      const rolDesdeServicio = await this._rolService.obtenerRolPorId(rolId);
+      if (this.usuario.comunaid) { // Reemplaza 'id' con la propiedad correspondiente que estés usando
+        this.getNombreComunaPorId(this.usuario.comunaid);
+      } else {
+        console.error('El ID de comuna es undefined');
+      }
 
-      // Asigna el nombre del rol a rolUsuario
-      this.rolUsuario = rolDesdeServicio ? rolDesdeServicio.nombre : undefined;
-      console.log("Rol Usuario: " + this.rolUsuario); // Esto es ahora de tipo string | undefined
-    } else {
-      console.error('Usuario o rol no disponibles');
+      if (this.usuario.regionid) { // Reemplaza 'id' con la propiedad correspondiente que estés usando
+        this.getNombreRegionPorId(this.usuario.regionid);
+      } else {
+        console.error('El ID de comuna es undefined');
+      }
+
+      if (this.usuario.rol && this.usuario.rol.length > 0) {
+        const rolId = this.usuario.rol[0];
+
+        const rolDesdeServicio = await this._rolService.obtenerRolPorId(rolId);
+        this.rolUsuario = rolDesdeServicio ? rolDesdeServicio.nombre : undefined;
+      } else {
+        console.error('Usuario o rol no disponibles');
+      }
+    }
+  }
+
+  async openChangePasswordModal() {
+    if (this.usuario) {
+      const modal = await this.modalCtrl.create({
+        component: CambiarPassComponent,
+        componentProps: {
+
+          rut: this.usuario.rut, // Enviar el RUT al modal
+          password: this.usuario.password, // Enviar la contraseña actual
+        }
+      }
+      );
+      return await modal.present();
     }
   }
 
   getComunasPorRegion(idRegion: number) {
-    this._regionComunaService.getComunaPorRegion(idRegion).subscribe(
-      (response: HttpResponse<Comuna[]>) => {
+    this._regionComunaService.getComunaPorRegion(idRegion).subscribe({
+      next: (response: HttpResponse<Comuna[]>) => {
         // Aquí obtienes el cuerpo de la respuesta
         if (response.body) {
           this.comunas = response.body; // Guarda las comunas en la variable
-          console.log('Comunas obtenidas:', this.comunas); // Muestra las comunas en consola
         }
       },
-      (error) => {
+      error: (error) => {
         console.error('Error al obtener comunas:', error); // Manejo de errores
       }
-    );
+    });
+  }
+
+  // Método para obtener el nombre de la comuna según el ID
+  async getNombreComunaPorId(idComuna: number): Promise<void> {
+    try {
+      const usuarioResponse: HttpResponse<Comuna[]> = await firstValueFrom(this._regionComunaService.getComunaPorId(idComuna));
+
+      // Verificamos que la respuesta contenga datos
+      if (usuarioResponse.body && usuarioResponse.body.length > 0) {
+        this.comunaUsuario = usuarioResponse.body[0]; // Asigna el primer objeto Comuna al atributo
+      } else {
+        console.error('No se encontró la comuna.');
+      }
+    } catch (error) {
+      console.error('Error al obtener la comuna:', error);
+    }
+  }
+
+  async getNombreRegionPorId(idRegion: number): Promise<void> {
+    try {
+      const usuarioResponse: HttpResponse<Region[]> = await firstValueFrom(this._regionComunaService.getRegionPorId(idRegion));
+
+      // Verificamos que la respuesta contenga datos
+      if (usuarioResponse.body && usuarioResponse.body.length > 0) {
+        this.regionUsuario = usuarioResponse.body[0]; // Asigna el primer objeto Comuna al atributo
+      } else {
+        console.error('No se encontró la comuna.');
+      }
+    } catch (error) {
+      console.error('Error al obtener la comuna:', error);
+    }
   }
 
   async formularioEditUsuario(event: Event) {
-  event.preventDefault(); // Prevenir el envío por defecto del formulario
+    event.preventDefault(); // Prevenir el envío por defecto del formulario
 
-  if (!this.usuario) {
-    console.error('No hay usuario logueado para editar');
-    return;
-  }
+    const form = event.target as HTMLFormElement;
 
-  const form = event.target as HTMLFormElement;
-  const formData = new FormData(form);
+    // Validar si el formulario es válido antes de continuar
+    if (form.checkValidity() === false) {
+      console.error('El formulario tiene errores o campos vacíos.');
+      return;
+    }
 
-  const updatedUser: Usuario = {
-    rut: this.usuario.rut, // Agregamos el rut aquí
-    nombre: formData.get('nombre') as string,
-    papellido: formData.get('pApellido') as string,
-    sapellido: formData.get('sApellido') as string,
-    correo: formData.get('correo') as string,
-    telefono: Number(formData.get('telefono')),
-    comunaid: this.selectedComuna ? this.selectedComuna.id : undefined, // Asegúrate de que esto sea correcto
-    regionid: this.selectedRegion ? this.selectedRegion.id : undefined, // Asegúrate de que esto sea correcto
-    password: this.usuario.password,
-    rol: [this.usuario.rol[0]],
-    estado: 1
-  };
+    if (!this.usuario) {
+      console.error('No hay usuario logueado para editar');
+      return;
+    }
 
-  console.log('comuna: ' + updatedUser.comunaid + '\nRegion: ' + updatedUser.regionid);
+    const formData = new FormData(form);
 
-  this._usuarioService.editarUsuario(updatedUser.rut, updatedUser).subscribe({
-    next: (response) => {
+    const updatedUser: Usuario = {
+      rut: this.usuario.rut,
+      nombre: formData.get('nombre') as string,
+      papellido: formData.get('pApellido') as string,
+      sapellido: formData.get('sApellido') as string,
+      correo: formData.get('correo') as string,
+      telefono: Number(formData.get('telefono')),
+      comunaid: this.selectedComuna ? this.selectedComuna.id : undefined,
+      regionid: this.selectedRegion ? this.selectedRegion.id : undefined,
+      password: this.usuario.password,
+      rol: [this.usuario.rol[0]],
+      estado: 1
+    };
+
+    try {
+      await firstValueFrom(this._usuarioService.editarUsuario(updatedUser.rut, updatedUser));
       this.successMessage = 'Usuario editado con éxito';
-      console.log('Usuario editado:', response.body);
-      // Cierra el modal o muestra un mensaje de éxito
       this.presentToast(this.successMessage);
       this.closeEditUserModal();
-    },
-    error: (error) => {
+
+      // Actualiza los datos del usuario en la página
+      this.obtenerDatosUsuario(); // Método para obtener y actualizar los datos del usuario
+    } catch (error) {
       console.error('Error al editar el usuario:', error);
-      // Manejo de errores
     }
-  });
-}
+  }
+  async obtenerDatosUsuario() {
+    if (this.usuario) {
+      try {
+        // Espera la respuesta del servicio y extrae el cuerpo
+        const response: HttpResponse<Usuario> = await firstValueFrom(this._usuarioService.getUsuarioPorRut(this.usuario.rut));
+
+        // Asigna el cuerpo a this.usuario
+        if (this.usuario) {
+          this.usuario = response.body; // Esto funcionará si response.body es de tipo Usuario
+        } else {
+          console.error('No se encontró el usuario.'); // Manejo de errores
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
 
 
   async formularioRegistroAdmin(event: Event) {
@@ -225,15 +308,12 @@ export class UserInfoPage {
   async onRegionChange() {
     if (this.selectedRegion) {
       const regionId = this.selectedRegion.id;
-      console.log('Region ID: ' + regionId);
 
       // Obtener las comunas desde el servicio
       this._regionComunaService.getComunaPorRegion(regionId).subscribe({
         next: (response: HttpResponse<Comuna[]>) => {
           // Acceder al cuerpo de la respuesta
           const comunas = response.body || []; // Asegúrate de que sea un array
-
-          console.log('Tamaño nuevo array: ' + comunas.length); // Corrección de 'lenght' a 'length'
 
           // Verifica si se obtuvo un array de comunas
           if (Array.isArray(comunas)) {
@@ -243,7 +323,6 @@ export class UserInfoPage {
             this.comunas = []; // Manejar el caso de error
           }
 
-          console.log('comunas: ', this.comunas); // Ahora deberías ver un array de objetos Comuna
           this.selectedComuna = null; // Resetea la comuna seleccionada
         },
         error: (error) => {
@@ -260,7 +339,6 @@ export class UserInfoPage {
   onWillDismiss(event: Event) {
     const ev = event as CustomEvent<OverlayEventDetail<string>>;
     if (ev.detail.role === 'confirm') {
-      console.log('Modal cerrado con confirmación');
     }
   }
 
@@ -326,6 +404,25 @@ export class UserInfoPage {
 
   }
 
+  get correoUsuario(): string {
+    return this.usuario?.correo || '';
+  }
+
+  get usuarioNombre(): string {
+    return this.usuario?.nombre || '';
+  }
+
+  get usuario1erApellido(): string {
+    return this.usuario?.papellido || '';
+  }
+
+  get usuario2doApellido(): string {
+    return this.usuario?.sapellido || '';
+  }
+
+  get usuarioTelefono(): number {
+    return this.usuario?.telefono || 0;
+  }
 
 }
 

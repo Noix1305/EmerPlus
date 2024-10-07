@@ -4,7 +4,6 @@ import { HttpParams, HttpResponse } from '@angular/common/http';
 import { Usuario } from 'src/app/models/usuario';
 import { catchError, firstValueFrom, map, Observable, throwError } from 'rxjs';
 import { MailSenderService } from '../mailService/mail-sender.service';
-import { LoginService } from '../loginService/login.service';
 
 
 
@@ -88,21 +87,6 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
     });
   }
 
-
-
-  // this.getUsuarioPorRut('17799487-1').subscribe({
-  //   next: (response) => {
-  //     const usuario = response.body;
-  //     console.log(usuario);
-  //   },
-  //   error: (error) => {
-  //     console.error('Error al obtener el usuario:', error);
-  //   },
-  //   complete: () => {
-  //     console.log('Solicitud completada');
-  //   }
-  // });
-
   obtenerUsuarios() {
     const params = new HttpParams().set('select', '*')
     return this.apiConfig.get<Usuario[]>(this.path, params).pipe(
@@ -132,6 +116,22 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
       map(response => {
         return new HttpResponse<Usuario>({
           body: response.body || null, // Puedes modificar esto si es necesario
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+      })
+    );
+  }
+
+  cambiarContrasena(rut: string, nuevaContrasena: string): Observable<HttpResponse<Usuario>> {
+    const path = `${this.path}?rut=eq.${rut}`;
+    const body = { password: nuevaContrasena }; // Asumiendo que el campo de la contraseña es 'password'
+
+    return this.apiConfig.patch<Usuario>(path, body).pipe(
+      map(response => {
+        return new HttpResponse<Usuario>({
+          body: response.body || null,
           status: response.status,
           statusText: response.statusText,
           headers: response.headers

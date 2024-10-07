@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { RegistroModalComponent } from '../../../components/registro-modal/registro-modal.component';
-import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.component';
+import { RegistroModalComponent } from '../../components/registro-modal/registro-modal.component';
 import { Usuario } from 'src/app/models/usuario';
+import { LoginModalComponent } from 'src/app/components/log-in-modal/log-in-modal.component';
 
 @Component({
   selector: 'app-home',

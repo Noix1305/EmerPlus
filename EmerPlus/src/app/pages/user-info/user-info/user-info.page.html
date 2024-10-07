@@ -1,5 +1,4 @@
 <ion-header>
-
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/"></ion-back-button>
@@ -21,32 +20,39 @@
             <!-- Fila para el nombre del usuario -->
             <ion-item>
               <ion-label><strong>Nombre</strong></ion-label>
-              <ion-label>{{ usuario?.nombre }}</ion-label>
+              <ion-label *ngIf="usuario">{{ usuario.nombre ? usuario.nombre: 'Cargando...' }}</ion-label>
+              <ion-label *ngIf="!usuario">No hay información disponible</ion-label>
             </ion-item>
             <!-- Fila para los apellidos del usuario -->
             <ion-item>
               <ion-label><strong>Apellidos</strong></ion-label>
-              <ion-label>{{ usuario?.papellido}} {{usuario?.sapellido }}</ion-label>
+              <ion-label *ngIf="usuario">{{ usuario.papellido ? usuario.papellido : 'Cargando...' }} {{
+                usuario.sapellido }}</ion-label>
+              <ion-label *ngIf="!usuario">No hay información disponible</ion-label>
             </ion-item>
+
             <!-- Fila para el teléfono del usuario -->
             <ion-item>
               <ion-label><strong>Teléfono</strong></ion-label>
-              <ion-label>{{ usuario?.telefono }}</ion-label>
+              <ion-label *ngIf="usuario">{{ usuario.telefono ? usuario.telefono: 'Cargando...' }}</ion-label>
+              <ion-label *ngIf="!usuario">0</ion-label>
             </ion-item>
             <!-- Fila para la comuna del usuario -->
             <ion-item>
               <ion-label><strong>Comuna</strong></ion-label>
-              <ion-label>{{ usuario?.comunaid }}</ion-label>
+              <ion-label>
+                {{ comunaUsuario ? comunaUsuario.nombre : 'Cargando...' }}
+              </ion-label>
             </ion-item>
             <!-- Fila para la región del usuario -->
             <ion-item>
               <ion-label><strong>Región</strong></ion-label>
-              <ion-label>{{ usuario?.regionid }}</ion-label>
+              <ion-label>{{ regionUsuario ? regionUsuario.nombre : 'Cargando...' }}</ion-label>
             </ion-item>
             <!-- Fila para el contacto de emergencia del usuario -->
             <ion-item>
               <ion-label><strong>Contacto Emergencia</strong></ion-label>
-              <ion-button (click)="mostrarContacto()">Mostrar Contacto</ion-button>
+              <ion-button (click)="mostrarContacto()" class="blue-button-gl">Mostrar Contacto</ion-button>
             </ion-item>
           </ion-list>
         </ion-col>
@@ -56,6 +62,7 @@
           Usuario</ion-button>
         <ion-button class="blue-button-gl" id="editarContactoEmergencia" (click)="openEditContactModal()">Editar
           Contacto</ion-button>
+        <ion-button (click)="openChangePasswordModal()" class="blue-button-gl">Cambiar Contraseña</ion-button>
       </div>
     </ion-grid>
   </ion-card>
@@ -74,16 +81,20 @@
     <ion-content>
       <ion-list>
         <ion-item>
-          <ion-label><strong>Nombre:</strong> {{ usuario?.contactoEmergencia?.nombre }}</ion-label>
+          <ion-label *ngIf="usuario?.contactoEmergencia"><strong>Nombre:</strong> {{ usuario?.contactoEmergencia?.nombre
+            }}</ion-label>
         </ion-item>
         <ion-item>
-          <ion-label><strong>Teléfono:</strong> {{ usuario?.contactoEmergencia?.telefono }}</ion-label>
+          <ion-label *ngIf="usuario?.contactoEmergencia"><strong>Teléfono:</strong> {{
+            usuario?.contactoEmergencia?.telefono }}</ion-label>
         </ion-item>
         <ion-item>
-          <ion-label><strong>Correo:</strong> {{ usuario?.contactoEmergencia?.correo }}</ion-label>
+          <ion-label *ngIf="usuario?.contactoEmergencia"><strong>Correo:</strong> {{ usuario?.contactoEmergencia?.correo
+            }}</ion-label>
         </ion-item>
         <ion-item>
-          <ion-label><strong>Relación:</strong> {{ usuario?.contactoEmergencia?.relacion }}</ion-label>
+          <ion-label *ngIf="usuario?.contactoEmergencia"><strong>Relación:</strong> {{
+            usuario?.contactoEmergencia?.relacion }}</ion-label>
         </ion-item>
       </ion-list>
     </ion-content>
@@ -149,43 +160,69 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <form (ngSubmit)="formularioEditUsuario($event)">
+      <form #editUserForm="ngForm" (ngSubmit)="formularioEditUsuario($event)" novalidate>
         <ion-list>
           <ion-item>
             <ion-label position="floating">Nombre</ion-label>
-            <ion-input name="nombre" type="text" [(ngModel)]="usuario.nombre"></ion-input>
+            <ion-input name="nombre" type="text" [(ngModel)]="usuarioNombre" required minlength="2">
+            </ion-input>
+            <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['nombre']?.valid" color="danger">
+              El nombre es requerido y debe tener al menos 2 caracteres.
+            </ion-note>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Primer Apellido</ion-label>
-            <ion-input name="pApellido" type="text" [(ngModel)]="usuario.papellido"></ion-input>
+            <ion-input name="pApellido" type="text" [(ngModel)]="usuario1erApellido" required>
+            </ion-input>
+            <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['pApellido']?.valid" color="danger">
+              El primer apellido es requerido.
+            </ion-note>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Segundo Apellido</ion-label>
-            <ion-input name="sApellido" type="text" [(ngModel)]="usuario.sapellido"></ion-input>
+            <ion-input name="sApellido" type="text" [(ngModel)]="usuario2doApellido" required>
+            </ion-input>
+            <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['sApellido']?.valid" color="danger">
+              El segundo apellido es requerido.
+            </ion-note>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Teléfono</ion-label>
-            <ion-input name="telefono" type="text" [(ngModel)]="usuario.telefono"></ion-input>
+            <ion-input name="telefono" type="text" [(ngModel)]="usuarioTelefono" required pattern="^[0-9]+$">
+            </ion-input>
+            <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['telefono']?.valid" color="danger">
+              El teléfono es requerido y debe ser numérico.
+            </ion-note>
           </ion-item>
           <ion-item>
             <ion-label position="floating">Correo</ion-label>
-            <ion-input name="correo" type="text" [(ngModel)]="usuario.correo"></ion-input>
+            <ion-input name="correo" type="email" [(ngModel)]="correoUsuario" required>
+            </ion-input>
+            <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['correo']?.valid" color="danger">
+              Un correo válido es requerido.
+            </ion-note>
           </ion-item>
           <ion-item>
             <ion-label>Región</ion-label>
-            <ion-select name="region" [(ngModel)]="selectedRegion" (ionChange)="onRegionChange()">
+            <ion-select name="region" [(ngModel)]="selectedRegion" required (ionChange)="onRegionChange()">
               <ion-select-option *ngFor="let region of regiones" [value]="region">
                 {{ region.nombre }}
               </ion-select-option>
             </ion-select>
+            <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['region']?.valid" color="danger">
+              Selecciona una región.
+            </ion-note>
           </ion-item>
           <ion-item>
             <ion-label>Selecciona una Comuna</ion-label>
-            <ion-select name="comuna" [(ngModel)]="selectedComuna">
+            <ion-select name="comuna" [(ngModel)]="selectedComuna" required>
               <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">
                 {{ comuna.nombre }}
               </ion-select-option>
             </ion-select>
+            <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['comuna']?.valid" color="danger">
+              Selecciona una comuna.
+            </ion-note>
           </ion-item>
           <ion-item>
             <ion-buttons slot="start">
@@ -193,7 +230,7 @@
             </ion-buttons>
           </ion-item>
         </ion-list>
-        <ion-button expand="full" type="submit">Guardar Cambios</ion-button>
+        <ion-button expand="full" type="submit" [disabled]="!editUserForm.form.valid">Guardar Cambios</ion-button>
       </form>
     </ion-content>
   </ng-template>

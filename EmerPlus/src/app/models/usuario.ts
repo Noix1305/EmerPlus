@@ -9,9 +9,8 @@ export interface Usuario {
   telefono?: number;
   regionid?: number;
   comunaid?: number;
-  contactoEmergencia?: Contacto;
+  contactoEmergencia?: Contacto; // Esta propiedad es opcional
   correo?: string;
-  rol: [number]; // Cada usuario puede tener múltiples roles
-  estado:number;
-
+  rol: [number]; // Puede ser un array
+  estado: number;
 }
