@@ -20,7 +20,6 @@ import { LoginModalComponent } from 'src/app/components/log-in-modal/log-in-moda
   ],
   declarations: [
     HomePage,
-    MenuComponent,
     RegistroModalComponent,
     LoginModalComponent
   ]

@@ -283,6 +283,42 @@ export class UserInfoPage {
     toast.present();
   }
 
+  async eliminarCuenta() {
+    const alert = await this.alertController.create({
+      header: 'Eliminar Cuenta',
+      message: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: () => {
+            console.log('Cancelado');
+          }
+        }, {
+          text: 'Eliminar',
+          handler: async () => {
+            if (this.usuario) {
+              try {
+                // Llama al servicio para eliminar el usuario
+                await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
+                this.successMessage = 'Cuenta eliminada exitosamente.';
+                await this.presentToast(this.successMessage);
+                this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
+              } catch (error) {
+                console.error('Error al eliminar la cuenta:', error);
+                this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
+                await this.presentToast(this.errorMessage);
+              }
+            }
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
   async mostrarContacto() {
     if (this.usuario?.contactoEmergencia) {
       await this.modalContacto.present();

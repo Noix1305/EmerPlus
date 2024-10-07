@@ -140,6 +140,25 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
     );
   }
 
+  eliminarCuenta(rut: string): Observable<HttpResponse<void>> {
+    const path = `${this.path}?rut=eq.${rut}`;
+
+    return this.apiConfig.delete<void>(path).pipe(
+      map(response => {
+        // Aquí podrías manejar cualquier lógica adicional si es necesario
+        return new HttpResponse<void>({
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+      }),
+      catchError(error => {
+        console.error('Error al eliminar la cuenta:', error);
+        return throwError(error); // Propaga el error
+      })
+    );
+  }
+
   decryptText(inputText: string) {
     // Desencripta el texto de entrada reemplazando las secuencias de caracteres especiales con sus vocales originales.
     // Si el texto no está vacío, cada secuencia de caracteres encriptada es reemplazada por su vocal correspondiente.

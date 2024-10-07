@@ -8,6 +8,7 @@ import { UserInfoPageRoutingModule } from './user-info-routing.module';
 
 import { UserInfoPage } from './user-info.page';
 import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pass.component';
+import { MenuComponent } from 'src/app/components/menu/menu.component';
 
 @NgModule({
   imports: [
@@ -15,9 +16,13 @@ import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pa
     FormsModule,
     IonicModule,
     UserInfoPageRoutingModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    
   ],
-  declarations: [UserInfoPage,CambiarPassComponent
+  declarations: [
+    UserInfoPage,
+    CambiarPassComponent,
+    MenuComponent,
   ]
 })
 export class UserInfoPageModule {}

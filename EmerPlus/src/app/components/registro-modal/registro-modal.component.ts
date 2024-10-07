@@ -27,6 +27,10 @@ export class RegistroModalComponent {
 
   closeModal() {
     this.modalController.dismiss(null, 'cancel');
+    this.rut = '';
+    this.password = '';
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 
   async presentToast(successMessage: string) {
@@ -78,8 +82,9 @@ export class RegistroModalComponent {
       this.presentToast(this.successMessage);
       this.closeModal(); // Cierra el modal si el registro fue exitoso
     } catch (error) {
-      console.error('Error al crear usuario:', error);
       this.errorMessage = 'Ocurrió un error al crear el usuario. Inténtalo de nuevo.';
+      console.log(this.errorMessage)
+      console.error('Error al crear usuario:', error);
     }
   }
 

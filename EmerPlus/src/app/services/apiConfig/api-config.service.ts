@@ -36,16 +36,16 @@ export class ApiConfigService {
     console.log('URL de la solicitud:', url);
 
     return this.httpClient.post<T>(
-        url,
-        data,
-        {
-            headers: this.getHeaders(),
-            observe: 'response'
-        }
+      url,
+      data,
+      {
+        headers: this.getHeaders(),
+        observe: 'response'
+      }
     ).pipe(
-        catchError(this.handleError)
+      catchError(this.handleError)
     );
-}
+  }
 
   patch<T>(path: string, data: any, params?: HttpParams): Observable<HttpResponse<T>> {
     return this.httpClient.patch<T>(`${this.urlBase}/${path}`,
@@ -58,6 +58,16 @@ export class ApiConfigService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  delete<T>(path: string, params?: HttpParams): Observable<HttpResponse<T>> {
+    return this.httpClient.delete<T>(`${this.urlBase}/${path}`, {
+      headers: this.getHeaders(),
+      observe: 'response',
+      params
+    }).pipe(
+      catchError(this.handleError)
+    );
   }
 
 }
