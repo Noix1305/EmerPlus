@@ -15,4 +15,4 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideHttpClient(withInterceptorsFromDi())],
   bootstrap: [AppComponent],
 })
-export class AppModule {}
+export class AppModule { }

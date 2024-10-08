@@ -28,23 +28,21 @@
       </div>
     </form>
 
-
     <div *ngIf="errorMessage" class="error-message" style="--background: transparent;">
       {{ errorMessage }}
     </div>
   </div>
+
+  <div *ngIf="isPasswordRecovery">
+    <form (submit)="onSubmitForgotPassword($event)" class="forgot-password-form">
+      <ion-label position="stacked" for="rut"></ion-label>
+      <ion-input type="text" name="rut" required placeholder="Ingrese su RUT"></ion-input>
+      <ion-button expand="full" type="submit" class="submit-button">Enviar</ion-button>
+    </form>
+  </div>
+
   <div style="text-align: center;">
     <em><a (click)="togglePasswordRecovery()">¿Olvidaste tu contraseña?</a></em>
   </div>
-
-  <form *ngIf="isPasswordRecovery" (submit)="handlePasswordRecovery($event)">
-    <ion-input placeholder="RUT" [(ngModel)]="username" name="username"></ion-input>
-    <ion-input placeholder="Correo Electrónico" [(ngModel)]="emailInput" name="email"></ion-input>
-    <div *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</div>
-    <ion-button type="submit">Recuperar Contraseña</ion-button>
-    <p *ngIf="msgContrasenaOlvidada">{{msgContrasenaOlvidada}}</p>
-  </form>
-
-
 
 </ion-content>

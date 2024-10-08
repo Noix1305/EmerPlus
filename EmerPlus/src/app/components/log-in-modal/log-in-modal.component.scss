@@ -1,0 +1,42 @@
+.error-message {
+  color: red;
+  font-weight: bold;
+}
+
+.form-container {
+  padding: 20px;
+  /* Espacio alrededor del contenedor */
+  border-radius: 10px;
+  /* Bordes redondeados */
+  background-color: #f9f9f9;
+  /* Color de fondo claro */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  /* Sombra sutil */
+  margin: 20px;
+  /* Margen alrededor del formulario */
+}
+
+.forgot-password-form {
+  display: flex;
+  flex-direction: column;
+  /* Disposición en columna */
+}
+
+ion-label {
+  margin-bottom: 10px;
+  /* Espacio entre la etiqueta y el input */
+}
+
+ion-input {
+  margin-bottom: 20px;
+  /* Espacio entre el input y el botón */
+}
+
+.submit-button {
+  --background: #3880ff;
+  /* Color de fondo del botón */
+  --color: #fff;
+  /* Color del texto del botón */
+  font-weight: bold;
+  /* Texto en negrita */
+}

@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { LoginService } from '../../services/loginService/login.service';
-import { RegistroModalComponent } from '../../../components/registro-modal/registro-modal.component';
-import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.component';
+import { RegistroModalComponent } from '../../components/registro-modal/registro-modal.component';
+import { Usuario } from 'src/app/models/usuario';
+import { LoginModalComponent } from 'src/app/components/log-in-modal/log-in-modal.component';
 
 @Component({
   selector: 'app-home',
@@ -11,12 +11,14 @@ import { LoginModalComponent } from 'src/components/log-in-modal/log-in-modal.co
 })
 export class HomePage {
   placeholderVisible: boolean = true;
+  usuarios: Usuario[] = [];
 
-  constructor(private _loginService: LoginService, private modalController: ModalController) { }
+  constructor(
+    private modalController: ModalController,
+  ) { }
 
-  // Abrir el modal de registro
-
-
+  async ngOnInit() {
+  }
 
   async openRegistroModal() {
     const modal = await this.modalController.create({
@@ -31,11 +33,6 @@ export class HomePage {
       component: LoginModalComponent,
     });
     return await modal.present();
-  }
-
-  // Mostrar usuarios del servicio de login
-  mostrarUsuarios() {
-    this._loginService.mostrarUsuarios();
   }
 
   // Método de cierre para cualquier modal

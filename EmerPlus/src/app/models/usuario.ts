@@ -1,17 +1,16 @@
 import { Contacto } from "./contacto";
-import { Rol } from "./rol";
-
 
 export interface Usuario {
   rut: string;
   password: string;
   nombre?: string;
-  pApellido?: string;
-  sApellido?: string;
+  papellido?: string;
+  sapellido?: string;
   telefono?: number;
-  region?: string;
-  comuna?: string;
-  contactoEmergencia?: Contacto;
+  regionid?: number;
+  comunaid?: number;
+  contactoEmergencia?: Contacto; // Esta propiedad es opcional
   correo?: string;
-  rol: Rol[]; // Cada usuario puede tener múltiples roles
+  rol: [number]; // Puede ser un array
+  estado: number;
 }

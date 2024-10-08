@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 <ion-content>
-  <form (submit)="handleRegistroSubmit($event)">
+  <form (submit)="formularioRegistro($event)">
     <ion-item>
       <ion-label position="floating"></ion-label>
       <ion-input [(ngModel)]="rut" name="rut" placeholder="Ingresa tu RUT"></ion-input>
@@ -24,6 +24,9 @@
         <ion-input-password-toggle slot="end"></ion-input-password-toggle>
       </ion-input>
     </ion-item>
-    <ion-button expand="full" type="submit">Registrar</ion-button>
   </form>
+  <div *ngIf="errorMessage" class="error-message" style="--background: transparent; color:red">
+    {{ errorMessage }}
+  </div>
+  <ion-button expand="full" type="submit">Registrar</ion-button>
 </ion-content>
