@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { HomePage } from './home.page';
 import { HomePageRoutingModule } from './home-routing.module';
-import { MenuComponent } from 'src/app/components/menu/menu.component';
 import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
 import { LoginModalComponent } from 'src/app/components/log-in-modal/log-in-modal.component';
 
