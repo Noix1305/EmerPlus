@@ -12,4 +12,14 @@ export class DashboardPage implements OnInit {
   ngOnInit() {
   }
 
+  makeEmergencyCall() {
+    // Lógica para realizar una llamada a emergencias
+    alert("Llamando al número de emergencias...");
+  }
+
+  sendAlertToContact() {
+    // Lógica para enviar una alerta al contacto de emergencia
+    alert("Alerta enviada a tu contacto de emergencia.");
+  }
+
 }

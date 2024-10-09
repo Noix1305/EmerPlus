@@ -21,8 +21,7 @@ import { MenuComponent } from 'src/app/components/menu/menu.component';
   ],
   declarations: [
     UserInfoPage,
-    CambiarPassComponent,
-    MenuComponent,
+    CambiarPassComponent
   ]
 })
 export class UserInfoPageModule {}

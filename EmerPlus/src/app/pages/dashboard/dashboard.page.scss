@@ -1,0 +1,44 @@
+.colorVerdeMusgo {
+    --background: #8A9A5B;
+    /* Verde musgo */
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.logo {
+    width: 150px;
+    height: auto;
+    border-radius: 10px;
+}
+
+.button-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* Dos columnas */
+    gap: 20px;
+    /* Espacio entre botones */
+    margin-top: 20px;
+}
+
+ion-card {
+    margin-top: 20px;
+}
+
+
+.button-square {
+    width: 100%;
+    /* Asegura que los contenedores ocupen el ancho completo */
+    aspect-ratio: 1;
+    
+    /* Mantiene la forma cuadrada */
+}
+
+ion-button {
+    height: 100%;
+    border-radius: 5%;
+    /* Hace que el botón ocupe todo el espacio del contenedor */
+}

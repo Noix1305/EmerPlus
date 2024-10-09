@@ -17,7 +17,24 @@ ion-row {
   justify-content: center;
   /* Centra horizontalmente */
   align-items: center;
-  /* Centra verticalmente si es necesario */
+  /* Centra verticalmente */
+  flex-wrap: wrap;
+  /* Permite que los botones se muevan a la siguiente fila si es necesario */
+  gap: 10px;
+  /* Espacio entre los botones */
+  padding: 10px;
+  /* Añade algo de espacio alrededor del contenedor */
+}
+
+.button-container ion-button {
+  flex: 1 1 100px;
+  /* Permite que los botones crezcan o se encojan, mínimo 100px */
+  max-width: 300px;
+  /* Ancho máximo del botón */
+  width: 100%;
+  /* Ocupa todo el ancho del contenedor disponible */
+  box-sizing: border-box;
+  /* Asegura que el padding se incluya en el ancho total */
 }
 
 .gridStyle {

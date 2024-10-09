@@ -1,13 +1,67 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>dashboard</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+<ion-app>
+  <app-menu></app-menu>
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+  <ion-header>
     <ion-toolbar>
-      <ion-title size="large">dashboard</ion-title>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/"></ion-back-button>
+      </ion-buttons>
+      <ion-buttons slot="end">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
     </ion-toolbar>
   </ion-header>
-</ion-content>
+
+  <ion-header>
+    <ion-toolbar color="danger">
+      <ion-title>Emerplus</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Main Content -->
+  <ion-content class="ion-padding" fullscreen>
+    <p style="text-align: center;">Enviar Alerta</p>
+    <div class="logo-container">
+      <img src="/assets/imgs/sirenaEmergencia.png" alt="Emergency App Logo" class="logo">
+    </div>
+
+    <!-- Botones de acción rápida -->
+    <div class="button-container">
+      <div class="button-square">
+        <ion-button class="colorVerdeMusgo" expand="full" (click)="makeEmergencyCall()">
+          <ion-icon name="call" slot="start"></ion-icon>
+          Carabineros
+        </ion-button>
+      </div>
+    
+      <div class="button-square">
+        <ion-button color="danger" expand="full" (click)="sendAlertToContact()">
+          <ion-icon name="call" slot="start"></ion-icon>
+          Bomberos
+        </ion-button>
+      </div>
+    
+      <div class="button-square">
+        <ion-button color="primary" expand="full">
+          <ion-icon name="call" slot="start"></ion-icon>
+          Ambulancia
+        </ion-button>
+      </div>
+
+      <div class="button-square">
+        <ion-button color="warning" expand="full">
+          <ion-icon name="alert" slot="start"></ion-icon>
+          Contacto Emergencia
+        </ion-button>
+      </div>
+    </div>
+    
+
+    <!-- Enlace para editar perfil -->
+    <ion-item lines="none" routerLink="/user-info">
+      <ion-label>Editar Perfil</ion-label>
+      <ion-icon name="person-circle" slot="start"></ion-icon>
+      <ion-button fill="clear">Ir</ion-button>
+    </ion-item>
+  </ion-content>
+</ion-app>
