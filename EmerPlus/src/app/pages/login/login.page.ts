@@ -1,7 +1,7 @@
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
 import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController } from '@ionic/angular';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
@@ -31,8 +31,9 @@ export class LoginPage implements OnInit {
     private modalController: ModalController,
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
-    private router: Router
+    private router:Router
   ) { }
+
 
   async openRegistroModal() {
     const modal = await this.modalController.create({
@@ -116,7 +117,7 @@ export class LoginPage implements OnInit {
 
       if (user) {
         // Si el usuario se encuentra y la contraseña es correcta
-        this.router.navigate(['user-info'], { state: { usuario: user } });
+        this.router.navigate(['dashboard'], { state: { usuario: user } });
         this.closeModal(); // Cierra el modal
       } else {
         // Si la contraseña es incorrecta

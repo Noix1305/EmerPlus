@@ -10,7 +10,12 @@
     </ion-card-header>
 
     <ion-card-content>
-      <img src="/assets/icon/person_icon_negro.png" alt="EmerPlus Logo" class="personImg" />
+      <!-- <img src="/assets/icon/person_Icon.png" alt="logo person" class="personImg"> -->
+      <div class="personImg">
+        <ion-icon name="person-circle" style="font-size: 200px; color: rgb(231, 236, 236);">
+        </ion-icon>
+      </div>
+      
       <div *ngIf="!isPasswordRecovery">
         <form (submit)="handleLoginSubmit($event)">
           <ion-item>
@@ -57,13 +62,13 @@
     <ion-card-content style="padding: 0;">
       <div class="cardContent">
         <ion-item class="ionItems2" expand="full" href="home" style="margin-left:10%">
-          <ion-icon name="home" color="secondary" class="iconosInferior"></ion-icon>
+          <ion-icon name="home" class="iconosInferior"></ion-icon>
         </ion-item>
         <ion-item class="ionItems2" expand="full" href="dashboard">
-          <ion-icon name="person" color="secondary" class="iconosInferior"></ion-icon>
+          <ion-icon name="person-circle" class="iconosInferior"></ion-icon>
         </ion-item>
         <ion-item class="ionItems2" expand="full">
-          <ion-icon name="settings" color="secondary" class="iconosInferior"></ion-icon>
+          <ion-icon name="settings" class="iconosInferior"></ion-icon>
         </ion-item>
       </div>
     </ion-card-content>

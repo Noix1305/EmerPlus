@@ -22,17 +22,21 @@
     gap: 20px;
     /* Espacio entre botones */
     margin-top: 20px;
+    margin: auto;
 }
 
 ion-card {
     margin-top: 20px;
 }
 
-
 .button-square {
     width: 100%;
     /* Asegura que los contenedores ocupen el ancho completo */
     aspect-ratio: 1;
+
+    max-width: 350px;
+    max-height: 350px;
+    margin: auto;
     
     /* Mantiene la forma cuadrada */
 }
