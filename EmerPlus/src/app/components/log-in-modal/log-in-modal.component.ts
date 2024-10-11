@@ -5,6 +5,7 @@ import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom, map } from 'rxjs';
+import { Preferences } from '@capacitor/preferences';
 
 @Component({
   selector: 'app-log-in-modal',
@@ -103,6 +104,13 @@ export class LoginModalComponent {
       const user = await this._loginService.login(rut, password); // Llama al método de inicio de sesión
 
       if (user) {
+
+        const setName = async () => {
+          await Preferences.set({
+            key: 'userInfo',
+            value: JSON.stringify(user),
+          });
+        };
         // Si el usuario se encuentra y la contraseña es correcta
         this.router.navigate(['user-info'], { state: { usuario: user } });
         this.closeModal(); // Cierra el modal

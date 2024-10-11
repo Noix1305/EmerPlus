@@ -5,3 +5,5 @@ npm install express nodemailer cors
 npm install dotenv
 npm install --save-dev @types/nodemailer
 npm install cors
+
+npm install @capacitor/preferences
