@@ -60,8 +60,32 @@ export class ApiConfigService {
       );
   }
 
+  patchParcial<T>(path: string, userModel: Partial<T>, params?: HttpParams): Observable<HttpResponse<T>> {
+    return this.httpClient.patch<T>(`${this.urlBase}/${path}`, userModel, {
+      headers: this.getHeaders(),
+      observe: 'response',
+      params
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
+  
+
   delete<T>(path: string, params?: HttpParams): Observable<HttpResponse<T>> {
     return this.httpClient.delete<T>(`${this.urlBase}/${path}`, {
+      headers: this.getHeaders(),
+      observe: 'response',
+      params
+    }).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  editField<T>(path: string, fieldName: string, value: any, params?: HttpParams): Observable<HttpResponse<T>> {
+    // Crear el objeto que contiene el campo a actualizar
+    const data = { [fieldName]: value };
+
+    return this.httpClient.patch<T>(`${this.urlBase}/${path}`, data, {
       headers: this.getHeaders(),
       observe: 'response',
       params

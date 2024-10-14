@@ -3,9 +3,6 @@
   <ion-router-outlet id="main-content"></ion-router-outlet>
   <ion-header>
     <ion-toolbar>
-      <ion-buttons slot="start">
-        <ion-back-button defaultHref="/"></ion-back-button>
-      </ion-buttons>
       <ion-title>Emerplus</ion-title>
       <ion-buttons slot="end">
         <ion-menu-button></ion-menu-button>
@@ -24,14 +21,14 @@
           Carabineros
         </ion-button>
       </div>
-    
+
       <div class="button-square">
         <ion-button color="danger" expand="full" (click)="bomberos('Bomberos')">
           <ion-icon name="call" slot="start"></ion-icon>
           Bomberos
         </ion-button>
       </div>
-    
+
       <div class="button-square">
         <ion-button color="primary" expand="full" (click)="ambulancia('Ambulancia')">
           <ion-icon name="call" slot="start"></ion-icon>
@@ -46,6 +43,6 @@
         </ion-button>
       </div>
     </div>
-    
+
   </ion-content>
 </ion-app>

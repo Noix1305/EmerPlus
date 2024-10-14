@@ -3,6 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { RegistroModalComponent } from '../../components/registro-modal/registro-modal.component';
 import { Usuario } from 'src/app/models/usuario';
 import { LoginModalComponent } from 'src/app/components/log-in-modal/log-in-modal.component';
+import { Preferences } from '@capacitor/preferences';
 
 @Component({
   selector: 'app-home',
@@ -18,6 +19,7 @@ export class HomePage {
   ) { }
 
   async ngOnInit() {
+    await Preferences.remove({ key: 'userInfo' });
   }
 
   async openRegistroModal() {

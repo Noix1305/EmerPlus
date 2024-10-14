@@ -7,6 +7,7 @@ import { UsuarioService } from 'src/app/services/usuarioService/usuario.service'
 import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom, map } from 'rxjs';
 import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
+import { Preferences } from '@capacitor/preferences';
 
 @Component({
   selector: 'app-login',
@@ -24,14 +25,14 @@ export class LoginPage implements OnInit {
   isPasswordRecovery: boolean = false;
 
   ngOnInit() {
+
   }
 
   constructor(
-    private cd: ChangeDetectorRef,
     private modalController: ModalController,
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
-    private router:Router
+    private router: Router
   ) { }
 
 
@@ -109,7 +110,7 @@ export class LoginPage implements OnInit {
       if (!usuarioExistente) {
         // Si el usuario no existe, solicita el registro
         this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado. Por favor, regístrate.';
-        return; // Salir de la función temprano
+        return false; // Salir de la función temprano
       }
 
       // Ahora intenta iniciar sesión
@@ -117,17 +118,27 @@ export class LoginPage implements OnInit {
 
       if (user) {
         // Si el usuario se encuentra y la contraseña es correcta
-        this.router.navigate(['dashboard'], { state: { usuario: user } });
-        this.closeModal(); // Cierra el modal
+
+        // Guarda la información del usuario en Preferences
+        await Preferences.set({
+          key: 'userInfo',
+          value: JSON.stringify(user) // Convierte el objeto de usuario a string
+        });
+
+        this.router.navigate(['dashboard']);
       } else {
         // Si la contraseña es incorrecta
         this.errorMessage = 'Credenciales incorrectas'; // Maneja credenciales incorrectas
+        return false; // No permite el acceso
       }
     } catch (error) {
       // Maneja cualquier error durante el proceso de inicio de sesión
       this.errorMessage = 'Ocurrió un error durante el login. Inténtalo de nuevo.';
       console.error('Error en el login:', error); // Registra el error
+      return false; // No permite el acceso
     }
+
+    return false; // Valor por defecto al final de la función
   }
 
   contraseñaOlvidada() {

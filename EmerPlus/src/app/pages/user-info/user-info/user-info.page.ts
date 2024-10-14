@@ -2,14 +2,17 @@ import { HttpResponse } from '@angular/common/http';
 import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Preferences } from '@capacitor/preferences';
 import { AlertController, IonModal, ModalController, ToastController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { firstValueFrom } from 'rxjs';
 import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pass.component';
+import { AgregarContactoUsuario } from 'src/app/models/agregarContactoUsuario';
 import { Comuna } from 'src/app/models/comuna';
 import { Contacto } from 'src/app/models/contacto';
 import { Region } from 'src/app/models/region';
 import { Usuario } from 'src/app/models/usuario';
+import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
@@ -27,14 +30,17 @@ export class UserInfoPage {
   @ViewChild('modalEditContact', { static: false }) modalEditContact!: IonModal;
 
   usuario: Usuario | null = null;
-  rolUsuario: string | undefined; // Cambia a string
+  rolUsuario: string | undefined;
+
   contacto: Contacto = {
-    rut_usuario: "",
-    nombre: "",
+    rut_usuario: '',
+    nombre: '',
+    apaterno: '',
+    amaterno: '',
     telefono: 0,
-    correo: "",
-    relacion: ""
-  }
+    correo: '',
+    relacion: ''
+  };
 
   rut: string = '';
   password: string = '';
@@ -46,13 +52,16 @@ export class UserInfoPage {
 
   regiones: Region[] = [];
   comunas: Comuna[] = [];
+
   comunasCargadas: Comuna[] = [];
+
   selectedRegion: Region | null = null;
   selectedComuna: Comuna | null = null;
-  comunaUsuario: Comuna | null = null; // Mantener el tipo Comuna
+
+  comunaUsuario: Comuna | null = null;
   regionUsuario: Region | null = null;
+
   form: FormGroup;
-  ;
 
   constructor(private router: Router,
     private alertController: AlertController,
@@ -62,7 +71,8 @@ export class UserInfoPage {
     private _regionComunaService: RegionComunaService,
     private toastController: ToastController,
     private fb: FormBuilder,
-    private modalCtrl: ModalController) {
+    private modalCtrl: ModalController,
+    private _contactoService: ContactosemergenciaService) {
 
     this.form = this.fb.group({
       nombre: ['', Validators.required],
@@ -78,8 +88,22 @@ export class UserInfoPage {
 
   async ngOnInit() {
     this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
+
     this.cargarRegiones();
     this.cargarComunas();
+
+    if (!this.usuario) {
+      const { value } = await Preferences.get({ key: 'userInfo' });
+
+      if (value) {
+        this.usuario = JSON.parse(value) as Usuario; // Convierte el JSON a Usuario
+        console.log('Usuario obtenido de Preferences:', this.usuario);
+      } else {
+        console.log('No se encontró el usuario en Preferences.');
+      }
+    } else {
+      console.log('Usuario obtenido desde la navegación:', this.usuario);
+    }
 
     if (this.usuario) {
 
@@ -378,67 +402,123 @@ export class UserInfoPage {
     }
   }
 
-  closeModal() {
-    this.modalContacto.dismiss();
+  // Función genérica para abrir un modal
+  openModal(modal: IonModal) {
+    modal.present();
   }
 
+  // Función genérica para cerrar un modal
+  closeModal(modal: IonModal) {
+    modal.dismiss();
+  }
+
+  // Funciones específicas que usan las funciones genéricas
   openAddUserModal() {
-    this.modalAddUser.present();
+    this.openModal(this.modalAddUser);
   }
 
   closeAddUserModal() {
-    this.modalAddUser.dismiss();
+    this.closeModal(this.modalAddUser);
   }
 
   openEditUserModal() {
-    this.modalEditUser.present();
+    this.openModal(this.modalEditUser);
   }
 
   closeEditUserModal() {
-    this.modalEditUser.dismiss();
+    this.closeModal(this.modalEditUser);
   }
 
   openEditContactModal() {
-    this.modalEditContact.present();
+    this.openModal(this.modalEditContact);
   }
 
   closeEditContactModal() {
-    this.modalEditContact.dismiss();
+    this.closeModal(this.modalEditContact);
+  }
+
+  closeModalContacto() {
+    this.closeModal(this.modalContacto);
+
   }
 
   async handleEditContactSubmit(event: Event) {
     event.preventDefault(); // Prevenir el envío por defecto del formulario
 
-    // Extraer los detalles del contacto del formulario
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
 
-    // Extraer y convertir el teléfono a número
     const telefonoString = formData.get('telefono') as string;
     const telefono = parseInt(telefonoString, 10);
 
-    // Validar si el teléfono es un número válido
     if (isNaN(telefono)) {
       console.error('El teléfono ingresado no es válido.');
       return;
     }
 
-    // Crear el objeto actualizado de contacto
-    const updatedContact: Contacto = {
-      rut_usuario: this.usuario!.rut, // RUT del usuario logueado
-      nombre: formData.get('nombre') as string,
-      telefono: telefono, // Usar el número convertido
-      correo: formData.get('correo') as string,
-      relacion: formData.get('relacion') as string,
-    };
+    if (this.usuario) {
+      const updatedContact: Contacto = {
+        rut_usuario: this.usuario.rut,
+        nombre: formData.get('nombre') as string,
+        apaterno: formData.get('apaterno') as string,
+        amaterno: formData.get('amaterno') as string,
+        telefono: telefono,
+        correo: formData.get('correo') as string,
+        relacion: formData.get('relacion') as string,
+      };
 
-    // Asegurarse de que `rut` está definido antes de actualizar `this.usuario`
-    if (!this.usuario?.rut) {
-      console.error('El RUT del usuario no está definido.');
-      return;
+      try {
+        // Llama al servicio para crear el contacto
+        const response = await firstValueFrom(this._contactoService.crearContacto(updatedContact));
+
+        // Verifica si la respuesta fue exitosa
+        if (response.ok) {
+          // Intenta buscar el contacto por su RUT
+          const contactoResponse = await firstValueFrom(this._contactoService.getContactoPorParametro('rut_usuario', updatedContact.rut_usuario));
+
+          // Asegúrate de que estás manejando la respuesta correctamente
+          if (contactoResponse.body && contactoResponse.body.length > 0) {
+            const contactoCreado = contactoResponse.body[contactoResponse.body.length - 1]; // Accede al primer elemento del array
+            console.info('Contacto creado:', contactoCreado); // Inspeccionar toda la respuesta
+            if (contactoCreado.id) {
+              const idContacto = contactoCreado.id;
+          
+              const usuario: Partial<AgregarContactoUsuario> = {
+                  id_contacto: idContacto // Asegúrate de que id_contacto está en Usuario
+              };
+          
+              // this._usuarioService.editarCampoUsuario(this.usuario.rut, usuario).subscribe(
+              //     (response) => {
+              //         console.log('Usuario actualizado:', response);
+              //     },
+              //     (error) => {
+              //         console.error('Error al actualizar usuario:', error);
+              //     }
+              // );
+          } else {
+              this.errorMessage = 'El ID del contacto no se encontró.';
+              console.error(this.errorMessage);
+          }
+          } else {
+            this.errorMessage = 'No se encontró el contacto creado tras la inserción.';
+            console.error(this.errorMessage);
+          }
+        } else {
+          this.errorMessage = 'Ocurrió un error al crear el contacto.';
+          console.error(this.errorMessage);
+        }
+
+
+        this.presentToast(this.successMessage);
+        this.closeEditContactModal();
+      } catch (error) {
+        this.errorMessage = 'Ocurrió un error al crear el contacto. Inténtalo de nuevo.';
+        console.log(this.errorMessage);
+        console.error('Error al crear contacto:', error);
+      }
     }
-
   }
+
 
   get correoUsuario(): string {
     return this.usuario?.correo || '';

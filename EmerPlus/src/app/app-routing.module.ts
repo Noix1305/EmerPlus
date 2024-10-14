@@ -1,21 +1,16 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
-import { isAdminGuard } from './guards/isAdmin/is-admin.guard';
+import { isUsuarioGuard } from './guards/isUsuario/is-usuario.guard';
 
 const routes: Routes = [
   {
     path: 'home',
-    loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule),
-    canActivate: [isAdminGuard]
-  },
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
+    loadChildren: () => import('./pages/home/home.module').then(m => m.HomePageModule)
   },
   {
     path: 'user-info',
-    loadChildren: () => import('./pages/user-info/user-info/user-info.module').then(m => m.UserInfoPageModule)
+    loadChildren: () => import('./pages/user-info/user-info/user-info.module').then(m => m.UserInfoPageModule),
+    canActivate: [isUsuarioGuard]
   },
   {
     path: 'login',
@@ -23,7 +18,13 @@ const routes: Routes = [
   },
   {
     path: 'dashboard',
-    loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardPageModule)
+    loadChildren: () => import('./pages/dashboard/dashboard.module').then(m => m.DashboardPageModule),
+    canActivate: [isUsuarioGuard]
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
   },
 
 ];

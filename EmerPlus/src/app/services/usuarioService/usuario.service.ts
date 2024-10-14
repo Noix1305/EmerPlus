@@ -124,6 +124,34 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
     );
   }
 
+  editarCampoUsuario(rut: string, usuario: Partial<Usuario>): Observable<HttpResponse<Usuario>> {
+    const path = `${this.path}?rut=eq.${rut}`; // Construye la ruta con el RUT
+    return this.apiConfig.patchParcial<Usuario>(path, usuario).pipe(
+      map(response => {
+        return new HttpResponse<Usuario>({
+          body: response.body || null,
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+      })
+    );
+  }
+
+  editariIdcontactoUsuario(rut: string, usuario: Usuario): Observable<HttpResponse<Usuario>> {
+    const path = `${this.path}?rut=eq.${rut}`;
+    return this.apiConfig.patch<Usuario>(path, usuario).pipe(
+      map(response => {
+        return new HttpResponse<Usuario>({
+          body: response.body || null, // Puedes modificar esto si es necesario
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+      })
+    );
+  }
+
   cambiarContrasena(rut: string, nuevaContrasena: string): Observable<HttpResponse<Usuario>> {
     const path = `${this.path}?rut=eq.${rut}`;
     const body = { password: nuevaContrasena }; // Asumiendo que el campo de la contraseña es 'password'
