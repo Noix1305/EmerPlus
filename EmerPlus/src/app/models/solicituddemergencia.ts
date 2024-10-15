@@ -1,4 +1,5 @@
 export interface SolicitudDeEmergencia {
+    id?: number
     usuario_id: string;      // ID o RUT del usuario (si el RUT es alfanumérico, puede ser string)
     latitud: number;         // Latitud de la ubicación en la emergencia (double en SQL se convierte a number en TypeScript)
     longitud: number;        // Longitud de la ubicación en la emergencia

@@ -26,26 +26,32 @@ export class UsuarioService {
     );
   }
 
-  async enviarContraseñaPorRut(rut: string): Promise<void> {
-    const usuarioResponse = await firstValueFrom(this.getUsuarioPorRut(rut));
+  async enviarContraseñaPorRut(rut?: string, email?: string): Promise<void> {
+    if (rut) {
+      const usuarioResponse = await firstValueFrom(this.getUsuarioPorRut(rut));
 
-    if (usuarioResponse.body && Array.isArray(usuarioResponse.body) && usuarioResponse.body.length > 0) {
-      const usuario: Usuario = usuarioResponse.body[0];
-      const email = usuario.correo;
+      if (usuarioResponse.body && Array.isArray(usuarioResponse.body) && usuarioResponse.body.length > 0) {
+        const usuario: Usuario = usuarioResponse.body[0];
+        const email = usuario.correo;
 
-      console.log('Usuario encontrado:', usuario.nombre);
-      console.log('Correo:', email);
+        console.log('Usuario encontrado:', usuario.nombre);
+        console.log('Correo:', email);
 
-      const passDesencriptada = this.decryptText(usuario.password);
+        const passDesencriptada = this.decryptText(usuario.password);
 
-      if (email) {
-        // Enviar la contraseña al correo
-        await this.enviarCorreoConContraseña(email, passDesencriptada);
+        if (email) {
+          // Enviar la contraseña al correo
+          await this.enviarCorreoConContraseña(email, passDesencriptada);
+        } else {
+          throw new Error('El correo electrónico no está disponible para el usuario.');
+        }
       } else {
-        throw new Error('El correo electrónico no está disponible para el usuario.');
+        throw new Error('Usuario no encontrado.');
       }
+    } else if (email) {
+
     } else {
-      throw new Error('Usuario no encontrado.');
+      console.error('No se encontraron los parametros para el envío del correo:')
     }
   }
 
@@ -74,8 +80,6 @@ Atentamente,
 El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la necesitas.
 `;
 
-
-
     // Enviar el correo utilizando MailSenderService
     this.mailSenderService.enviarCorreo(email, asunto, texto).subscribe({
       next: () => {
@@ -87,6 +91,41 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
       }
     });
   }
+
+
+  async enviarCorreoRegistroContacto(email: string, usuario: Usuario, nombreContacto: string): Promise<void> {
+    const asunto = 'Registro como Contacto de Emergencia';
+    const texto = `
+Estimado/a ${nombreContacto},
+
+Esperamos que se encuentre bien.
+
+Le informamos que ha sido registrado/a como **contacto de emergencia** en nuestro servicio por el usuario ${usuario.nombre} ${usuario.papellido}.
+Esto significa que, en caso de emergencia, usted será notificado/a y podrá ser contactado/a en situaciones donde se necesite su ayuda.
+
+A continuación, le ofrecemos algunos detalles adicionales:
+
+1. **Servicio de Emergencia**: Este registro permite al usuario confiar en usted como parte importante de su red de apoyo.
+2. **Acciones a tomar**: En caso de recibir notificaciones, por favor, responda lo más pronto posible para brindar asistencia.
+3. **Confidencialidad y Seguridad**: La información proporcionada se maneja de forma confidencial y está protegida por nuestras políticas de seguridad.
+
+Si tiene alguna pregunta o necesita más información, no dude en ponerse en contacto con nuestro equipo de soporte.
+
+Atentamente,  
+El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la necesitas.
+`;
+
+    // Enviar el correo utilizando MailSenderService
+    this.mailSenderService.enviarCorreo(email, asunto, texto).subscribe({
+      next: () => {
+      },
+      error: (error) => {
+        console.error('Error al enviar el correo:', error);
+        alert('Hubo un error al enviar el correo.');
+      }
+    });
+  }
+
 
   obtenerUsuarios() {
     const params = new HttpParams().set('select', '*')
@@ -174,7 +213,7 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
       }),
       catchError(error => {
         console.error('Error al eliminar la cuenta:', error);
-        return throwError(error); // Propaga el error
+        return throwError(() => new Error('test')); // Propaga el error
       })
     );
   }

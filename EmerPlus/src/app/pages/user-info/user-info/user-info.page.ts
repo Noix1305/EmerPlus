@@ -32,6 +32,9 @@ export class UserInfoPage {
   usuario: Usuario | null = null;
   rolUsuario: string | undefined;
 
+  colorVerde: string = 'success'
+  colorRojo: string = 'danger'
+
   contacto: Contacto = {
     rut_usuario: '',
     nombre: '',
@@ -225,7 +228,7 @@ export class UserInfoPage {
     try {
       await firstValueFrom(this._usuarioService.editarUsuario(updatedUser.rut, updatedUser));
       this.successMessage = 'Usuario editado con éxito';
-      this.presentToast(this.successMessage);
+      this.presentToast(this.successMessage, this.colorVerde);
       this.closeEditUserModal();
 
       // Actualiza los datos del usuario en la página
@@ -289,20 +292,21 @@ export class UserInfoPage {
       // Llama al servicio para crear el usuario
       await firstValueFrom(this._usuarioService.crearUsuario(newUser)); // Asegúrate de que la función `crearUsuario` devuelva un Observable
       this.successMessage = 'Usuario creado exitosamente.';
-      this.presentToast(this.successMessage);
+      this.presentToast(this.successMessage, this.colorVerde);
       this.closeAddUserModal(); // Cierra el modal si el registro fue exitoso
     } catch (error) {
       console.error('Error al crear usuario:', error);
       this.errorMessage = 'Ocurrió un error al crear el usuario. Inténtalo de nuevo.';
+      this.presentToast(this.successMessage, this.colorRojo);
     }
   }
 
-  async presentToast(successMessage: string) {
+  async presentToast(successMessage: string, color: string) {
     const toast = await this.toastController.create({
       message: successMessage,
       duration: 2000, // Duración en milisegundos
       position: 'top', // Posición del Toast
-      color: 'success', // Color del Toast, puedes cambiarlo según tus necesidades
+      color: color, // Color del Toast, puedes cambiarlo según tus necesidades
     });
     toast.present();
   }
@@ -327,12 +331,12 @@ export class UserInfoPage {
                 // Llama al servicio para eliminar el usuario
                 await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
                 this.successMessage = 'Cuenta eliminada exitosamente.';
-                await this.presentToast(this.successMessage);
+                await this.presentToast(this.successMessage, 'success');
                 this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
               } catch (error) {
                 console.error('Error al eliminar la cuenta:', error);
                 this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
-                await this.presentToast(this.errorMessage);
+                await this.presentToast(this.errorMessage, 'danger');
               }
             }
           }
@@ -470,46 +474,31 @@ export class UserInfoPage {
       try {
         // Llama al servicio para crear el contacto
         const response = await firstValueFrom(this._contactoService.crearContacto(updatedContact));
+        this.successMessage = 'Contacto agregado con éxito, se le ha enviado una notificación.'
 
         // Verifica si la respuesta fue exitosa
         if (response.ok) {
-          // Intenta buscar el contacto por su RUT
-          const contactoResponse = await firstValueFrom(this._contactoService.getContactoPorParametro('rut_usuario', updatedContact.rut_usuario));
-
-          // Asegúrate de que estás manejando la respuesta correctamente
-          if (contactoResponse.body && contactoResponse.body.length > 0) {
-            const contactoCreado = contactoResponse.body[contactoResponse.body.length - 1]; // Accede al primer elemento del array
-            console.info('Contacto creado:', contactoCreado); // Inspeccionar toda la respuesta
-            if (contactoCreado.id) {
-              const idContacto = contactoCreado.id;
-          
-              const usuario: Partial<AgregarContactoUsuario> = {
-                  id_contacto: idContacto // Asegúrate de que id_contacto está en Usuario
-              };
-          
-              // this._usuarioService.editarCampoUsuario(this.usuario.rut, usuario).subscribe(
-              //     (response) => {
-              //         console.log('Usuario actualizado:', response);
-              //     },
-              //     (error) => {
-              //         console.error('Error al actualizar usuario:', error);
-              //     }
-              // );
-          } else {
-              this.errorMessage = 'El ID del contacto no se encontró.';
-              console.error(this.errorMessage);
-          }
-          } else {
-            this.errorMessage = 'No se encontró el contacto creado tras la inserción.';
-            console.error(this.errorMessage);
+          try {
+            //Envío de notificación al contacto agregado
+            await this._usuarioService.enviarCorreoRegistroContacto(updatedContact.correo, this.usuario, updatedContact.nombre)
+          } catch (error: unknown) {
+            if (error instanceof Error) {
+              this.successMessage = 'Error durante el envío de la notificación.'
+              console.error('Error durante el envío de la notificación:', error.message);
+              alert(error.message || 'Ocurrió un error inesperado.');
+            } else {
+              console.error('Error desconocido:', error);
+              this.successMessage = 'Error durante el envío de la notificación.'
+              alert('Ocurrió un error inesperado.');
+            }
           }
         } else {
           this.errorMessage = 'Ocurrió un error al crear el contacto.';
           console.error(this.errorMessage);
+          this.presentToast(this.errorMessage, 'danger');
         }
 
-
-        this.presentToast(this.successMessage);
+        this.presentToast(this.successMessage, 'success');
         this.closeEditContactModal();
       } catch (error) {
         this.errorMessage = 'Ocurrió un error al crear el contacto. Inténtalo de nuevo.';
