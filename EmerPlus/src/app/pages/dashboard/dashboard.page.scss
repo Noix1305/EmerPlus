@@ -37,7 +37,7 @@ ion-card {
     max-width: 350px;
     max-height: 350px;
     margin: auto;
-    
+
     /* Mantiene la forma cuadrada */
 }
 
@@ -45,4 +45,31 @@ ion-button {
     height: 100%;
     border-radius: 5%;
     /* Hace que el botón ocupe todo el espacio del contenedor */
+}
+
+.notification-icon {
+    position: relative;
+    display: inline-block;
+    margin-right: 16px;
+    font-size: 25px;
+    /* Ajusta el valor según sea necesario */
+}
+
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -10px;
+    background-color: rgb(238, 48, 48);
+    /* Cambia el color según sea necesario */
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    /* Ajusta el tamaño según sea necesario */
+    height: 20px;
+    /* Ajusta el tamaño según sea necesario */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    /* Ajusta el tamaño de la fuente según sea necesario */
 }

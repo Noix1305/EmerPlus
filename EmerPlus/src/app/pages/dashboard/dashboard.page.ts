@@ -19,6 +19,7 @@ import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergenc
 export class DashboardPage implements OnInit {
   usuario: Usuario | null = null;
   contacto: Contacto[] | null = null;
+  notificacion: number = 2;
 
   constructor(
     private alertController: AlertController,
@@ -44,6 +45,10 @@ export class DashboardPage implements OnInit {
     } else {
       console.log('Usuario obtenido desde la navegación:', this.usuario);
     }
+  }
+
+  limpiarNotificaciones() {
+    this.notificacion = 0;
   }
 
   carabineros(entidad: string) {
@@ -82,7 +87,7 @@ export class DashboardPage implements OnInit {
             tipo: tipoEmergencia
           };
           // Enviar la solicitud de emergencia
-           this.emergenciaService.enviarSolicitud(nuevaSolicitud).subscribe({
+          this.emergenciaService.enviarSolicitud(nuevaSolicitud).subscribe({
             next: () => {
               console.log('Solicitud enviada con éxito');
               // Ahora, obtén la última solicitud

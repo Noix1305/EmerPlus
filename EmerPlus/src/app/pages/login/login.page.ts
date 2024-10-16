@@ -59,10 +59,6 @@ export class LoginPage implements OnInit {
     this.isPasswordRecovery = !this.isPasswordRecovery; // Alterna el estado
   }
 
-  async handlePasswordRecovery(event: Event) {
-
-  }
-
   async onSubmitForgotPassword(event: Event): Promise<void> {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
