@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
 

@@ -1,7 +1,6 @@
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import {  ModalController } from '@ionic/angular';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
