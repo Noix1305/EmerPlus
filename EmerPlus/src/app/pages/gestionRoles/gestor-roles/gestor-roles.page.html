@@ -1,0 +1,25 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Gestor Roles</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Gestor Roles</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-list>
+    <ion-item *ngFor="let usuario of usuarios">
+      <ion-label>
+        <h2>{{ usuario.rut }}</h2>
+        <p>Nombre: {{ usuario.nombre }} {{ usuario.papellido }} {{ usuario.sapellido }}</p>
+        <p>Estado: {{ usuario.estado === 1 ? 'Activo' : 'Inactivo' }}</p>
+        <p>Rol: {{ usuario.rolNombre || 'Sin rol asignado' }}</p> <!-- Mostrar nombre del rol -->
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

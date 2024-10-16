@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ApiConfigService } from '../apiConfig/api-config.service';
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
-import { catchError, map, Observable, of, tap, throwError } from 'rxjs';
-import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { catchError, firstValueFrom, map, Observable, of, tap, throwError } from 'rxjs';
+import { HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -22,27 +22,40 @@ export class SolicitudDeEmergenciaService {
     );
   }
 
-  obtenerUltimaSolicitud(): Observable<SolicitudDeEmergencia | null> {
-    return this.obtenerSolicitudes().pipe(
-      map(response => {
-        if (response && response.body) {
-          this.solicitudes = response.body; // Asigna el cuerpo de la respuesta al array
-          return this.solicitudes[this.solicitudes.length - 1] || null; // Devuelve el último elemento o null
-        } else {
-          console.warn('No se encontraron solicitudes.');
-          return null; // Devuelve null si no hay solicitudes
-        }
-      }),
-      catchError(error => {
-        console.error('Error al obtener solicitudes:', error);
-        return of(null); // Devuelve null en caso de error
-      })
-    );
+  async obtenerUltimaSolicitud(): Promise<SolicitudDeEmergencia | null> {
+    try {
+      const solicitudes = await this.obtenerSolicitudes(); // Espera a que se resuelva la promesa
+      if (solicitudes.length > 0) {
+        return solicitudes[solicitudes.length - 1]; // Devuelve la última solicitud
+      } else {
+        console.warn('No se encontraron solicitudes.');
+        return null; // Devuelve null si no hay solicitudes
+      }
+    } catch (error) {
+      console.error('Error al obtener la última solicitud:', error);
+      return null; // Devuelve null en caso de error
+    }
   }
 
-  // Método para obtener todas las solicitudes de emergencia (GET)
-  obtenerSolicitudes(): Observable<HttpResponse<SolicitudDeEmergencia[]>> {
-    return this._apiConfig.get<SolicitudDeEmergencia[]>(this.path);
+
+  async obtenerSolicitudes(): Promise<SolicitudDeEmergencia[]> {
+    const params = new HttpParams().set('select', '*');
+
+    const solicitudes$ = this._apiConfig.get<SolicitudDeEmergencia[]>(this.path, params).pipe(
+      map(response => {
+        return response.body || []; // Devuelve el body o un array vacío si no hay
+      })
+    );
+
+    try {
+      // Usa firstValueFrom para esperar la respuesta
+      const solicitudes = await firstValueFrom(solicitudes$);
+      this.solicitudes = solicitudes; // Asigna las regiones a la propiedad
+      return solicitudes; // Devuelve las regiones
+    } catch (error) {
+      console.error('Error al obtener regiones:', error);
+      return []; // Devuelve un array vacío en caso de error
+    }
   }
 
   // Método para actualizar una solicitud de emergencia (PATCH)

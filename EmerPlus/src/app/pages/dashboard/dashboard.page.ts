@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
 import { AlertController, ToastController } from '@ionic/angular';
+import { firstValueFrom } from 'rxjs';
 import { Contacto } from 'src/app/models/contacto';
 import { Notificacion } from 'src/app/models/notificacion';
 
@@ -68,11 +69,13 @@ export class DashboardPage implements OnInit {
     // Lógica para enviar una alerta al contacto de emergencia
   }
 
-  enviarSolicitudDeEmergencia(tipoEmergencia: string) {
+  async enviarSolicitudDeEmergencia(tipoEmergencia: string) {
     if (this.usuario) {
-      // Obtener la ubicación en tiempo real
-      this.obtenerUbicacionActual().then(async (ubicacion) => {
-        if (ubicacion && this.usuario) {
+      try {
+        // Obtener la ubicación en tiempo real
+        const ubicacion = await this.obtenerUbicacionActual();
+
+        if (ubicacion) {
           const nuevaSolicitud: SolicitudDeEmergencia = {
             usuario_id: this.usuario.rut,
             latitud: ubicacion.latitud,  // Latitud obtenida
@@ -81,48 +84,39 @@ export class DashboardPage implements OnInit {
             hora: new Date().toTimeString().split(' ')[0], // Hora en formato 'HH:mm:ss'
             tipo: tipoEmergencia
           };
-          // Enviar la solicitud de emergencia
-           this.emergenciaService.enviarSolicitud(nuevaSolicitud).subscribe({
-            next: () => {
-              console.log('Solicitud enviada con éxito');
-              // Ahora, obtén la última solicitud
-              this.emergenciaService.obtenerUltimaSolicitud().subscribe({
-                next: (ultimaSolicitud) => {
-                  if (ultimaSolicitud) {
-                    const idSolicitud = ultimaSolicitud.id; // Asumiendo que `id` es el campo que necesitas
-                    console.log('Id: ' + idSolicitud)
-                    if (idSolicitud) {
-                      this.enviarNotificacion(tipoEmergencia, idSolicitud);
-                    }
-                  } else {
-                    console.warn('No se encontró la última solicitud.');
-                  }
-                },
-                error: (error) => {
-                  console.error('Error al obtener la última solicitud:', error);
-                  alert('Error al obtener la última solicitud.');
-                }
-              });
-            },
-            error: (error) => {
-              console.error('Error al enviar la solicitud', error);
-              alert('Hubo un error al enviar la solicitud. Inténtalo nuevamente.');
-            }
-          });
 
-          //this.enviarNotificacion(tipoEmergencia);
+          // Enviar la solicitud de emergencia
+          const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
+          console.log('Solicitud enviada con éxito');
+
+          // Ahora, obtén la última solicitud
+          const ultimaSolicitud = await this.emergenciaService.obtenerUltimaSolicitud();
+
+          if (ultimaSolicitud) {
+            const idSolicitud = ultimaSolicitud.id; // Asumiendo que `id` es el campo que necesitas
+            console.log('Id: ' + idSolicitud);
+
+            if (idSolicitud) {
+              this.enviarNotificacion(tipoEmergencia, idSolicitud);
+            }
+          } else {
+            console.warn('No se encontró la última solicitud.');
+          }
         } else {
           // Caso 3: Ubicación no disponible
           console.error('No se pudo obtener la ubicación.');
           alert('No se pudo obtener tu ubicación. Por favor, verifica los permisos e inténtalo de nuevo.');
         }
-      }).catch((error) => {
-        // Caso 2: Error obteniendo la ubicación
-        console.error('Error al obtener la ubicación:', error);
-        alert('Error: La ubicación es requerida para enviar la solicitud.');
-      });
+      } catch (error) {
+        // Manejo de errores
+        console.error('Error al enviar la solicitud o al obtener la ubicación:', error);
+        alert('Hubo un error al enviar la solicitud o al obtener la ubicación. Inténtalo nuevamente.');
+      }
+    } else {
+      console.warn('No hay usuario conectado.');
     }
   }
+
 
   // Simulación de función para obtener ubicación actual
   private obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {

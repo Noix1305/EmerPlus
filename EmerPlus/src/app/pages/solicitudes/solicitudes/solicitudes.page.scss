@@ -1,0 +1,29 @@
+ion-content {
+    h2 {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    ion-item {
+        --border-color: var(--ion-color-primary);
+    }
+
+    ion-label {
+        h3 {
+            font-weight: bold;
+            color: var(--ion-color-primary);
+        }
+
+        p {
+            color: var(--ion-color-medium);
+        }
+    }
+}
+
+.text-center {
+    text-align: center;
+}
+
+ion-button {
+    margin-top: 20px; // Ajusta el margen superior según sea necesario
+}

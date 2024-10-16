@@ -97,12 +97,8 @@ export class LoginPage implements OnInit {
     const password = this._loginService.encryptText(this.password); // Encripta la contraseña del formulario
 
     try {
-      // Obtiene los usuarios activos como un observable
-      const response = await firstValueFrom(this._usuarioService.obtenerUsuarios().pipe(
-        map(res => res.body || [])
-      ));
-
-      const usuariosActivos: Usuario[] = response; // Ahora puedes acceder a usuarios activos directamente
+      // Obtiene los usuarios activos directamente como un observable
+      const usuariosActivos: Usuario[] = await firstValueFrom(this._usuarioService.obtenerUsuarios());
 
       // Usar el tipo de usuario aquí
       const usuarioExistente = usuariosActivos.find((usuario: Usuario) => usuario.rut === rut);
@@ -125,7 +121,15 @@ export class LoginPage implements OnInit {
           value: JSON.stringify(user) // Convierte el objeto de usuario a string
         });
 
-        this.router.navigate(['dashboard']);
+        // Redirecciona según el rol del usuario
+        if (user.rol[0] === 1) {
+          this.router.navigate(['admin']);
+        } else if (user.rol[0] === 2) {
+          this.router.navigate(['dashboard']);
+        } else {
+          this.router.navigate(['home']);
+        }
+
       } else {
         // Si la contraseña es incorrecta
         this.errorMessage = 'Credenciales incorrectas'; // Maneja credenciales incorrectas
@@ -140,6 +144,7 @@ export class LoginPage implements OnInit {
 
     return false; // Valor por defecto al final de la función
   }
+
 
   contraseñaOlvidada() {
 

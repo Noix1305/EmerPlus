@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Solicitudes de Emergencia</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="text-center">
+    <h2>Lista de Solicitudes de Emergencia</h2>
+
+    <ion-list>
+      <ion-item *ngFor="let solicitud of solicitudes">
+        <ion-label>
+          <h3>{{ solicitud.tipo }}</h3>
+          <p>{{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+          <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-button (click)="generarPDF()" expand="full">Generar PDF</ion-button>
+  </div>
+</ion-content>

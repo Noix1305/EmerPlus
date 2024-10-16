@@ -127,21 +127,19 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
   }
 
 
-  obtenerUsuarios() {
-    const params = new HttpParams().set('select', '*')
+  obtenerUsuarios(): Observable<Usuario[]> {
+    const params = new HttpParams().set('select', '*');
     return this.apiConfig.get<Usuario[]>(this.path, params).pipe(
       map(response => {
-        console.log(response)
-        const datoFiltrado = response.body?.filter(usuario => usuario.estado === 1)
-
-        return new HttpResponse({
-          body: datoFiltrado,
-          headers: response.headers,
-          status: response.status,
-          statusText: response.statusText
-        })
+        // Filtramos los usuarios que están activos
+        const usuariosActivos = response.body?.filter(usuario => usuario.estado === 1);
+        return usuariosActivos || [];
+      }),
+      catchError((error) => {
+        console.error('Error al obtener usuarios:', error);
+        return throwError(() => new Error('Error al obtener usuarios.'));
       })
-    )
+    );
   }
 
   // Método para crear un nuevo usuario

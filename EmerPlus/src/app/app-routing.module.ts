@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { isUsuarioGuard } from './guards/isUsuario/is-usuario.guard';
+import { isAdminGuard } from './guards/isAdmin/is-admin.guard';
 
 const routes: Routes = [
   {
@@ -22,10 +23,25 @@ const routes: Routes = [
     canActivate: [isUsuarioGuard]
   },
   {
+    path: 'admin',
+    loadChildren: () => import('./pages/admin/admin/admin.module').then(m => m.AdminPageModule),
+    canActivate: [isAdminGuard]
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
+  },  {
+    path: 'solicitudes',
+    loadChildren: () => import('./pages/solicitudes/solicitudes/solicitudes.module').then( m => m.SolicitudesPageModule)
   },
+  {
+    path: 'gestor-roles',
+    loadChildren: () => import('./pages/gestionRoles/gestor-roles/gestor-roles.module').then( m => m.GestorRolesPageModule)
+  },
+
+
+
 
 ];
 

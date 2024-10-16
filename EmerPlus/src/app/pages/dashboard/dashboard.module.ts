@@ -16,7 +16,9 @@ import { MenuComponent } from 'src/app/components/menu/menu.component';
     IonicModule,
     DashboardPageRoutingModule
   ],
-  declarations: [DashboardPage,
-    MenuComponent]
+  declarations: [
+    DashboardPage,
+    MenuComponent
+  ]
 })
 export class DashboardPageModule { }

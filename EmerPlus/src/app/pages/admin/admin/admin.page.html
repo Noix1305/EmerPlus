@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Panel de Administración</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon name="log-out-outline"></ion-icon>
+        Salir
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <h2>Bienvenido, Administrador</h2>
+  <p>Selecciona una de las siguientes acciones:</p>
+
+  <ion-list>
+    <!-- Ver todas las solicitudes de emergencia -->
+    <ion-item button (click)="verSolicitudes()">
+      <ion-icon name="list-outline" slot="start"></ion-icon>
+      Ver todas las solicitudes de emergencia
+    </ion-item>
+
+    <!-- Agregar usuario -->
+    <ion-item button (click)="agregarUsuario()">
+      <ion-icon name="person-add-outline" slot="start"></ion-icon>
+      Agregar usuario
+    </ion-item>
+
+    <!-- Ver estadísticas -->
+    <ion-item button (click)="verEstadisticas()">
+      <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
+      Ver estadísticas
+    </ion-item>
+
+    <!-- Gestionar roles de usuario -->
+    <ion-item button (click)="gestionarRoles()">
+      <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+      Gestionar roles de usuario
+    </ion-item>
+  </ion-list>
+</ion-content>
