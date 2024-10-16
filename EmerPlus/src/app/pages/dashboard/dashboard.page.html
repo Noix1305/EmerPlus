@@ -5,6 +5,12 @@
     <ion-toolbar>
       <ion-title>Emerplus</ion-title>
       <ion-buttons slot="end">
+        <div class="notification-icon">
+          <ion-button (click)="limpiarNotificaciones()">
+            <ion-icon name="notifications" style="color: blue;"></ion-icon>
+            <ion-badge class="notification-badge" *ngIf="notificacion >0">{{ notificacion }}</ion-badge>
+          </ion-button>
+        </div>
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
     </ion-toolbar>

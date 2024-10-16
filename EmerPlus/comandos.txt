@@ -1,5 +1,4 @@
 node server.js
-npm install express nodemailer cors
-npm install dotenv
+npm install express nodemailer cors dotenv
 
 npm install @capacitor/preferences

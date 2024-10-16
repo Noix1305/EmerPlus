@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ModalController, NavParams } from '@ionic/angular';
+import { ModalController, NavParams, ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
@@ -16,13 +16,16 @@ export class CambiarPassComponent implements OnInit {
   rut: string;
   password: string;
   errorMsg: string = '';
+  successMessage: string = '';
 
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController,
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
-    private navParams: NavParams) {
+    private toastController: ToastController,
+    private navParams: NavParams
+  ) {
 
     this.rut = this.navParams.get('rut');
     this.password = this.navParams.get('password');
@@ -49,6 +52,8 @@ export class CambiarPassComponent implements OnInit {
       return;
     }
 
+
+
     // Extraer valores del formulario
     let { contrasenaActual, nuevaContrasena } = this.form.value;
 
@@ -66,7 +71,8 @@ export class CambiarPassComponent implements OnInit {
     try {
       const nuevaContrasenaEncriptada = this._loginService.encryptText(nuevaContrasena);
       await firstValueFrom(this._usuarioService.cambiarContrasena(this.rut, nuevaContrasenaEncriptada));
-      console.log('Contraseña cambiada con éxito');
+      this.successMessage = 'Contraseña cambiada con exito.';
+      this.presentToast(this.successMessage, 'success');
     } catch (error) {
       console.error('Error al cambiar la contraseña:', error);
     }
@@ -77,6 +83,16 @@ export class CambiarPassComponent implements OnInit {
 
   closeModal() {
     this.modalCtrl.dismiss();
+  }
+
+  async presentToast(successMessage: string, color: string) {
+    const toast = await this.toastController.create({
+      message: successMessage,
+      duration: 2000, // Duración en milisegundos
+      position: 'top', // Posición del Toast
+      color: color, // Color del Toast, puedes cambiarlo según tus necesidades
+    });
+    toast.present();
   }
 
 }

@@ -20,6 +20,7 @@ import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergenc
 export class DashboardPage implements OnInit {
   usuario: Usuario | null = null;
   contacto: Contacto[] | null = null;
+  notificacion: number = 2;
 
   constructor(
     private alertController: AlertController,
@@ -45,6 +46,10 @@ export class DashboardPage implements OnInit {
     } else {
       console.log('Usuario obtenido desde la navegación:', this.usuario);
     }
+  }
+
+  limpiarNotificaciones() {
+    this.notificacion = 0;
   }
 
   carabineros(entidad: string) {
@@ -86,7 +91,7 @@ export class DashboardPage implements OnInit {
           };
 
           // Enviar la solicitud de emergencia
-          const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
+         const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
           console.log('Solicitud enviada con éxito');
 
           // Ahora, obtén la última solicitud

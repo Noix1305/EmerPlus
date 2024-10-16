@@ -135,16 +135,22 @@ export class UserInfoPage {
 
   async openChangePasswordModal() {
     if (this.usuario) {
-      const modal = await this.modalCtrl.create({
-        component: CambiarPassComponent,
-        componentProps: {
+      try {
+        const modal = await this.modalCtrl.create({
+          component: CambiarPassComponent,
+          componentProps: {
 
-          rut: this.usuario.rut, // Enviar el RUT al modal
-          password: this.usuario.password, // Enviar la contraseña actual
+            rut: this.usuario.rut, // Enviar el RUT al modal
+            password: this.usuario.password, // Enviar la contraseña actual
+          }
         }
+        );
+        return await modal.present();
+      } catch (error) {
+        return error;
       }
-      );
-      return await modal.present();
+    } else {
+      return;
     }
   }
 
@@ -229,10 +235,18 @@ export class UserInfoPage {
       await firstValueFrom(this._usuarioService.editarUsuario(updatedUser.rut, updatedUser));
       this.successMessage = 'Usuario editado con éxito';
       this.presentToast(this.successMessage, this.colorVerde);
-      this.closeEditUserModal();
+      this.usuario = updatedUser;
 
-      // Actualiza los datos del usuario en la página
-      this.obtenerDatosUsuario(); // Método para obtener y actualizar los datos del usuario
+      await Preferences.set({
+        key: 'userInfo',
+        value: JSON.stringify(this.usuario) // Convierte el objeto de usuario a string
+      });
+      this.closeEditUserModal();
+      location.reload()
+      this.usuario = updatedUser;
+
+      // // Actualiza los datos del usuario en la página
+      // this.obtenerDatosUsuario(); // Método para obtener y actualizar los datos del usuario
     } catch (error) {
       console.error('Error al editar el usuario:', error);
     }
