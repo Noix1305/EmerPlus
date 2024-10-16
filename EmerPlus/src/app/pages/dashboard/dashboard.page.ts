@@ -20,7 +20,7 @@ import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergenc
 export class DashboardPage implements OnInit {
   usuario: Usuario | null = null;
   contacto: Contacto[] | null = null;
-  notificacion: number = 2;
+  notificacion: number = 8;
 
   constructor(
     private alertController: AlertController,
@@ -91,7 +91,7 @@ export class DashboardPage implements OnInit {
           };
 
           // Enviar la solicitud de emergencia
-         const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
+          const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
           console.log('Solicitud enviada con éxito');
 
           // Ahora, obtén la última solicitud
