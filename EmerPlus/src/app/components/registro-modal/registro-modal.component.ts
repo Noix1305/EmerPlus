@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
+import { CrearUsuario } from 'src/app/models/crearUsuario';
 import { Usuario } from 'src/app/models/usuario';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
@@ -15,9 +16,11 @@ export class RegistroModalComponent {
   password: string = '';
   defaultRoleId: number = 2;
   repeatPassword: string = '';
+  correo: string = '';
 
   errorMessage: string = '';
   successMessage: string = '';
+
 
   constructor(
     private modalController: ModalController,
@@ -31,6 +34,7 @@ export class RegistroModalComponent {
     this.password = '';
     this.errorMessage = '';
     this.successMessage = '';
+    this.correo = '';
   }
 
   async presentToast(successMessage: string) {
@@ -51,7 +55,7 @@ export class RegistroModalComponent {
     let passwordFinal = '';
 
     // Validar campos
-    if (!this.rut || !this.password || !this.repeatPassword) {
+    if (!this.rut || !this.password || !this.repeatPassword || !this.correo) {
       this.errorMessage = 'Todos los campos son obligatorios.';
       return;
     }
@@ -79,10 +83,11 @@ export class RegistroModalComponent {
       }
 
       // Si el RUT no está registrado, proceder con la creación del usuario
-      const newUser: Usuario = {
+      const newUser: CrearUsuario = {
         rut: this.rut,
         password: passwordFinal,
         rol: [this.defaultRoleId],
+        correo: this.correo,
         estado: 1
       };
 

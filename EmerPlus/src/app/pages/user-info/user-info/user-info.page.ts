@@ -7,7 +7,6 @@ import { AlertController, IonModal, ModalController, ToastController } from '@io
 import { OverlayEventDetail } from '@ionic/core/components';
 import { firstValueFrom } from 'rxjs';
 import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pass.component';
-import { AgregarContactoUsuario } from 'src/app/models/agregarContactoUsuario';
 import { Comuna } from 'src/app/models/comuna';
 import { Contacto } from 'src/app/models/contacto';
 import { Region } from 'src/app/models/region';
@@ -29,14 +28,29 @@ export class UserInfoPage {
   @ViewChild('modalEditUser', { static: false }) modalEditUser!: IonModal;
   @ViewChild('modalEditContact', { static: false }) modalEditContact!: IonModal;
 
-  usuario: Usuario | null = null;
   rolUsuario: string | undefined;
+  usuario: Usuario = {
+    rut: '',
+    password: '',
+    nombre: '',
+    papellido: '',
+    sapellido: '',
+    telefono: 0,
+    regionid: undefined,
+    comunaid: undefined,
+    contactoEmergencia: undefined, // Inicializar como undefined
+    correo: '',
+    rol: [0], // Inicializar como un array vacío
+    rolNombre: '',
+    estado: 1 // O el valor que desees
+  };
+
 
   colorVerde: string = 'success'
   colorRojo: string = 'danger'
 
   contacto: Contacto = {
-    rut_usuario: '',
+    usuario_id: '',
     nombre: '',
     apaterno: '',
     amaterno: '',
@@ -109,6 +123,26 @@ export class UserInfoPage {
     }
 
     if (this.usuario) {
+
+      this._contactoService.getContactoPorRut(this.usuario.rut).subscribe({
+        next: (response: HttpResponse<Contacto>) => {
+          this.contacto = response.body || {
+            usuario_id: '',
+            nombre: '',
+            apaterno: '',
+            amaterno: '',
+            telefono: 0,
+            correo: '',
+            relacion: ''
+          };
+        },
+        error: (error) => {
+          console.error('Error al obtener contacto:', error);
+        },
+        complete: () => {
+          console.log('Solicitud completada');
+        }
+      });
 
       if (this.usuario.comunaid) { // Reemplaza 'id' con la propiedad correspondiente que estés usando
         this.getNombreComunaPorId(this.usuario.comunaid);
@@ -257,17 +291,21 @@ export class UserInfoPage {
         // Espera la respuesta del servicio y extrae el cuerpo
         const response: HttpResponse<Usuario> = await firstValueFrom(this._usuarioService.getUsuarioPorRut(this.usuario.rut));
 
-        // Asigna el cuerpo a this.usuario
-        if (this.usuario) {
+        // Comprueba si response.body es null antes de asignar
+        if (response.body) {
           this.usuario = response.body; // Esto funcionará si response.body es de tipo Usuario
         } else {
-          console.error('No se encontró el usuario.'); // Manejo de errores
+          console.warn('No se encontró el usuario, se mantiene el estado anterior.');
+          // O puedes asignar un valor predeterminado aquí si lo prefieres
+          // this.usuario = { ... }; // Un objeto predeterminado
         }
+
       } catch (error) {
-        console.log(error);
+        console.log('Error al obtener datos del usuario:', error);
       }
     }
   }
+
 
 
   async formularioRegistroAdmin(event: Event) {
@@ -476,7 +514,7 @@ export class UserInfoPage {
 
     if (this.usuario) {
       const updatedContact: Contacto = {
-        rut_usuario: this.usuario.rut,
+        usuario_id: this.usuario.rut,
         nombre: formData.get('nombre') as string,
         apaterno: formData.get('apaterno') as string,
         amaterno: formData.get('amaterno') as string,

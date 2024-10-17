@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Usuario } from 'src/app/models/usuario';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../usuarioService/usuario.service';
 

@@ -162,17 +162,22 @@ export class DashboardPage implements OnInit {
           if (this.usuario) {
             this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
               next: (contactosResponse) => {
-                // Aquí asignamos los contactos recibidos
-                this.contacto = contactosResponse.body;
-                console.info(this.contacto);
+                // Asegúrate de que contactosResponse.body sea un array o null
+                if (Array.isArray(contactosResponse.body)) {
+                  this.contacto = contactosResponse.body; // Asigna el array a this.contacto
+                  console.info(this.contacto);
 
-                // Si tienes contactos, envía notificación por correo a cada uno
-                if (this.contacto && this.contacto.length > 0) {
-                  this.contacto.forEach((contacto) => {
-                    if (this.usuario) {
-                      this._notificacionService.enviarNotificacionCorreo(contacto.correo, nuevaNotificacion, this.usuario);
-                    }
-                  });
+                  // Si tienes contactos, envía notificación por correo a cada uno
+                  if (this.contacto.length > 0) {
+                    this.contacto.forEach((contacto) => {
+                      if (this.usuario) {
+                        this._notificacionService.enviarNotificacionCorreo(contacto.correo, nuevaNotificacion, this.usuario);
+                      }
+                    });
+                  }
+                } else {
+                  console.warn('No se encontraron contactos o el formato es incorrecto.');
+                  this.presentToast('No se encontraron contactos.', 'info');
                 }
               },
               error: (error) => {
@@ -187,6 +192,8 @@ export class DashboardPage implements OnInit {
           this.presentToast('Error al enviar la notificación.', 'danger');
         }
       });
+
+
 
     } else {
       console.error('No se encontró el usuario para enviar la notificación.');

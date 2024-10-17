@@ -21,12 +21,22 @@ export class ContactosemergenciaService {
     return this._apiConfig.post(this.path, contacto);
   }
 
-  getContactoPorParametro(parametroIngresado: string, valorDeBusqueda: string): Observable<HttpResponse<[Contacto]>> {
-    const params = new HttpParams().set(parametroIngresado, `eq.${valorDeBusqueda}`);
-    return this._apiConfig.get<[Contacto]>(this.path, params).pipe(
+  getContactoPorParametro(parametroIngresado: string, valorDeBusqueda: string): Observable<HttpResponse<Contacto>> {
+    const params = new HttpParams().set(valorDeBusqueda, `eq.${parametroIngresado}`);
+    return this._apiConfig.get<Contacto>(this.path, params).pipe(
       catchError((error) => {
         console.error('Error al obtener contacto:', error);
         return throwError(() => new Error('Error al obtener contacto.'));
+      })
+    );
+  }
+
+  getContactoPorRut(rut_usuario: string): Observable<HttpResponse<Contacto>> {
+    const params = new HttpParams().set('usuario_id', `eq.${rut_usuario}`);
+    return this._apiConfig.get<Contacto>(this.path, params).pipe(
+      catchError((error) => {
+        console.error('Error al obtener usuario por RUT:', error);
+        return throwError(() => new Error('Error al obtener usuario por RUT.'));
       })
     );
   }

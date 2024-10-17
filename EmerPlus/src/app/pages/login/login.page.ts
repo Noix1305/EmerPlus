@@ -1,10 +1,10 @@
 import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import {  ModalController } from '@ionic/angular';
+import { ModalController } from '@ionic/angular';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
 import { Preferences } from '@capacitor/preferences';
 
