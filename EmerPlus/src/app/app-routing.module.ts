@@ -28,17 +28,25 @@ const routes: Routes = [
     canActivate: [isAdminGuard]
   },
   {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
-  },  {
     path: 'solicitudes',
-    loadChildren: () => import('./pages/solicitudes/solicitudes/solicitudes.module').then( m => m.SolicitudesPageModule)
+    loadChildren: () => import('./pages/solicitudes/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule)
   },
   {
     path: 'gestor-roles',
-    loadChildren: () => import('./pages/gestionRoles/gestor-roles/gestor-roles.module').then( m => m.GestorRolesPageModule)
+    loadChildren: () => import('./pages/gestionRoles/gestor-roles/gestor-roles.module').then(m => m.GestorRolesPageModule),
+    canActivate: [isAdminGuard]
   },
+  {
+    path: 'agregar-usuario-admin',
+    loadChildren: () => import('./pages/agregarUsuarioAdmin/agregar-usuario-admin/agregar-usuario-admin.module').then(m => m.AgregarUsuarioAdminPageModule),
+    canActivate: [isAdminGuard]
+  },
+  {
+    path: '',
+    redirectTo: 'home',
+    pathMatch: 'full'
+  },
+
 
 
 

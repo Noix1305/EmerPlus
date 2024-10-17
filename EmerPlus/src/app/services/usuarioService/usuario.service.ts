@@ -5,6 +5,7 @@ import { Usuario } from 'src/app/models/usuario';
 import { catchError, firstValueFrom, map, Observable, throwError } from 'rxjs';
 import { MailSenderService } from '../mailService/mail-sender.service';
 import { AgregarContactoUsuario } from 'src/app/models/agregarContactoUsuario';
+import { ActualizarRol } from 'src/app/models/actualizarRol';
 
 
 
@@ -233,5 +234,8 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
     return decryptedText;
   }
 
-
+  actualizarRol(rut: string, data: ActualizarRol): Observable<HttpResponse<any>> {
+    const path = `${this.path}?rut=eq.${rut}`;
+    return this.apiConfig.patch<any>(path, data);
+  }
 }

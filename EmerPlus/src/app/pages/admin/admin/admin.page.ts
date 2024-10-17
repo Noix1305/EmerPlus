@@ -20,7 +20,7 @@ export class AdminPage {
 
   // Función para agregar un nuevo usuario
   agregarUsuario() {
-    this.router.navigate(['/agregar-usuario']); // Redirigir a una página para agregar usuarios
+    this.router.navigate(['/agregar-usuario-admin']); // Redirigir a una página para agregar usuarios
   }
 
   // Función para ver estadísticas

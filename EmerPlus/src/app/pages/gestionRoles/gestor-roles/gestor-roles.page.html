@@ -1,28 +1,27 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/admin"></ion-back-button>
-    </ion-buttons>
-    <ion-title>Gestor Roles</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+  <ion-header>
     <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button defaultHref="/admin"></ion-back-button>
+      </ion-buttons>
       <ion-title size="large">Gestor Roles</ion-title>
     </ion-toolbar>
   </ion-header>
 
+  <ion-toolbar>
+    <ion-searchbar [(ngModel)]="filterRUT" (ionInput)="filtrarPorRUT()" placeholder="Buscar por RUT"
+      style="margin-top: 10px;"></ion-searchbar>
+  </ion-toolbar>
+
   <ion-list>
-    <ion-item *ngFor="let usuario of usuarios">
+    <ion-item *ngFor="let usuario of usuariosParaMostrar">
       <ion-label>
         <h2>{{ usuario.rut }}</h2>
         <p>Nombre: {{ usuario.nombre }} {{ usuario.papellido }} {{ usuario.sapellido }}</p>
         <p>Estado: {{ usuario.estado === 1 ? 'Activo' : 'Inactivo' }}</p>
         <p>Rol: {{ usuario.rolNombre || 'Sin rol asignado' }}</p> <!-- Mostrar nombre del rol -->
       </ion-label>
+      <ion-button (click)="abrirModalRol(usuario)">Modificar Rol</ion-button> <!-- Botón para modificar rol -->
     </ion-item>
   </ion-list>
-
 </ion-content>

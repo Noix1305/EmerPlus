@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { GestorRolesPageRoutingModule } from './gestor-roles-routing.module';
 
 import { GestorRolesPage } from './gestor-roles.page';
+import { ModificarRolModalComponent } from 'src/app/components/modificarRol/modificar-rol-modal/modificar-rol-modal.component';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { GestorRolesPage } from './gestor-roles.page';
     IonicModule,
     GestorRolesPageRoutingModule
   ],
-  declarations: [GestorRolesPage]
+  declarations: [GestorRolesPage, ModificarRolModalComponent]
 })
-export class GestorRolesPageModule {}
+export class GestorRolesPageModule { }
