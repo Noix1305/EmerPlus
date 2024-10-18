@@ -18,12 +18,13 @@
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
+/* Importaciones adicionales */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+
 
 /**
  * Ionic Dark Mode
@@ -44,60 +45,72 @@
 
 :root {
     --ion-color-moss: #8A9A5B; /* Verde musgo */
-  }
+}
 
 body {
     font-family: Arial, sans-serif;
 }
 
-ion-content {
-    --background: linear-gradient(135deg, rgba(240, 174, 207, 0.8), rgba(180, 230, 243, 0.8));
-    /* Cambia los colores y ángulo según tus preferencias */
+/* Logo más ajustado */
+.logo {
+    width: 120px;
+    height: auto;
+    max-width: 100%;
 }
 
-ion-item {
-    --padding-start: 0;
-    /* Ajusta el espaciado si es necesario */
-    --inner-padding-end: 0;
-    --background: transparent;
-    /* Ajusta el espaciado del lado del botón */
-}
-
-ion-buttons {
-    margin-left: auto;
-    /* Empuja el botón hacia el extremo derecho */
-}
-
-ion-toolbar {
-    --background: linear-gradient(135deg, rgba(240, 174, 207, 0.8), rgba(180, 230, 243, 0.8));
-    /* Cambia los colores y ángulo según tus preferencias */
-}
-
-ion-menu{
-    background-color: transparent !important;
-}
-
-ion-list{
-    background-color: transparent !important;
-}
-
-ion-card{
-    background-color: transparent !important;
-}
-
-ion-input{
-    text-align:start;
-}
-
-.blue-button {
-    --background: #007bff;
-    /* Color de fondo azul */
-    --color: #fff;
-    /* Color del texto blanco */
+/* Botones más compactos */
+.button-container {
     display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 15px;
+}
+
+.button-square ion-button {
+    width: 100%;
+    max-width: 250px;
+    margin: 0 auto;
+}
+
+ion-button {
+    font-size: 1rem;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+
+/* Estilo del botón Editar Perfil */
+.profile-item {
+    padding: 10px;
+    --background: transparent;
     align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    /* Asegura que esté por encima de otros elementos */
+}
+
+.profile-item ion-button {
+    font-size: 0.9rem;
+}
+
+.profile-item ion-label {
+    font-size: 1rem;
+}
+
+.profile-item ion-icon {
+    font-size: 1.4rem;
+}
+
+/* Texto de la sección de alerta */
+.alert-text {
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #d32f2f;
+    margin-bottom: 16px;
+    cursor: pointer; /* Hace que sea clickeable */
+}
+
+/* Colores personalizados para el botón */
+.colorVerdeMusgo {
+    --background: #388e3c;
+    --background-activated: #2e7d32;
+    --background-focused: #43a047;
 }
 

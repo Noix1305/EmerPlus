@@ -1,50 +1,133 @@
 @import 'src/global';
 
-ion-row {
-  border-bottom: 1px solid #ccc;
-  /* Línea de separación */
-  padding: 10px 0;
-  /* Espaciado dentro de las filas */
+:root {
+  --ion-color-primary: #4CAF50;   /* Verde vibrante */
+  --ion-color-secondary: #FF5722; /* Naranja vibrante */
+  --ion-color-warning: #FFC107;   /* Amarillo para alertas */
+  --ion-color-danger: #f44336;    /* Rojo para botones de peligro */
+  --ion-color-light: #f1f1f1;     /* Fondo claro */
+  --ion-color-dark: #212121;      /* Texto oscuro */
 }
 
-.blue-button-gl {
-  @extend .blue-button !optional;
-  // Otros estilos específicos del componente
+ion-app {
+  font-family: Arial, sans-serif;
 }
 
+ion-header {
+  --background: var(--ion-color-secondary); /* Naranja vibrante para el header */
+  color: white;
+}
+
+ion-toolbar {
+  --background: var(--ion-color-secondary); /* Naranja vibrante */
+  --color: white;
+}
+
+/* Estilo del título de perfil */
+.perfil-titulo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+  color: var(--ion-color-dark); /* Texto oscuro */
+}
+
+/* Botones */
+ion-button {
+  --background: var(--ion-color-primary); /* Verde vibrante para los botones */
+  color: white;
+  border-radius: 12px;
+  font-weight: bold;
+  height: 50px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+ion-button:hover {
+  transform: scale(1.05); /* Efecto hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra */
+}
+
+ion-button[color="danger"] {
+  --background: var(--ion-color-danger); /* Botón rojo para eliminar */
+}
+
+/* Contenedor de los botones */
 .button-container {
   display: flex;
-  justify-content: center;
-  /* Centra horizontalmente */
-  align-items: center;
-  /* Centra verticalmente */
-  flex-wrap: wrap;
-  /* Permite que los botones se muevan a la siguiente fila si es necesario */
-  gap: 10px;
-  /* Espacio entre los botones */
-  padding: 10px;
-  /* Añade algo de espacio alrededor del contenedor */
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px; /* Espacio entre botones */
 }
 
-.button-container ion-button {
-  flex: 1 1 100px;
-  /* Permite que los botones crezcan o se encojan, mínimo 100px */
-  max-width: 300px;
-  /* Ancho máximo del botón */
-  width: 100%;
-  /* Ocupa todo el ancho del contenedor disponible */
-  box-sizing: border-box;
-  /* Asegura que el padding se incluya en el ancho total */
+/* Estilo de las tarjetas */
+ion-card {
+  border-radius: 12px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  background-color: var(--ion-color-light); /* Fondo claro */
+  padding: 15px;
+  margin-bottom: 20px;
 }
 
-.gridStyle {
-  border: none;
-  border-radius: 10px;
+ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  margin-bottom: 10px;
 }
 
-.perfil-titulo {
+/* Inputs y etiquetas */
+ion-label {
   font-weight: bold;
-  font-size: 2rem;
-  text-align: center;
-  /* Centra el texto */
+  color: var(--ion-color-dark); /* Texto oscuro */
+}
+
+ion-input {
+  background-color: var(--ion-color-light);
+  border: 1px solid var(--ion-color-primary);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+/* Footer de los modales */
+ion-footer ion-button {
+  --background: var(--ion-color-primary);
+  margin-top: 20px;
+}
+
+.cardContent {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+}
+/* Botón de agregar contacto de emergencia más pequeño */
+#editarContactoEmergencia {
+  --background: var(--ion-color-primary); /* Verde vibrante */
+  font-size: 0.85rem; /* Tamaño de fuente más pequeño */
+  padding: 8px 16px; /* Espaciado interno más reducido */
+  height: 40px; /* Ajustamos la altura */
+  width: auto; /* El ancho se ajusta automáticamente */
+  border-radius: 8px;
+  font-weight: bold;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#editarContactoEmergencia:hover {
+  transform: scale(1.05); /* Efecto hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra */
+}
+/* Botón de agregar usuario más pequeño */
+#agregarUser {
+  --background: var(--ion-color-primary); /* Verde vibrante */
+  font-size: 0.85rem; /* Tamaño de fuente más pequeño */
+  padding: 8px 16px; /* Espaciado interno más reducido */
+  height: 40px; /* Ajustamos la altura */
+  width: auto; /* Que el ancho se ajuste automáticamente */
+  border-radius: 8px;
+  font-weight: bold;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#agregarUser:hover {
+  transform: scale(1.05); /* Efecto hover */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Sombra */
 }

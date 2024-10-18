@@ -1,6 +1,15 @@
+:root {
+    --ion-color-primary: #4CAF50;   /* Verde vibrante */
+    --ion-color-secondary: #FF5722; /* Naranja vibrante */
+    --ion-color-warning: #FFC107;   /* Amarillo para alertas */
+    --ion-color-danger: #f44336;    /* Rojo para botones de peligro */
+    --ion-color-light: #f1f1f1;     /* Fondo claro */
+    --ion-color-dark: #212121;      /* Texto oscuro */
+}
+
+/* Estilo de los botones de acción rápida */
 .colorVerdeMusgo {
-    --background: #8A9A5B;
-    /* Verde musgo */
+    --background: #8A9A5B; /* Verde musgo */
 }
 
 .logo-container {
@@ -10,39 +19,92 @@
 }
 
 .logo {
-    width: 150px;
+    width: 120px;
     height: auto;
     border-radius: 10px;
 }
 
+/* Contenedor de los botones */
 .button-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    /* Dos columnas */
-    gap: 20px;
-    /* Espacio entre botones */
+    gap: 15px;
     margin-top: 20px;
-    margin: auto;
+    justify-content: center;
 }
 
-ion-card {
-    margin-top: 20px;
-}
-
+/* Estilo de los cuadros de botones */
 .button-square {
     width: 100%;
-    /* Asegura que los contenedores ocupen el ancho completo */
     aspect-ratio: 1;
-
-    max-width: 350px;
-    max-height: 350px;
+    max-width: 300px;
     margin: auto;
-    
-    /* Mantiene la forma cuadrada */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave para profundidad */
+    border-radius: 15px; /* Bordes más redondeados */
+    background: var(--ion-color-light); /* Fondo claro para contraste */
+    overflow: hidden;
 }
 
 ion-button {
     height: 100%;
-    border-radius: 5%;
-    /* Hace que el botón ocupe todo el espacio del contenedor */
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    --background: var(--ion-color-primary);
+    color: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+ion-button:hover {
+    transform: scale(1.05); /* Efecto de zoom al pasar el ratón */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Sombra más profunda */
+}
+
+/* Colores personalizados para cada botón */
+.colorVerdeMusgo {
+    --background: #4CAF50; /* Verde vibrante */
+}
+
+ion-button[color="danger"] {
+    --background: var(--ion-color-danger); /* Rojo para peligro */
+}
+
+ion-button[color="primary"] {
+    --background: var(--ion-color-primary); /* Verde vibrante */
+}
+
+ion-button[color="warning"] {
+    --background: var(--ion-color-warning); /* Amarillo para alertas */
+}
+
+/* Ajustes para mejorar la visibilidad */
+ion-toolbar {
+    --background: linear-gradient(135deg, #FF5722, #FFC107); /* Naranja a amarillo */
+    color: white;
+}
+
+ion-content {
+    --background: linear-gradient(135deg, rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.9));
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 600px) {
+    .button-square {
+        flex: 1 1 100%; /* Los botones ocupan el 100% del ancho en pantallas pequeñas */
+    }
+
+    .logo {
+        width: 80px; /* Tamaño más pequeño para pantallas móviles */
+    }
+}
+
+/* Ajustes para pantallas medianas */
+@media (min-width: 600px) and (max-width: 1024px) {
+    .button-square {
+        flex: 1 1 48%; /* Los botones ocupan casi el 50% del ancho */
+    }
 }

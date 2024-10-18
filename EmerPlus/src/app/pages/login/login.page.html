@@ -10,43 +10,34 @@
     </ion-card-header>
 
     <ion-card-content>
-      <!-- <img src="/assets/icon/person_Icon.png" alt="logo person" class="personImg"> -->
       <div class="personImg">
-        <ion-icon name="person-circle" style="font-size: 200px; color: rgb(231, 236, 236);">
-        </ion-icon>
+        <ion-icon name="person-circle" style="font-size: 200px; color: rgb(231, 236, 236);"></ion-icon>
       </div>
-      
+
       <div *ngIf="!isPasswordRecovery">
         <form (submit)="handleLoginSubmit($event)">
           <ion-item>
-            <ion-label position="floating"></ion-label>
-            <ion-input [(ngModel)]="username" name="username" placeholder="Ingresa tu RUT" required
-              class="input"></ion-input>
+            <ion-input [(ngModel)]="username" name="username" placeholder="Ingresa tu RUT" required class="input"></ion-input>
           </ion-item>
           <ion-item>
-            <ion-label position="floating"></ion-label>
-            <ion-input [(ngModel)]="password" name="password" type="password" placeholder="Ingresa tu contraseña"
-              required class="input">
+            <ion-input [(ngModel)]="password" name="password" type="password" placeholder="Ingresa tu contraseña" required class="input">
               <ion-input-password-toggle slot="end"></ion-input-password-toggle>
             </ion-input>
           </ion-item>
           <ion-button expand="block" type="submit">Iniciar Sesión</ion-button>
 
           <div *ngIf="rutNoRegistrado">
-            <p>{{ rutNoRegistrado }} <em><a (click)="rutNotRegistrado()" style="font-weight: bold;">Registrate</a></em>
-              para
-              ingresar.</p>
+            <p>{{ rutNoRegistrado }} <em><a (click)="rutNotRegistrado()" style="font-weight: bold;">Registrate</a></em> para ingresar.</p>
           </div>
         </form>
 
-        <div *ngIf="errorMessage" class="error-message" style="--background: transparent;">
+        <div *ngIf="errorMessage" class="error-message">
           {{ errorMessage }}
         </div>
       </div>
 
       <div *ngIf="isPasswordRecovery">
         <form (submit)="onSubmitForgotPassword($event)" class="forgot-password-form">
-          <ion-label position="stacked" for="rut"></ion-label>
           <ion-input type="text" name="rut" required placeholder="Ingrese su RUT"></ion-input>
           <ion-button expand="full" type="submit" class="submit-button">Enviar</ion-button>
         </form>
@@ -61,7 +52,7 @@
   <ion-card>
     <ion-card-content style="padding: 0;">
       <div class="cardContent">
-        <ion-item class="ionItems2" expand="full" href="home" style="margin-left:10%">
+        <ion-item class="ionItems2" expand="full" href="home">
           <ion-icon name="home" class="iconosInferior"></ion-icon>
         </ion-item>
         <ion-item class="ionItems2" expand="full" href="dashboard">
@@ -73,9 +64,4 @@
       </div>
     </ion-card-content>
   </ion-card>
-
-
-
-
-
 </ion-content>
