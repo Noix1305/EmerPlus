@@ -7,6 +7,8 @@ import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom } from 'rxjs';
 import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
 import { Preferences } from '@capacitor/preferences';
+import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
+import { Contacto } from 'src/app/models/contacto';
 
 @Component({
   selector: 'app-login',
@@ -31,7 +33,8 @@ export class LoginPage implements OnInit {
     private modalController: ModalController,
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private _contactoService: ContactosemergenciaService
   ) { }
 
 
@@ -108,13 +111,13 @@ export class LoginPage implements OnInit {
       const user = await this._loginService.login(rut, password); // Llama al método de inicio de sesión
 
       if (user) {
-        // Si el usuario se encuentra y la contraseña es correcta
-
         // Guarda la información del usuario en Preferences
         await Preferences.set({
           key: 'userInfo',
           value: JSON.stringify(user) // Convierte el objeto de usuario a string
         });
+
+        this._usuarioService.actualizarUsuario(user);
 
         // Redirecciona según el rol del usuario
         if (user.rol[0] === 1) {

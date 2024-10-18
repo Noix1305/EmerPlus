@@ -21,9 +21,23 @@ export class ContactosemergenciaService {
     return this._apiConfig.post(this.path, contacto);
   }
 
-  getContactoPorParametro(parametroIngresado: string, valorDeBusqueda: string): Observable<HttpResponse<Contacto>> {
-    const params = new HttpParams().set(valorDeBusqueda, `eq.${parametroIngresado}`);
-    return this._apiConfig.get<Contacto>(this.path, params).pipe(
+  editarContacto(id: number, contacto: Contacto): Observable<HttpResponse<Contacto>> {
+    const path = `${this.path}?id=eq.${id}`;
+    return this._apiConfig.patch<Contacto>(path, contacto).pipe(
+      map(response => {
+        return new HttpResponse<Contacto>({
+          body: response.body || null, // Puedes modificar esto si es necesario
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+      })
+    );
+  }
+
+  getContactoPorParametro(parametroIngresado: string, valorDeBusqueda: string): Observable<HttpResponse<Contacto[]>> {
+    const params = new HttpParams().set(parametroIngresado, `eq.${valorDeBusqueda}`);
+    return this._apiConfig.get<Contacto[]>(this.path, params).pipe(
       catchError((error) => {
         console.error('Error al obtener contacto:', error);
         return throwError(() => new Error('Error al obtener contacto.'));

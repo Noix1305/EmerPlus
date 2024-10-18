@@ -1,6 +1,6 @@
 export interface Contacto {
     id?: number
-    usuario_id: string
+    rut_usuario: string
     nombre: string
     apaterno: string
     amaterno?: string

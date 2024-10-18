@@ -8,7 +8,6 @@ import { UserInfoPageRoutingModule } from './user-info-routing.module';
 
 import { UserInfoPage } from './user-info.page';
 import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pass.component';
-import { MenuComponent } from 'src/app/components/menu/menu.component';
 
 @NgModule({
   imports: [

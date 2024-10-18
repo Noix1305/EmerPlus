@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import { ApiConfigService } from '../apiConfig/api-config.service';
 import { HttpParams, HttpResponse } from '@angular/common/http';
 import { Usuario } from 'src/app/models/usuario';
-import { catchError, firstValueFrom, map, Observable, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, firstValueFrom, map, Observable, throwError } from 'rxjs';
 import { MailSenderService } from '../mailService/mail-sender.service';
-import { AgregarContactoUsuario } from 'src/app/models/agregarContactoUsuario';
 import { ActualizarRol } from 'src/app/models/actualizarRol';
+import { Preferences } from '@capacitor/preferences';
 
 
 
@@ -14,8 +14,12 @@ import { ActualizarRol } from 'src/app/models/actualizarRol';
 })
 export class UsuarioService {
   path = 'usuarios';
+  private usuarioSubject = new BehaviorSubject<Usuario | null>(null);
+  public usuario$ = this.usuarioSubject.asObservable();
 
-  constructor(private apiConfig: ApiConfigService, private mailSenderService: MailSenderService) { }
+  constructor(private apiConfig: ApiConfigService, private mailSenderService: MailSenderService) { 
+    this.cargarUsuario();
+  }
 
   getUsuarioPorRut(rut: string): Observable<HttpResponse<Usuario>> {
     const params = new HttpParams().set('rut', `eq.${rut}`);
@@ -237,5 +241,27 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
   actualizarRol(rut: string, data: ActualizarRol): Observable<HttpResponse<any>> {
     const path = `${this.path}?rut=eq.${rut}`;
     return this.apiConfig.patch<any>(path, data);
+  }
+
+  async cargarUsuario() {
+    const result = await Preferences.get({ key: 'userInfo' });
+    const value = result.value;
+    if (value) {
+      const usuario = JSON.parse(value) as Usuario;
+      this.usuarioSubject.next(usuario); // Emite el nuevo usuario
+      console.log('Usuario cargado:', usuario);
+    }
+  }
+
+  actualizarUsuario(usuario: Usuario) {
+    this.usuarioSubject.next(usuario); // Actualiza el estado del usuario
+  }
+
+  limpiarUsuario() {
+    this.usuarioSubject.next(null); // Limpia el usuario en caso de logout
+  }
+
+  getUsuario(): Usuario | null {
+    return this.usuarioSubject.getValue(); // Obtiene el valor actual del BehaviorSubject
   }
 }

@@ -50,7 +50,7 @@ export class UserInfoPage {
   colorRojo: string = 'danger'
 
   contacto: Contacto = {
-    usuario_id: '',
+    rut_usuario: '',
     nombre: '',
     apaterno: '',
     amaterno: '',
@@ -83,7 +83,6 @@ export class UserInfoPage {
   constructor(private router: Router,
     private alertController: AlertController,
     private _rolService: RolService,
-    private _loginService: LoginService,
     private _usuarioService: UsuarioService,
     private _regionComunaService: RegionComunaService,
     private toastController: ToastController,
@@ -123,26 +122,34 @@ export class UserInfoPage {
     }
 
     if (this.usuario) {
-
-      this._contactoService.getContactoPorRut(this.usuario.rut).subscribe({
-        next: (response: HttpResponse<Contacto>) => {
-          this.contacto = response.body || {
-            usuario_id: '',
-            nombre: '',
-            apaterno: '',
-            amaterno: '',
-            telefono: 0,
-            correo: '',
-            relacion: ''
-          };
+      this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
+        next: (response) => {
+          console.log('Respuesta del servicio de contacto:', response); // Agregado para depuración
+          if (response.body && response.body.length > 0) {
+            this.contacto = response.body[0];
+            this.usuario.contactoEmergencia = this.contacto;
+            console.log('Contacto de emergencia obtenido:', this.usuario.contactoEmergencia); // Verificar el contacto
+          } else {
+            console.log('No se encontró ningún contacto de emergencia.'); // Manejo del caso sin contacto
+          }
         },
         error: (error) => {
           console.error('Error al obtener contacto:', error);
         },
-        complete: () => {
+        complete: async () => {
           console.log('Solicitud completada');
+          if (this.usuario.contactoEmergencia) {
+            await Preferences.set({
+              key: 'contacto',
+              value: JSON.stringify(this.usuario.contactoEmergencia) // Convierte el objeto de contacto a string
+            });
+            console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);
+          } else {
+            console.log('No hay contacto de emergencia para guardar');
+          }
         }
       });
+
 
       if (this.usuario.comunaid) { // Reemplaza 'id' con la propiedad correspondiente que estés usando
         this.getNombreComunaPorId(this.usuario.comunaid);
@@ -306,53 +313,6 @@ export class UserInfoPage {
     }
   }
 
-
-
-  async formularioRegistroAdmin(event: Event) {
-    event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-
-    this.errorMessage = ''; // Reiniciar el mensaje de error
-    this.successMessage = ''; // Reiniciar el mensaje de éxito
-    let passwordFinal = '';
-
-    // Validar campos
-    if (!this.rut || !this.password || !this.repeatPassword) {
-      this.errorMessage = 'Todos los campos son obligatorios.';
-      return;
-    }
-
-    if (this.password !== this.repeatPassword) {
-      this.errorMessage = 'Las contraseñas no coinciden.';
-      return;
-    }
-
-    if (!this._loginService.validarRUT(this.rut)) {
-      this.errorMessage = 'El RUT ingresado no es válido.';
-      return;
-    }
-
-    passwordFinal = this._loginService.encryptText(this.password);
-
-    const newUser: Usuario = {
-      rut: this.rut,
-      password: passwordFinal,
-      rol: [this.roleId],
-      estado: 1
-    };
-
-    try {
-      // Llama al servicio para crear el usuario
-      await firstValueFrom(this._usuarioService.crearUsuario(newUser)); // Asegúrate de que la función `crearUsuario` devuelva un Observable
-      this.successMessage = 'Usuario creado exitosamente.';
-      this.presentToast(this.successMessage, this.colorVerde);
-      this.closeAddUserModal(); // Cierra el modal si el registro fue exitoso
-    } catch (error) {
-      console.error('Error al crear usuario:', error);
-      this.errorMessage = 'Ocurrió un error al crear el usuario. Inténtalo de nuevo.';
-      this.presentToast(this.successMessage, this.colorRojo);
-    }
-  }
-
   async presentToast(successMessage: string, color: string) {
     const toast = await this.toastController.create({
       message: successMessage,
@@ -400,7 +360,7 @@ export class UserInfoPage {
   }
 
   async mostrarContacto() {
-    if (this.usuario?.contactoEmergencia) {
+    if (this.usuario.contactoEmergencia) {
       await this.modalContacto.present();
     } else {
       const alert = await this.alertController.create({
@@ -468,15 +428,6 @@ export class UserInfoPage {
     modal.dismiss();
   }
 
-  // Funciones específicas que usan las funciones genéricas
-  openAddUserModal() {
-    this.openModal(this.modalAddUser);
-  }
-
-  closeAddUserModal() {
-    this.closeModal(this.modalAddUser);
-  }
-
   openEditUserModal() {
     this.openModal(this.modalEditUser);
   }
@@ -514,7 +465,7 @@ export class UserInfoPage {
 
     if (this.usuario) {
       const updatedContact: Contacto = {
-        usuario_id: this.usuario.rut,
+        rut_usuario: this.usuario.rut,
         nombre: formData.get('nombre') as string,
         apaterno: formData.get('apaterno') as string,
         amaterno: formData.get('amaterno') as string,
@@ -525,29 +476,31 @@ export class UserInfoPage {
 
       try {
         // Llama al servicio para crear el contacto
-        const response = await firstValueFrom(this._contactoService.crearContacto(updatedContact));
-        this.successMessage = 'Contacto agregado con éxito, se le ha enviado una notificación.'
+        if (this.contacto.id) {
+          const response = await firstValueFrom(this._contactoService.editarContacto(this.contacto.id, updatedContact));
+          this.successMessage = 'Contacto agregado con éxito, se le ha enviado una notificación.'
 
-        // Verifica si la respuesta fue exitosa
-        if (response.ok) {
-          try {
-            //Envío de notificación al contacto agregado
-            await this._usuarioService.enviarCorreoRegistroContacto(updatedContact.correo, this.usuario, updatedContact.nombre)
-          } catch (error: unknown) {
-            if (error instanceof Error) {
-              this.successMessage = 'Error durante el envío de la notificación.'
-              console.error('Error durante el envío de la notificación:', error.message);
-              alert(error.message || 'Ocurrió un error inesperado.');
-            } else {
-              console.error('Error desconocido:', error);
-              this.successMessage = 'Error durante el envío de la notificación.'
-              alert('Ocurrió un error inesperado.');
+          // Verifica si la respuesta fue exitosa
+          if (response.ok) {
+            try {
+              //Envío de notificación al contacto agregado
+              await this._usuarioService.enviarCorreoRegistroContacto(updatedContact.correo, this.usuario, updatedContact.nombre)
+            } catch (error: unknown) {
+              if (error instanceof Error) {
+                this.successMessage = 'Error durante el envío de la notificación.'
+                console.error('Error durante el envío de la notificación:', error.message);
+                alert(error.message || 'Ocurrió un error inesperado.');
+              } else {
+                console.error('Error desconocido:', error);
+                this.successMessage = 'Error durante el envío de la notificación.'
+                alert('Ocurrió un error inesperado.');
+              }
             }
+          } else {
+            this.errorMessage = 'Ocurrió un error al crear el contacto.';
+            console.error(this.errorMessage);
+            this.presentToast(this.errorMessage, 'danger');
           }
-        } else {
-          this.errorMessage = 'Ocurrió un error al crear el contacto.';
-          console.error(this.errorMessage);
-          this.presentToast(this.errorMessage, 'danger');
         }
 
         this.presentToast(this.successMessage, 'success');
