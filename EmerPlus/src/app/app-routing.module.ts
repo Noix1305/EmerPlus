@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { isUsuarioGuard } from './guards/isUsuario/is-usuario.guard';
 import { isAdminGuard } from './guards/isAdmin/is-admin.guard';
+import { isAdminOrUserGuard } from './guards/isAdminOrUser/is-admin-or-user.guard';
 
 const routes: Routes = [
   {
@@ -29,7 +30,8 @@ const routes: Routes = [
   },
   {
     path: 'solicitudes',
-    loadChildren: () => import('./pages/solicitudes/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule)
+    loadChildren: () => import('./pages/solicitudes/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule),
+    canActivate: [isAdminOrUserGuard]
   },
   {
     path: 'gestor-roles',

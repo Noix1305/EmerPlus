@@ -29,6 +29,12 @@
             <ion-label>Configuración</ion-label>
           </ion-item>
 
+          <ion-item *ngIf="isUser" routerLink="/solicitudes">
+            <ion-icon slot="start" name="list-circle" color="secondary"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Ver Solicitudes</ion-label>
+          </ion-item>
+
           <!-- Menu de Admin -->
           <ion-item *ngIf="isAdmin" routerLink="/admin">
             <ion-icon slot="start" name="shield-checkmark" color="danger"></ion-icon>

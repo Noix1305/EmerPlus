@@ -6,4 +6,6 @@ export interface SolicitudDeEmergencia {
     fecha: string;           // Fecha de la emergencia (ISO string o 'YYYY-MM-DD')
     hora: string;            // Hora de la emergencia (HH:mm:ss formato de cadena)
     tipo: string;            // Tipo de emergencia
+    estado: number;
+    estadoDescripcion?: string;
 }
