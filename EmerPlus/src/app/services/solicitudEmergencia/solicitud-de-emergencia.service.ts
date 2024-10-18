@@ -83,4 +83,5 @@ export class SolicitudDeEmergenciaService {
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage)); // Devuelve un observable con un error
   }
+
 }

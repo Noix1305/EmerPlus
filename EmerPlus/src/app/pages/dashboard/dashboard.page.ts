@@ -21,6 +21,7 @@ export class DashboardPage implements OnInit {
   usuario: Usuario | null = null;
   contacto: Contacto[] | null = null;
   notificacion: number = 8;
+  defaultEstado: number = 4;
 
   constructor(
     private alertController: AlertController,
@@ -87,7 +88,8 @@ export class DashboardPage implements OnInit {
             longitud: ubicacion.longitud, // Longitud obtenida
             fecha: new Date().toISOString().split('T')[0], // Fecha en formato 'YYYY-MM-DD'
             hora: new Date().toTimeString().split(' ')[0], // Hora en formato 'HH:mm:ss'
-            tipo: tipoEmergencia
+            tipo: tipoEmergencia,
+            estado: this.defaultEstado
           };
 
           // Enviar la solicitud de emergencia
@@ -122,8 +124,6 @@ export class DashboardPage implements OnInit {
     }
   }
 
-
-  // Simulación de función para obtener ubicación actual
   private obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
     return new Promise((resolve, reject) => {
       if (navigator.geolocation) {
@@ -140,6 +140,29 @@ export class DashboardPage implements OnInit {
       }
     });
   }
+
+
+  // Simulación de función para obtener ubicación actual
+  // async obtenerUbicacionActual(): Promise<{ latitud: number; longitud: number } | null> {
+  //   try {
+  //     // Solicitar permiso para acceder a la ubicación
+  //     const permission = await Geolocation.requestPermissions();
+  //     if (permission.location === 'granted') {
+  //       // Obtener la posición actual
+  //       const position = await Geolocation.getCurrentPosition();
+  //       return {
+  //         latitud: position.coords.latitude,
+  //         longitud: position.coords.longitude,
+  //       };
+  //     } else {
+  //       console.error('Permiso de ubicación denegado');
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error('Error al obtener la ubicación:', error);
+  //     return null;
+  //   }
+  // }
 
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {
     if (this.usuario) {

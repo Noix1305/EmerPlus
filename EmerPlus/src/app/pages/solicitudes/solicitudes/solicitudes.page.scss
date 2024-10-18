@@ -27,3 +27,56 @@ ion-content {
 ion-button {
     margin-top: 20px; // Ajusta el margen superior según sea necesario
 }
+
+.horizontal-date-picker {
+    display: flex; // Usa flexbox para disposición en fila
+    justify-content: space-between; // Espaciado igual entre elementos
+    align-items: center; // Alinea los elementos verticalmente al centro
+    flex-wrap: wrap; // Permite que los elementos se ajusten si no caben
+
+    ion-item {
+        flex: 1; // Hace que cada ion-item ocupe el mismo espacio
+        margin: 0 5px; // Espaciado entre items, ajusta según necesites
+        min-width: 80px; // Ancho mínimo para que no se colapse
+        max-width: 100px; // Ancho máximo para mantener el diseño
+    }
+
+    ion-label {
+        font-size: 14px; // Tamaño de fuente del label
+    }
+
+    .custom-select {
+        font-size: 14px; // Tamaño de fuente del selector
+        height: 40px; // Ajusta la altura según lo necesites
+        --padding-top: 0; // Elimina padding superior
+        --padding-bottom: 0; // Elimina padding inferior
+    }
+}
+
+.filters-container {
+    display: flex;
+    flex-direction: column; // Cambia a columna para los items
+    align-items: stretch; // Alinea los items al ancho completo
+
+    .horizontal-date-picker {
+        display: flex;
+        justify-content: space-between; // Espaciado entre los selectores
+        align-items: center;
+        flex-wrap: wrap;
+
+        ion-item {
+            flex: 1;
+            margin: 0 5px; // Espaciado entre items
+            min-width: 80px; // Ancho mínimo para que no se colapse
+            max-width: 100px; // Ancho máximo
+        }
+    }
+
+    ion-item {
+        margin: 10px 0; // Espaciado vertical entre items
+    }
+
+    ion-button {
+        margin-top: 10px; // Espaciado superior para el botón
+    }
+}
