@@ -12,5 +12,6 @@ export interface Usuario {
   contactoEmergencia?: Contacto; // Esta propiedad es opcional
   correo?: string;
   rol: [number]; // Puede ser un array
+  rolNombre?:string;
   estado: number;
 }

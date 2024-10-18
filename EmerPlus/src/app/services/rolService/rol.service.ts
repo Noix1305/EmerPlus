@@ -40,7 +40,7 @@ export class RolService {
   async obtenerRolPorId(id: number): Promise<Rol | undefined> {
     const roles = await this.obtenerRoles(); // Obtiene todos los roles
     return roles.find(rol => rol.id === id); // Retorna el rol con el ID proporcionado
-}
+  }
 
   // Método para obtener la descripción de un rol
   async obtenerNombreRol(id: number): Promise<string | undefined> {
@@ -48,4 +48,6 @@ export class RolService {
 
     return rol ? rol.nombre : undefined; // Devuelve la descripción (nombre) si lo encuentra
   }
+
+  
 }

@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Modificar Rol</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrarModal()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>Nombre del Usuario</ion-label>
+      <ion-note slot="end">{{ usuario.nombre }}</ion-note>
+    </ion-item>
+    <ion-item>
+      <ion-label>Correo Electrónico</ion-label>
+      <ion-note slot="end">{{ usuario.correo }}</ion-note>
+    </ion-item>
+    <ion-item>
+      <ion-label>Teléfono</ion-label>
+      <ion-note slot="end">{{ usuario.telefono }}</ion-note>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Seleccionar Rol</ion-label>
+      <ion-select [(ngModel)]="selectedRoleId" placeholder="Selecciona un rol">
+        <ion-select-option *ngFor="let rol of roles" [value]="rol.id">
+          {{ rol.nombre }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="full" (click)="guardarRol()">Guardar Rol</ion-button>
+</ion-content>

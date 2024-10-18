@@ -1,0 +1,53 @@
+.custom-square-radio {
+    --background-checked: transparent;
+    --border-width: 2px;
+    --border-color: #000;
+    --background: white;
+    --color-checked: #fff;
+    --size: 24px;
+    --border-radius: 0;
+    position: relative;
+}
+
+.custom-square-radio::before {
+    content: '';
+    display: block;
+    width: 30px; // Aumentar si es necesario
+    height: 30px; // Aumentar si es necesario
+    border: 2px solid #131212;
+    background: white;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.custom-square-radio[aria-checked="true"]::before {
+    content: '\2713';
+    font-size: 18px;
+    color: #4caf50;
+    display: block;
+    background: #4caf50;
+    border: 2px solid #4caf50;
+    text-align: center;
+    line-height: 30px;
+    width: 30px; // Aumentar si es necesario
+    height: 30px; // Aumentar si es necesario
+}
+
+.list {
+    border: 2px solid;
+    align-items: center;
+    display: block;
+    text-align: center;
+    margin: 10px; // Ajustar según sea necesario
+    padding: 0; // Asegurar que no haya padding extra
+}
+
+.custom-modal {
+    --width: 80%; /* Ancho del modal */
+    --max-height: 80%; /* Altura máxima del modal */
+    --border-radius: 10px; /* Esquinas redondeadas */
+    --background: white; /* Fondo blanco para el modal */
+    /* Puedes agregar más estilos para personalizar el modal */
+  }

@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
 import { Usuario } from 'src/app/models/usuario';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
 import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../usuarioService/usuario.service';
 
@@ -22,11 +20,10 @@ export class LoginService {
   async login(rut: string, password: string): Promise<Usuario | undefined> {
     try {
       // Obtener los usuarios con estado activo
-      const response = await firstValueFrom(this._usuarioService.obtenerUsuarios());
-      const usuariosActivos = response.body || [];
+      const usuariosActivos: Usuario[] = await firstValueFrom(this._usuarioService.obtenerUsuarios());
 
       // Buscar el usuario por RUT entre los usuarios activos
-      const usuarioEncontrado = usuariosActivos.find(usuario => usuario.rut === rut);
+      const usuarioEncontrado = usuariosActivos.find((usuario: Usuario) => usuario.rut === rut);
 
       if (!usuarioEncontrado) {
         console.error('Usuario no encontrado o no activo');

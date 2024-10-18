@@ -1,13 +1,14 @@
-import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { Component, ChangeDetectorRef, Input, OnInit } from '@angular/core';
-import { AlertController, ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { ModalController } from '@ionic/angular';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
-import { firstValueFrom, map } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
 import { Preferences } from '@capacitor/preferences';
+import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
+import { Contacto } from 'src/app/models/contacto';
 
 @Component({
   selector: 'app-login',
@@ -32,7 +33,8 @@ export class LoginPage implements OnInit {
     private modalController: ModalController,
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
-    private router: Router
+    private router: Router,
+    private _contactoService: ContactosemergenciaService
   ) { }
 
 
@@ -57,10 +59,6 @@ export class LoginPage implements OnInit {
     this.rutNoRegistrado = '';
     this.msgContrasenaOlvidada = '';
     this.isPasswordRecovery = !this.isPasswordRecovery; // Alterna el estado
-  }
-
-  async handlePasswordRecovery(event: Event) {
-
   }
 
   async onSubmitForgotPassword(event: Event): Promise<void> {
@@ -97,12 +95,8 @@ export class LoginPage implements OnInit {
     const password = this._loginService.encryptText(this.password); // Encripta la contraseña del formulario
 
     try {
-      // Obtiene los usuarios activos como un observable
-      const response = await firstValueFrom(this._usuarioService.obtenerUsuarios().pipe(
-        map(res => res.body || [])
-      ));
-
-      const usuariosActivos: Usuario[] = response; // Ahora puedes acceder a usuarios activos directamente
+      // Obtiene los usuarios activos directamente como un observable
+      const usuariosActivos: Usuario[] = await firstValueFrom(this._usuarioService.obtenerUsuarios());
 
       // Usar el tipo de usuario aquí
       const usuarioExistente = usuariosActivos.find((usuario: Usuario) => usuario.rut === rut);
@@ -117,15 +111,23 @@ export class LoginPage implements OnInit {
       const user = await this._loginService.login(rut, password); // Llama al método de inicio de sesión
 
       if (user) {
-        // Si el usuario se encuentra y la contraseña es correcta
-
         // Guarda la información del usuario en Preferences
         await Preferences.set({
           key: 'userInfo',
           value: JSON.stringify(user) // Convierte el objeto de usuario a string
         });
 
-        this.router.navigate(['dashboard']);
+        this._usuarioService.actualizarUsuario(user);
+
+        // Redirecciona según el rol del usuario
+        if (user.rol[0] === 1) {
+          this.router.navigate(['admin']);
+        } else if (user.rol[0] === 2) {
+          this.router.navigate(['dashboard']);
+        } else {
+          this.router.navigate(['home']);
+        }
+
       } else {
         // Si la contraseña es incorrecta
         this.errorMessage = 'Credenciales incorrectas'; // Maneja credenciales incorrectas
@@ -140,6 +142,7 @@ export class LoginPage implements OnInit {
 
     return false; // Valor por defecto al final de la función
   }
+
 
   contraseñaOlvidada() {
 

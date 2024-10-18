@@ -1,3 +1,73 @@
 <ion-app>
-  <ion-router-outlet></ion-router-outlet>
+  <ion-split-pane contentId="main-content">
+    <ion-menu contentId="main-content" type="overlay">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title color="secondary">Menu de Inicio</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding">
+        <ion-list>
+          <!-- Menu de Usuario -->
+          <ion-item routerLink="/dashboard" *ngIf="isUser">
+            <ion-icon slot="start" name="home" color="secondary"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Inicio</ion-label>
+          </ion-item>
+          <ion-item routerLink="/user-info" *ngIf="isUser">
+            <ion-icon slot="start" name="person" color="secondary"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Perfil</ion-label></ion-item>
+          <ion-item *ngIf="isUser">
+            <ion-icon slot="start" name="location" color="secondary" ></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Ubicación</ion-label>
+          </ion-item>
+          <ion-item *ngIf="isUser">
+            <ion-icon slot="start" name="settings" color="secondary"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Configuración</ion-label>
+          </ion-item>
+
+          <ion-item *ngIf="isUser" routerLink="/solicitudes">
+            <ion-icon slot="start" name="list-circle" color="secondary"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Ver Solicitudes</ion-label>
+          </ion-item>
+
+          <!-- Menu de Admin -->
+          <ion-item *ngIf="isAdmin" routerLink="/admin">
+            <ion-icon slot="start" name="shield-checkmark" color="danger"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Panel Admin</ion-label>
+          </ion-item>
+          <ion-item *ngIf="isAdmin" routerLink="/agregar-usuario-admin">
+            <ion-icon slot="start" name="person-add-outline" color="danger"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Agregar Usuarios</ion-label>
+          </ion-item>
+          <ion-item *ngIf="isAdmin" routerLink="/gestor-roles">
+            <ion-icon slot="start" name="document-text" color="danger"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Gestionar Roles de Usuarios</ion-label>
+          </ion-item>
+          <ion-item *ngIf="isAdmin" routerLink="/solicitudes">
+            <ion-icon slot="start" name="list-circle" color="danger"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Ver Solicitudes</ion-label>
+          </ion-item>
+          <!-- Cierre sesión general -->
+          <ion-item (click)="cerrarSesion()">
+            <ion-icon slot="start" name="log-out" color="danger"></ion-icon>
+            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
+            <ion-label>Cerrar Sesión</ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-content>
+      <div class="footer">
+        <em style="font-size: 0.75rem;">Powered by Ionic - Version 0.0.1 - 2024</em>
+      </div>
+    </ion-menu>
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
 </ion-app>

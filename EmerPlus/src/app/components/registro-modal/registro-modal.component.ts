@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { ModalController, ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
+import { CrearUsuario } from 'src/app/models/crearUsuario';
 import { Usuario } from 'src/app/models/usuario';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
@@ -15,9 +16,11 @@ export class RegistroModalComponent {
   password: string = '';
   defaultRoleId: number = 2;
   repeatPassword: string = '';
+  correo: string = '';
 
   errorMessage: string = '';
   successMessage: string = '';
+
 
   constructor(
     private modalController: ModalController,
@@ -31,6 +34,7 @@ export class RegistroModalComponent {
     this.password = '';
     this.errorMessage = '';
     this.successMessage = '';
+    this.correo = '';
   }
 
   async presentToast(successMessage: string) {
@@ -51,7 +55,7 @@ export class RegistroModalComponent {
     let passwordFinal = '';
 
     // Validar campos
-    if (!this.rut || !this.password || !this.repeatPassword) {
+    if (!this.rut || !this.password || !this.repeatPassword || !this.correo) {
       this.errorMessage = 'Todos los campos son obligatorios.';
       return;
     }
@@ -68,24 +72,36 @@ export class RegistroModalComponent {
 
     passwordFinal = this._loginService.encryptText(this.password);
 
-    const newUser: Usuario = {
-      rut: this.rut,
-      password: passwordFinal,
-      rol: [this.defaultRoleId],
-      estado: 1
-    };
-
     try {
+      // Verificar si el usuario ya existe por su RUT
+      const usuarioExistente = await firstValueFrom(this._usuarioService.getUsuarioPorRut(this.rut));
+      if (usuarioExistente.body && Array.isArray(usuarioExistente.body) && usuarioExistente.body.length > 0) {
+        // Si el RUT ya está registrado
+        this.errorMessage = 'El RUT ya está registrado en el sistema.';
+        console.error(this.errorMessage);
+        return;
+      }
+
+      // Si el RUT no está registrado, proceder con la creación del usuario
+      const newUser: CrearUsuario = {
+        rut: this.rut,
+        password: passwordFinal,
+        rol: [this.defaultRoleId],
+        correo: this.correo,
+        estado: 1
+      };
+
+      console.log('Registrando nuevo usuario...');
+
       // Llama al servicio para crear el usuario
-      await firstValueFrom(this._usuarioService.crearUsuario(newUser)); // Asegúrate de que la función `crearUsuario` devuelva un Observable
+      await firstValueFrom(this._usuarioService.crearUsuario(newUser));
       this.successMessage = 'Usuario creado exitosamente.';
       this.presentToast(this.successMessage);
       this.closeModal(); // Cierra el modal si el registro fue exitoso
     } catch (error) {
       this.errorMessage = 'Ocurrió un error al crear el usuario. Inténtalo de nuevo.';
-      console.log(this.errorMessage)
+      console.log(this.errorMessage);
       console.error('Error al crear usuario:', error);
     }
   }
-
 }

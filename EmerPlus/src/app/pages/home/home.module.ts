@@ -6,7 +6,6 @@ import { IonicModule } from '@ionic/angular';
 import { HomePage } from './home.page';
 import { HomePageRoutingModule } from './home-routing.module';
 import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
-import { LoginModalComponent } from 'src/app/components/log-in-modal/log-in-modal.component';
 
 
 
@@ -19,8 +18,7 @@ import { LoginModalComponent } from 'src/app/components/log-in-modal/log-in-moda
   ],
   declarations: [
     HomePage,
-    RegistroModalComponent,
-    LoginModalComponent
+    RegistroModalComponent
   ]
 })
 export class HomePageModule { }

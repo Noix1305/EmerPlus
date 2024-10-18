@@ -1,0 +1,97 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin" *ngIf="esAdmin"></ion-back-button>
+      <ion-back-button defaultHref="/dashboard" *ngIf="!esAdmin"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Solicitudes de Emergencia</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="text-center">
+    <h2>Lista de Solicitudes de Emergencia</h2>
+
+    <ion-list *ngIf="esAdmin">
+      <ion-item *ngFor="let solicitud of solicitudes">
+        <ion-label>
+          <h3>{{ solicitud.tipo }}</h3>
+          <p>ID: {{ solicitud.id }}</p>
+          <p>Usuario: {{ solicitud.usuario_id }}</p>
+          <p>{{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+          <p>Hora: {{ solicitud.hora }}</p>
+          <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
+          <p>Estado: {{solicitud.estadoDescripcion}}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list *ngIf="!esAdmin">
+      <ion-item>
+        <ion-label>Fecha Desde</ion-label>
+        <ion-select [(ngModel)]="fechaDesde" interface="action-sheet">
+          <ion-select-option value="hoy">Hoy</ion-select-option>
+          <ion-select-option value="ayer">Ayer</ion-select-option>
+          <ion-select-option value="semana">Última semana</ion-select-option>
+          <ion-select-option value="mes">Último mes</ion-select-option>
+          <ion-select-option value="personalizado">Personalizado</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Fecha Hasta</ion-label>
+        <ion-select [(ngModel)]="fechaHasta" interface="action-sheet">
+          <ion-select-option value="hoy">Hoy</ion-select-option>
+          <ion-select-option value="ayer">Ayer</ion-select-option>
+          <ion-select-option value="semana">Última semana</ion-select-option>
+          <ion-select-option value="mes">Último mes</ion-select-option>
+          <ion-select-option value="personalizado">Personalizado</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Estado</ion-label>
+        <ion-select [(ngModel)]="estadoFiltro" interface="action-sheet">
+          <ion-select-option value="0">Todos</ion-select-option> <!-- Usar 0 para "Todos" -->
+          <ion-select-option value="1">Atendida</ion-select-option> <!-- 1 -->
+          <ion-select-option value="2">En ejecución</ion-select-option> <!-- 2 -->
+          <ion-select-option value="3">Recibida</ion-select-option> <!-- 3 -->
+          <ion-select-option value="4">Enviada</ion-select-option> <!-- 4 -->
+        </ion-select>
+      </ion-item>
+
+      <ion-button (click)="filtrarSolicitudes()">Filtrar</ion-button>
+    </ion-list>
+
+    <!-- Mostrar solo si hay solicitudes filtradas -->
+    <ion-list *ngIf="solicitudesFiltradas.length > 0">
+      <ion-item *ngFor="let solicitud of solicitudesFiltradas">
+        <ion-label>
+          <h2>{{ solicitud.tipo }}</h2>
+          <p>ID: {{ solicitud.id }}</p>
+          <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+          <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
+          <p>Estado: {{ solicitud.estadoDescripcion }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Mostrar si no hay solicitudes filtradas -->
+    <ion-list *ngIf="solicitudesUsuario.length > 0 && solicitudesFiltradas.length === 0">
+      <ion-item *ngFor="let solicitud of solicitudesUsuario">
+        <ion-label>
+          <h2>{{ solicitud.tipo }}</h2>
+          <p>ID: {{ solicitud.id }}</p>
+          <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+          <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
+          <p>Estado: {{ solicitud.estadoDescripcion }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-button (click)="generarPDF()" expand="full" *ngIf="esAdmin">Generar PDF</ion-button>
+  </div>
+</ion-content>
