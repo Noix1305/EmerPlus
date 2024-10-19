@@ -1,10 +1,16 @@
 :root {
-    --ion-color-primary: #4CAF50;   /* Verde vibrante */
-    --ion-color-secondary: #FF5722; /* Naranja vibrante */
-    --ion-color-warning: #FFC107;   /* Amarillo para alertas */
-    --ion-color-danger: #f44336;    /* Rojo para botones de peligro */
-    --ion-color-light: #f1f1f1;     /* Fondo claro */
-    --ion-color-dark: #212121;      /* Texto oscuro */
+    --ion-color-primary: #4CAF50;
+    /* Verde vibrante */
+    --ion-color-secondary: #FF5722;
+    /* Naranja vibrante */
+    --ion-color-warning: #FFC107;
+    /* Amarillo para alertas */
+    --ion-color-danger: #f44336;
+    /* Rojo para botones de peligro */
+    --ion-color-light: #f1f1f1;
+    /* Fondo claro */
+    --ion-color-dark: #212121;
+    /* Texto oscuro */
 }
 
 ion-content {
@@ -19,9 +25,16 @@ ion-card {
     margin-bottom: 20px;
 }
 
+ion-card-content {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
 /* Estilo para los encabezados de las tarjetas */
 .cardHeader {
-    background-color: var(--ion-color-secondary); /* Naranja vibrante */
+    background-color: var(--ion-color-secondary);
+    /* Naranja vibrante */
     border-radius: 12px 12px 0 0;
     padding: 15px;
 }
@@ -44,11 +57,17 @@ ion-card-title p {
     margin: 20px 0;
 }
 
+.person-icon {
+    font-size: 200px;
+    color: rgb(231, 236, 236);
+}
+
 ion-item {
     --background: transparent;
     --padding-start: 0;
     --padding-end: 0;
     margin-bottom: 16px;
+    width: 100%;
 }
 
 .input {
@@ -56,22 +75,25 @@ ion-item {
     padding: 10px;
     background: var(--ion-color-light);
     border-radius: 8px;
-    border: 1px solid var(--ion-color-primary);
 }
 
 ion-button {
-    --background: var(--ion-color-primary); /* Verde vibrante */
-    font-size: 1rem;
+    --background: var(--ion-color-primary);
+    /* Verde vibrante */
     font-weight: bold;
     width: 100%;
     margin-top: 20px;
     height: 50px;
-    border-radius: 8px;
+    width: auto;
+    max-width: 285px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    align-self: center;
+    margin: auto;
 }
 
 ion-button:hover {
-    transform: scale(1.05); /* Efecto de zoom ligero */
+    transform: scale(1.05);
+    /* Efecto de zoom ligero */
     box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
 }
 
@@ -96,12 +118,19 @@ a:hover {
 .cardContent {
     display: flex;
     justify-content: space-around;
-    padding: 10px;
+    align-items: center;
+    flex-direction: row;
+    margin-left:40px;
+    padding: auto;
+
 }
 
 .iconosInferior {
     font-size: 2rem;
-    color: var(--ion-color-secondary); /* Naranja vibrante */
+    color: var(--ion-color-secondary);
+    margin-left: 10px;
+    align-self: auto;
+    /* Naranja vibrante */
 }
 
 /* Estilo de los ítems de la barra inferior */
@@ -109,4 +138,18 @@ a:hover {
     --background: transparent;
     justify-content: center;
     padding: 10px;
+}
+
+.center-title {
+    text-align: center;
+    /* Centrar el texto */
+    width: 100%;
+    /* Ocupar todo el ancho disponible */
+}
+
+form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
