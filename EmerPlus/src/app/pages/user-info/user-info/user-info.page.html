@@ -33,6 +33,12 @@
               <ion-label *ngIf="usuario">{{ usuario.telefono ? usuario.telefono: 'Sin información...' }}</ion-label>
               <ion-label *ngIf="!usuario">0</ion-label>
             </ion-item>
+
+            <ion-item>
+              <ion-label><strong>Correo</strong></ion-label>
+              <ion-label *ngIf="usuario">{{ usuario.correo ? usuario.correo: 'Sin información...' }}</ion-label>
+              <ion-label *ngIf="!usuario">0</ion-label>
+            </ion-item>
             <!-- Fila para la comuna del usuario -->
             <ion-item>
               <ion-label><strong>Comuna</strong></ion-label>
@@ -50,7 +56,7 @@
               <ion-label><strong>Contacto Emergencia</strong></ion-label>
               <!-- Si el usuario tiene contacto de emergencia, muestra el botón para visualizar -->
               <ion-button *ngIf="usuario?.contactoEmergencia; else agregarContacto" (click)="mostrarContacto()"
-                class="blue-button-gl">
+                class="blue-button-gl mostrarContacto">
                 Mostrar Contacto
               </ion-button>
               <ng-template #agregarContacto>

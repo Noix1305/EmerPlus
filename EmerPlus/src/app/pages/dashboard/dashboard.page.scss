@@ -1,15 +1,22 @@
 :root {
-    --ion-color-primary: #4CAF50;   /* Verde vibrante */
-    --ion-color-secondary: #FF5722; /* Naranja vibrante */
-    --ion-color-warning: #FFC107;   /* Amarillo para alertas */
-    --ion-color-danger: #f44336;    /* Rojo para botones de peligro */
-    --ion-color-light: #f1f1f1;     /* Fondo claro */
-    --ion-color-dark: #212121;      /* Texto oscuro */
+    --ion-color-primary: #4CAF50;
+    /* Verde vibrante */
+    --ion-color-secondary: #FF5722;
+    /* Naranja vibrante */
+    --ion-color-warning: #FFC107;
+    /* Amarillo para alertas */
+    --ion-color-danger: #f44336;
+    /* Rojo para botones de peligro */
+    --ion-color-light: #f1f1f1;
+    /* Fondo claro */
+    --ion-color-dark: #212121;
+    /* Texto oscuro */
 }
 
 /* Estilo de los botones de acción rápida */
 .colorVerdeMusgo {
-    --background: #8A9A5B; /* Verde musgo */
+    --background: #8A9A5B;
+    /* Verde musgo */
 }
 
 .logo-container {
@@ -41,9 +48,11 @@
     margin: auto;
 
     /* Mantiene la forma cuadrada */
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave para profundidad */
-    border-radius: 15px; /* Bordes más redondeados */
-    background: var(--ion-color-light); /* Fondo claro para contraste */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    /* Sombra suave para profundidad */
+    border-radius: 15px;
+    /* Bordes más redondeados */
+    /* Fondo claro para contraste */
     overflow: hidden;
 }
 
@@ -52,36 +61,42 @@ ion-button {
     border-radius: 15px;
     font-size: 1rem;
     font-weight: bold;
-    --background: var(--ion-color-primary);
+    --background: transparent;
     color: white;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 ion-button:hover {
-    transform: scale(1.05); /* Efecto de zoom al pasar el ratón */
-    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3); /* Sombra más profunda */
+    transform: scale(1.05);
+    /* Efecto de zoom al pasar el ratón */
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+    /* Sombra más profunda */
 }
 
 /* Colores personalizados para cada botón */
 .colorVerdeMusgo {
-    --background: #4CAF50; /* Verde vibrante */
+    background-color: #208524;
+    /* Verde vibrante */
 }
 
-ion-button[color="danger"] {
-    --background: var(--ion-color-danger); /* Rojo para peligro */
+.colorDanger {
+    background-color: var(--ion-color-danger);
 }
 
-ion-button[color="primary"] {
-    --background: var(--ion-color-primary); /* Verde vibrante */
+.colorPrimary {
+    background-color: var(--ion-color-primary);
 }
 
-ion-button[color="warning"] {
-    --background: var(--ion-color-warning); /* Amarillo para alertas */
+.colorWarning {
+    background-color: var(--ion-color-warning);
 }
+
+/* Amarillo para alertas */
 
 /* Ajustes para mejorar la visibilidad */
 ion-toolbar {
-    --background: linear-gradient(135deg, #FF5722, #FFC107); /* Naranja a amarillo */
+    --background: linear-gradient(135deg, #FF5722, #FFC107);
+    /* Naranja a amarillo */
     color: white;
 }
 
@@ -93,43 +108,84 @@ ion-content {
     align-items: center;
     flex-direction: column;
 }
+
 /* Ajustes para pantallas pequeñas */
 @media (max-width: 600px) {
     .button-square {
-        flex: 1 1 100%; /* Los botones ocupan el 100% del ancho en pantallas pequeñas */
+        flex: 1 1 100%;
+        /* Los botones ocupan el 100% del ancho en pantallas pequeñas */
     }
 
     .logo {
-        width: 80px; /* Tamaño más pequeño para pantallas móviles */
+        width: 80px;
+        /* Tamaño más pequeño para pantallas móviles */
+    }
+
+    ion-button {
+        flex: 1 1 100%;
+        font-size: 0.75rem;
+        /* Los botones ocupan el 100% del ancho en pantallas pequeñas */
     }
 }
 
 /* Ajustes para pantallas medianas */
 @media (min-width: 600px) and (max-width: 1024px) {
     .button-square {
-        flex: 1 1 48%; /* Los botones ocupan casi el 50% del ancho */
+        flex: 1 1 48%;
+        /* Los botones ocupan casi el 50% del ancho */
+    }
+
+    ion-button {
+        border: none;
+        font-size: 1.25rem;
+        /* Los botones ocupan el 100% del ancho en pantallas pequeñas */
+    }
+
+    .header {
+        height: 100px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .notification-icon {
+        
+        font-size: 30px;
+        margin: auto;
+        width: 90px;
+        /* Ajusta el valor según sea necesario */
+    }
+    
+    .notification-badge {
+        position: absolute;
+        top: -10px;
+        right: 10px;
+        background-color: rgb(238, 48, 48);
+        font-size: 1rem;
+        /* Ajusta el tamaño de la fuente según sea necesario */
     }
 }
 
 .notification-icon {
     position: relative;
     display: inline-block;
-    margin-right: 16px;
-    font-size: 25px;
+    font-size: 15px;
+    margin: auto;
+    width: 60px;
     /* Ajusta el valor según sea necesario */
 }
 
 .notification-badge {
     position: absolute;
-    top: -4px;
-    right: -10px;
+    top: -5px;
+    right: -2px;
     background-color: rgb(238, 48, 48);
     /* Cambia el color según sea necesario */
     color: white;
     border-radius: 50%;
-    width: 20px;
+    width: 15px;
     /* Ajusta el tamaño según sea necesario */
-    height: 20px;
+    height: 15px;
     /* Ajusta el tamaño según sea necesario */
     display: flex;
     align-items: center;
@@ -137,3 +193,4 @@ ion-content {
     font-size: 0.75rem;
     /* Ajusta el tamaño de la fuente según sea necesario */
 }
+

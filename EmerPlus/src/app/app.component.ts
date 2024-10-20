@@ -28,7 +28,6 @@ export class AppComponent {
         } else if (rol === 2) {
           this.isUser = true;
         }
-        console.log('Rol verificado:', rol);
       } else {
         this.isAdmin = false;
         this.isUser = false;

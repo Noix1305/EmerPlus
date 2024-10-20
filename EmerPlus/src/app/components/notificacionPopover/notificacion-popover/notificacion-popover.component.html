@@ -1,0 +1,8 @@
+<ion-list>
+  <ion-item *ngFor="let notificacion of notificaciones">
+    <ion-label>
+      {{ notificacion.mensaje }} <!-- Cambia "mensaje" por la propiedad que tengas -->
+    </ion-label>
+    <ion-button (click)="verNotificacion(notificacion)">Ver</ion-button> <!-- Llama a la función con el objeto notificación completo -->
+  </ion-item>
+</ion-list>
