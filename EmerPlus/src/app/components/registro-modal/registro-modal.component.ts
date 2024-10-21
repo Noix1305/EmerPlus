@@ -75,33 +75,19 @@ export class RegistroModalComponent {
     passwordFinal = this._loginService.encryptText(this.password);
 
     try {
-      // Verificar si el usuario ya existe por su RUT
-      const usuarioExistente = await firstValueFrom(this._usuarioService.getUsuarioPorRut(this.rut));
-      if (usuarioExistente.body && Array.isArray(usuarioExistente.body) && usuarioExistente.body.length > 0) {
+      // Verificar si el usuario ya existe en tu base de datos
+      const usuarioExistenteBD = await firstValueFrom(this._usuarioService.getUsuarioPorRut(this.rut));
+      if (usuarioExistenteBD.body && Array.isArray(usuarioExistenteBD.body) && usuarioExistenteBD.body.length > 0) {
         // Si el RUT ya está registrado
-        this.errorMessage = 'El RUT ya está registrado en el sistema.';
+        this.errorMessage = 'El RUT ya está registrado en la base de datos.';
         console.error(this.errorMessage);
         return;
       }
 
-      // Si el RUT no está registrado, proceder con la creación del usuario
-      const newUser: CrearUsuario = {
-        rut: this.rut,
-        password: passwordFinal,
-        rol: [this.defaultRoleId],
-        correo: this.correo,
-        estado: 1
-      };
-
-      console.log('Registrando nuevo usuario...');
-
-      // Llama al servicio para crear el usuario en tu base de datos
-      await firstValueFrom(this._usuarioService.crearUsuario(newUser));
-
-      // Registrar también al usuario en Supabase
-      const { data: supabaseUser, error: supabaseError } = await this.supabaseService.auth.signUp({
-        email: this.correo, // Usar RUT como correo electrónico
-        password: passwordFinal // Usar la contraseña original (no cifrada)
+      // Verificar si el correo ya existe en Supabase
+      const { data: supabaseUserExistente, error: supabaseError } = await this.supabaseService.auth.signUp({
+        email: this.correo,
+        password: passwordFinal
       });
 
       if (supabaseError) {
@@ -109,6 +95,28 @@ export class RegistroModalComponent {
         console.error(this.errorMessage);
         return;
       }
+
+      // Ahora verifica si el usuario puede ser registrado en tu base de datos
+      const nuevoUsuario: CrearUsuario = {
+        rut: this.rut,
+        password: passwordFinal,
+        rol: [this.defaultRoleId],
+        correo: this.correo,
+        estado: 1
+      };
+
+      // Verificar si el usuario ya existe en la base de datos nuevamente, en caso de que se registre en Supabase
+      const usuarioExistenteBD2 = await firstValueFrom(this._usuarioService.getUsuarioPorRut(this.rut));
+      if (usuarioExistenteBD2.body && Array.isArray(usuarioExistenteBD2.body) && usuarioExistenteBD2.body.length > 0) {
+        // Si el RUT ya está registrado después de intentar registrar en Supabase
+        this.errorMessage = 'El RUT ya está registrado en la base de datos después de intentar registrarse en Supabase.';
+        console.error(this.errorMessage);
+        return;
+      }
+
+      // Ahora proceder a registrar en tu base de datos
+      console.log('Registrando nuevo usuario en la base de datos...');
+      await firstValueFrom(this._usuarioService.crearUsuario(nuevoUsuario));
 
       this.successMessage = 'Usuario creado exitosamente.';
       this.presentToast(this.successMessage);
@@ -119,4 +127,5 @@ export class RegistroModalComponent {
       console.error('Error al crear usuario:', error);
     }
   }
+
 }
