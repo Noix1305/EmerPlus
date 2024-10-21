@@ -84,17 +84,17 @@ export class RegistroModalComponent {
         return;
       }
 
-      // Verificar si el correo ya existe en Supabase
-      const { data: supabaseUserExistente, error: supabaseError } = await this.supabaseService.auth.signUp({
-        email: this.correo,
-        password: passwordFinal
-      });
+      // // Verificar si el correo ya existe en Supabase
+      // const { data: supabaseUserExistente, error: supabaseError } = await this.supabaseService.auth.signUp({
+      //   email: this.correo,
+      //   password: passwordFinal
+      // });
 
-      if (supabaseError) {
-        this.errorMessage = 'Error al registrar el usuario en Supabase: ' + supabaseError.message;
-        console.error(this.errorMessage);
-        return;
-      }
+      // if (supabaseError) {
+      //   this.errorMessage = 'Error al registrar el usuario en Supabase: ' + supabaseError.message;
+      //   console.error(this.errorMessage);
+      //   return;
+      // }
 
       // Ahora verifica si el usuario puede ser registrado en tu base de datos
       const nuevoUsuario: CrearUsuario = {
@@ -105,14 +105,14 @@ export class RegistroModalComponent {
         estado: 1
       };
 
-      // Verificar si el usuario ya existe en la base de datos nuevamente, en caso de que se registre en Supabase
-      const usuarioExistenteBD2 = await firstValueFrom(this._usuarioService.getUsuarioPorRut(this.rut));
-      if (usuarioExistenteBD2.body && Array.isArray(usuarioExistenteBD2.body) && usuarioExistenteBD2.body.length > 0) {
-        // Si el RUT ya está registrado después de intentar registrar en Supabase
-        this.errorMessage = 'El RUT ya está registrado en la base de datos después de intentar registrarse en Supabase.';
-        console.error(this.errorMessage);
-        return;
-      }
+      // // Verificar si el usuario ya existe en la base de datos nuevamente, en caso de que se registre en Supabase
+      // const usuarioExistenteBD2 = await firstValueFrom(this._usuarioService.getUsuarioPorRut(this.rut));
+      // if (usuarioExistenteBD2.body && Array.isArray(usuarioExistenteBD2.body) && usuarioExistenteBD2.body.length > 0) {
+      //   // Si el RUT ya está registrado después de intentar registrar en Supabase
+      //   this.errorMessage = 'El RUT ya está registrado en la base de datos después de intentar registrarse en Supabase.';
+      //   console.error(this.errorMessage);
+      //   return;
+      // }
 
       // Ahora proceder a registrar en tu base de datos
       console.log('Registrando nuevo usuario en la base de datos...');
