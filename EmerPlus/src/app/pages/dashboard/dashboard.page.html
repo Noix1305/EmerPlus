@@ -4,21 +4,20 @@
       <ion-title>Emerplus</ion-title>
       <ion-buttons slot="end">
         <div class="notification-icon notificacion">
-          <ion-button (click)="limpiarNotificaciones($event)" >
+          <ion-button (click)="limpiarNotificaciones($event)">
             <ion-icon name="notifications" style="color: blue;"></ion-icon>
             <ion-badge class="notification-badge" *ngIf="notificacion >0">{{ notificacion }}</ion-badge>
           </ion-button>
-        </div>  
+        </div>
         <ion-menu-button></ion-menu-button>
-        <ion-button><input type="file" (change)="onFileSelected($event)"/></ion-button>
-        
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
   <!-- Main Content -->
   <ion-content class="ion-padding" fullscreen>
-    
+
+    <!-- <img [src]="urlImage" alt="Imagen" *ngIf="urlImage" /> -->
     <!-- Contenedor del logo -->
     <div class="logo-container">
       <img src="/assets/imgs/logo.png" alt="EmerPlus Logo" class="logo">

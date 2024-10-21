@@ -1,7 +1,6 @@
-import { HttpResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 import { Preferences } from '@capacitor/preferences';
 import { AlertController, PopoverController, ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
@@ -11,10 +10,9 @@ import { Notificacion } from 'src/app/models/notificacion';
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
 import { Usuario } from 'src/app/models/usuario';
 import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
+import { GestorArchivosService } from 'src/app/services/gestorArchivos/gestor-archivos.service';
 import { NotificacionService } from 'src/app/services/notificacionService/notificacion.service';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
-import { SupabaseService } from 'src/app/services/supabase_service/supabase.service';
-import { Photo } from 'src/app/models/photo';
 
 @Component({
   selector: 'app-dashboard',
@@ -27,6 +25,10 @@ export class DashboardPage implements OnInit {
   notificacion: number = 0;
   defaultEstado: number = 4;
   notificaciones: Notificacion[] = []
+  rutaCarabineros: string = 'Carabineros'
+  rutaAmbulancia: string = 'Ambulancia'
+  rutaBomberos: string = 'Bomberos'
+  urlImage:string = 'https://ndmnmgusnnmndqwigiyp.supabase.co/storage/v1/object/public/images/Carabineros/undefined_foto_1729471801126.jpg'
 
   constructor(
     private alertController: AlertController,
@@ -36,7 +38,7 @@ export class DashboardPage implements OnInit {
     private toastController: ToastController,
     private _contactoService: ContactosemergenciaService,
     private popoverController: PopoverController,
-    private supabaseService: SupabaseService
+    private _gestorArchivos: GestorArchivosService
   ) { }
 
   async ngOnInit() {
@@ -97,61 +99,77 @@ export class DashboardPage implements OnInit {
     // Lógica para enviar una alerta al contacto de emergencia
   }
 
-  async enviarSolicitudDeEmergencia(tipoEmergencia: string, entidad: string) {
-    if (this.usuario) {
-      try {
-        const alert = await this.alertController.create({
-          header: 'Agregar fotografía',
-          message: '¿Quieres agregar una fotografía a tu solicitud?',
-          buttons: [
-            {
-              text: 'No subir imagen',
-              role: 'cancel',
-              handler: async () => {
-                console.warn('Se presionó No subir imagen. Procediendo sin imagen.');
-                await this.procesarSolicitud(tipoEmergencia);
-                this.mostrarAlerta(entidad);
-              },
-            },
-            {
-              text: 'Aceptar',
-              handler: async () => {
-                const image = await this.tomarFoto();
-                try {
-                  if (image) {
-                    // Usa image.webPath y image.fileName
-                    await this.procesarSolicitud(tipoEmergencia, image);
-                  } else {
-                    console.warn('No se seleccionó ninguna imagen. Procediendo sin imagen.');
-                    await this.procesarSolicitud(tipoEmergencia, null);
-                  }
-                  this.mostrarAlerta(entidad);
-                } catch (error) {
-                  console.error('Error al procesar la solicitud:', error);
-                }
-              },
-            },
-          ],
-        });
+  async enviarSolicitudDeEmergencia(tipoEmergencia: string, ruta: string) {
+    const usuario = this.usuario;
 
-        await alert.present();
-      } catch (error) {
-        console.error('Error al mostrar la alerta:', error);
-      }
-    } else {
+    if (!usuario) {
       console.warn('No hay usuario conectado.');
+      return;
+    }
+
+    try {
+      const alert = await this.alertController.create({
+        header: 'Agregar fotografía',
+        message: '¿Quieres agregar una fotografía a tu solicitud?',
+        buttons: [
+          {
+            text: 'No subir imagen',
+            role: 'cancel',
+            handler: () => this.procesarSolicitud(tipoEmergencia, ruta), // Procesar sin imagen
+          },
+          {
+            text: 'Tomar Foto',
+            handler: async () => {
+              const fileWithName = await this._gestorArchivos.tomarFotoDesdeCamara(); // Llama a la función para tomar la foto
+              if (fileWithName) {
+                await this.procesarSolicitud(tipoEmergencia, ruta, fileWithName); // Procesar con la imagen tomada
+              } else {
+                console.warn('No se tomó ninguna foto.');
+              }
+              await alert.dismiss(); // Cierra la alerta después de procesar
+            },
+          },
+          {
+            text: 'Galería',
+            handler: async () => {
+              const file = await this._gestorArchivos.seleccionarFotoDesdeGaleria();
+              if (file) {
+                await this.procesarSolicitud(tipoEmergencia,ruta, file);
+              }
+              await alert.dismiss(); // Cierra la alerta después de procesar
+            },
+          },
+        ],
+      });
+
+      await alert.present();
+    } catch (error) {
+      console.error('Error al mostrar la alerta:', error);
+      this.mostrarError('No se pudo mostrar la alerta.');
     }
   }
 
-  async convertUriToFile(uri: string, fileName: string): Promise<File> {
-    // Realiza una solicitud para obtener el archivo
-    const response = await fetch(uri);
-    const blob = await response.blob();
+  async descargarImagen(url: string) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Error al descargar la imagen');
+        }
+        const blob = await response.blob();
 
-    // Convierte el blob en un objeto File
-    return new File([blob], fileName, { type: blob.type });
-  }
-
+        // Crear un enlace para descargar
+        const urlBlob = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = urlBlob;
+        a.download = 'nombre-de-la-imagen.jpg'; // El nombre con el que se descargará
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(urlBlob);
+    } catch (error) {
+        console.error('Error al descargar la imagen:', error);
+    }
+}
 
   // Función para mostrar un error
   private async mostrarError(mensaje: string) {
@@ -163,167 +181,69 @@ export class DashboardPage implements OnInit {
     await alert.present(); // Presentar la alerta de error
   }
 
-
-
-
-  // Función para tomar una foto o seleccionar una imagen
-  async tomarFoto(): Promise<{ webPath: string; fileName: string } | null> {
-    try {
-      // Intenta tomar la foto desde la cámara
-      const image = await Camera.getPhoto({
-        resultType: CameraResultType.Uri, // Para obtener la imagen como URI
-        source: CameraSource.Camera, // Abrir la cámara
-        quality: 90, // Calidad de la imagen
-      });
-
-      // Si se obtuvo la imagen desde la cámara
-      if (image && image.webPath) {
-        return {
-          webPath: image.webPath,
-          fileName: 'foto_' + new Date().getTime() + '.jpg', // Genera un nombre de archivo único
-        };
-      }
-    } catch (error) {
-      console.error('Error al tomar la foto:', error);
-    }
-
-    // Si falló al tomar la foto, intenta usar el input de archivo
-    const fileInput = document.getElementById('file-input') as HTMLInputElement;
-
-    return new Promise((resolve) => {
-      // Agrega un listener para el evento change
-      fileInput.addEventListener('change', async (event) => {
-        const target = event.target as HTMLInputElement; // Asegúrate de que sea un HTMLInputElement
-        const files = target.files; // Accede a files de forma segura
-
-        if (files && files.length > 0) { // Verifica que files no sea null y tenga al menos un archivo
-          const file = files[0]; // Obtiene el primer archivo seleccionado
-          const publicUrl = await this.supabaseService.uploadImage2(file);
-
-          if (publicUrl) {
-            console.log('URL pública de la imagen:', publicUrl);
-            resolve({
-              webPath: publicUrl, // Retorna la URL pública
-              fileName: file.name, // Usa el nombre original del archivo
-            });
-          } else {
-            console.error('No se pudo subir la imagen.');
-            resolve(null);
-          }
-        } else {
-          console.error('No se seleccionó ninguna imagen.');
-          resolve(null);
-        }
-      });
-
-      // Simula un clic en el input de archivo para abrir el selector de archivos
-      fileInput.click();
-    });
-  }
-
-
-
-
-
-  async seleccionarImagenDesdeEquipo() {
-    try {
-      const fileInput: HTMLInputElement | null = document.querySelector('#fileInput');
-      if (fileInput) {
-        fileInput.click(); // Simula un clic en el input para abrir el selector de archivos
-        return new Promise((resolve) => {
-          fileInput.onchange = () => {
-            const file = fileInput.files ? fileInput.files[0] : null; // Obtiene el archivo seleccionado
-            if (file) {
-              resolve(file); // Resuelve con el archivo seleccionado
-            } else {
-              resolve(null); // Resuelve con null si no hay archivo
-            }
-          };
-        });
-      } else {
-        console.error('No se encontró el input de archivo');
-        return null; // Retornar null si no se encuentra el input
-      }
-    } catch (error) {
-      console.error('Error al seleccionar imagen desde el equipo:', error);
-      return null; // Retornar null en caso de error
-    }
-  }
-
-  async handleFileInputChange(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0]; // Obtiene el primer archivo seleccionado
-      const publicUrl = await this.supabaseService.uploadFile(file);
-
-    } else {
-      console.error('No se ha seleccionado ningún archivo.');
-    }
-  }
-
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      this.supabaseService.uploadImage2(file); // Llama a tu función de subir imagen
-    } else {
-      console.error('No se seleccionó ningún archivo.');
-    }
-  }
-
-
   // Nueva función para procesar la solicitud
-  async procesarSolicitud(tipoEmergencia: string, image?: any) {
+  async procesarSolicitud(tipoEmergencia: string, ruta: string, image?: File) {
     try {
-      // Obtener la ubicación en tiempo real
-      let urlImg = null;
-
       const ubicacion = await this.obtenerUbicacionActual();
-      if (image) {
-        urlImg = await this.supabaseService.uploadImage2(image);
+
+      if (!ubicacion) {
+        throw new Error('No se pudo obtener la ubicación. Verifica los permisos.');
       }
 
-      if (ubicacion && this.usuario) {
-        const nuevaSolicitud: SolicitudDeEmergencia = {
-          usuario_id: this.usuario.rut,
-          latitud: ubicacion.latitud,
-          longitud: ubicacion.longitud,
-          fecha: new Date().toISOString().split('T')[0],
-          hora: new Date().toTimeString().split(' ')[0],
-          tipo: tipoEmergencia,
-          estado: this.defaultEstado,
-          image_url: urlImg || undefined, // Asegúrate de pasar undefined si urlImg es null
-        };
+      // Cambiar urlImg a string | undefined
+      let urlImg: string | null = null;
 
-        // Enviar la solicitud de emergencia
-        const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
-        console.log('Solicitud enviada con éxito');
+      // Si se obtuvo un archivo, súbelo
+      if (image) {
+        urlImg = await this._gestorArchivos.uploadPhoto(image, ruta); // Usa la función para subir la foto
+        console.log('URL Imagen: ' + urlImg);
+      }
 
-        // Ahora, obtén la última solicitud
-        const ultimaSolicitud = await this.emergenciaService.obtenerUltimaSolicitud();
+      if (!this.usuario) {
+        throw new Error('No hay usuario autenticado para procesar la solicitud.');
+      }
 
-        if (ultimaSolicitud) {
-          const idSolicitud = ultimaSolicitud.id; // Asumiendo que `id` es el campo que necesitas
-          console.log('Id: ' + idSolicitud);
+      // Crear la nueva solicitud de emergencia
+      const nuevaSolicitud: SolicitudDeEmergencia = {
+        usuario_id: this.usuario.rut,
+        latitud: ubicacion.latitud,
+        longitud: ubicacion.longitud,
+        fecha: new Date().toISOString().split('T')[0],
+        hora: new Date().toTimeString().split(' ')[0],
+        tipo: tipoEmergencia,
+        estado: this.defaultEstado,
+        imageUrl: urlImg, // Esto ahora es compatible
+      };
 
-          if (idSolicitud) {
-            this.enviarNotificacion(tipoEmergencia, idSolicitud);
-          }
-        } else {
-          console.warn('No se encontró la última solicitud.');
+      // Enviar la solicitud de emergencia
+      const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
+      console.log('Solicitud enviada con éxito:', response);
+
+      // Obtener la última solicitud y enviar notificación
+      const ultimaSolicitud = await this.emergenciaService.obtenerUltimaSolicitud();
+
+      if (ultimaSolicitud) {
+        const idSolicitud = ultimaSolicitud.id; // Esto ahora es seguro
+        console.log('Id: ' + idSolicitud);
+
+        if (idSolicitud) {
+          this.enviarNotificacion(tipoEmergencia, idSolicitud);
         }
       } else {
-        console.error('No se pudo obtener la ubicación.');
-        alert('No se pudo obtener tu ubicación. Por favor, verifica los permisos e inténtalo de nuevo.');
+        console.warn('No se encontró la última solicitud.');
+        alert('No se pudo encontrar la última solicitud. Inténtalo nuevamente más tarde.');
       }
     } catch (error) {
-      console.error('Error al enviar la solicitud o al obtener la ubicación:', error);
-      alert('Hubo un error al enviar la solicitud o al obtener la ubicación. Inténtalo nuevamente.');
+      console.error('Error al procesar la solicitud:', error);
+
+      if (error instanceof HttpErrorResponse) {
+        console.error('Error del servidor:', error.message);
+        console.error('Detalles del error:', error.error); // Esto puede dar más información sobre el problema
+      }
+
+      alert(error instanceof Error ? error.message : 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.');
     }
   }
-
-
-
 
   private obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
     return new Promise((resolve, reject) => {
@@ -341,29 +261,6 @@ export class DashboardPage implements OnInit {
       }
     });
   }
-
-
-  // Simulación de función para obtener ubicación actual
-  // async obtenerUbicacionActual(): Promise<{ latitud: number; longitud: number } | null> {
-  //   try {
-  //     // Solicitar permiso para acceder a la ubicación
-  //     const permission = await Geolocation.requestPermissions();
-  //     if (permission.location === 'granted') {
-  //       // Obtener la posición actual
-  //       const position = await Geolocation.getCurrentPosition();
-  //       return {
-  //         latitud: position.coords.latitude,
-  //         longitud: position.coords.longitude,
-  //       };
-  //     } else {
-  //       console.error('Permiso de ubicación denegado');
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error al obtener la ubicación:', error);
-  //     return null;
-  //   }
-  // }
 
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {
     if (this.usuario) {
@@ -501,5 +398,4 @@ export class DashboardPage implements OnInit {
     });
     toast.present();
   }
-
 }

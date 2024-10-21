@@ -7,6 +7,7 @@ import { environment } from 'src/environments/environment';
 })
 export class SupabaseService {
   private supabase: SupabaseClient;
+  bucket: string = 'images'
 
   constructor() {
     this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
@@ -16,77 +17,24 @@ export class SupabaseService {
     return this.supabase;
   }
 
-  async uploadFile(file: File) {
-    const client = createClient(environment.supabaseUrl, environment.supabaseKey);
-    const { data, error } = await this.client.storage.from('imagenes').upload(file.name, file)
+  get auth() {
+    return this.supabase.auth;
+  }
+
+  async uploadFile(bucket: string, path: string, file: File): Promise<{ url: string | null; error: any }> {
+    // Subir el archivo al bucket
+    const { data, error } = await this.supabase.storage.from(bucket).upload(path, file);
+
+    // Si hay un error, retornarlo
     if (error) {
-      // Handle error
-    } else {
-      // Handle success
-    }
-  }
-
-
-
-  // Función para subir una imagen con tipo de contenido
-  async uploadImage2(file: File): Promise<string | null> {
-    if (!file || !file.name) {
-      console.error('El archivo no tiene nombre o es inválido');
-      return null;
+        return { url: null, error };
     }
 
-    // Verificar que el archivo sea una imagen
-    if (!file.type.startsWith('image/')) {
-      console.error('El archivo seleccionado no es una imagen.');
-      return null;
-    }
+    // Si la carga fue exitosa, obtenemos la URL pública
+    const { data: { publicUrl } } = this.supabase.storage.from(bucket).getPublicUrl(path);
 
-    try {
-      // Genera un nombre único para el archivo
-      const fileName = `${file.name}`;
+    // Retornamos la URL pública y el posible error
+    return { url: publicUrl, error: null };
+}
 
-      // Subir la imagen al bucket de Supabase
-      const { data, error } = await this.supabase.storage
-        .from('imagenes') // Reemplaza con tu nombre de bucket
-        .upload(fileName, file, {
-          contentType: file.type
-        });
-
-      if (error) {
-        console.error('Error al subir la imagen:', error);
-        return null;
-      }
-
-      // Obtener la URL pública de la imagen subida
-      const { data: publicData } = this.supabase
-        .storage
-        .from('imagenes')
-        .getPublicUrl(fileName); // Asegúrate de usar el nombre generado
-
-      // Retornar la URL pública
-      return publicData?.publicUrl || null;
-    } catch (error) {
-      console.error('Error al subir la imagen:', error);
-      return null;
-    }
-  }
-
-
-  // Función para manejar el evento de carga de archivos
-  async handleFileInputChange(event: Event): Promise<void> {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0]; // Obtiene el primer archivo seleccionado
-      const publicUrl = await this.uploadImage2(file);
-
-      if (publicUrl) {
-        console.log('URL pública de la imagen:', publicUrl);
-        // Aquí puedes usar la URL como necesites
-      } else {
-        console.error('No se pudo subir la imagen.');
-      }
-    } else {
-      console.error('No se ha seleccionado ningún archivo.');
-    }
-  }
 }

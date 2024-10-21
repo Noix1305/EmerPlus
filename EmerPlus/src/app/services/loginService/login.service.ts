@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../usuarioService/usuario.service';
+import { SupabaseService } from '../supabase_service/supabase.service';
+import { AuthResponse } from '@supabase/supabase-js';
 
 @Injectable({
   providedIn: 'root'
@@ -10,37 +12,60 @@ export class LoginService {
 
   // ID del rol por defecto (Usuario)
   defaultRoleId: number = 2;
+  correo: string = '';
 
   constructor(
-    private _usuarioService: UsuarioService) {
+    private _usuarioService: UsuarioService,
+    private supabaseService: SupabaseService) {
   }
 
   mostrarUsuarios() { }
 
   async login(rut: string, password: string): Promise<Usuario | undefined> {
-    try {
-      // Obtener los usuarios con estado activo
-      const usuariosActivos: Usuario[] = await firstValueFrom(this._usuarioService.obtenerUsuarios());
+    const usuarioResponse = await firstValueFrom(this._usuarioService.getUsuarioPorRut(rut));
 
-      // Buscar el usuario por RUT entre los usuarios activos
+    // Verificar si se encontró el usuario y obtener el correo
+    if (usuarioResponse.body && Array.isArray(usuarioResponse.body) && usuarioResponse.body.length > 0) {
+      const usuario = usuarioResponse.body[0]; // Asumiendo que el primer usuario es el que buscas
+      this.correo = usuario.correo; // Asignar el correo a la variable
+      console.log('Correo del usuario:', this.correo);
+    } else {
+      console.error('Usuario no encontrado.');
+    }
+    try {
+      const { data, error }: AuthResponse = await this.supabaseService.auth.signInWithPassword({
+        email: this.correo, // Cambia esto si no estás usando el RUT como parte del correo
+        password: password
+
+      });
+      console.log('Rut: ' + rut)
+      console.log(password);
+
+      if (error) {
+        console.error('Error al iniciar sesión con Supabase:', error.message);
+        return undefined; // Maneja el error y devuelve undefined
+      }
+
+      const user = data.user; // Accede al objeto de usuario
+      if (!user) {
+        console.error('Usuario no encontrado en la respuesta de Supabase');
+        return undefined; // Devuelve undefined si el usuario no existe
+      }
+
+      // Aquí puedes seguir buscando el usuario en tu base de datos local
+      const usuariosActivos: Usuario[] = await firstValueFrom(this._usuarioService.obtenerUsuarios());
       const usuarioEncontrado = usuariosActivos.find((usuario: Usuario) => usuario.rut === rut);
 
       if (!usuarioEncontrado) {
-        console.error('Usuario no encontrado o no activo');
-        return undefined; // Usuario no encontrado o no activo
+        console.error('Usuario no encontrado en la base de datos');
+        return undefined; // Devuelve undefined si el usuario no se encuentra en tu base de datos
       }
 
-      // Verificar la contraseña
-      if (usuarioEncontrado.password === password) {
-        console.log('Usuario autenticado con éxito:', usuarioEncontrado);
-        return usuarioEncontrado; // Retornar el usuario autenticado
-      } else {
-        console.error('Contraseña incorrecta');
-        return undefined; // Contraseña incorrecta
-      }
+      console.log('Usuario autenticado con éxito:', usuarioEncontrado);
+      return usuarioEncontrado; // Retorna el usuario autenticado
     } catch (error) {
       console.error('Error al loguear el usuario:', error);
-      return undefined; // Manejar error de obtención de usuarios
+      return undefined; // Maneja el error de obtención de usuarios y devuelve undefined
     }
   }
 

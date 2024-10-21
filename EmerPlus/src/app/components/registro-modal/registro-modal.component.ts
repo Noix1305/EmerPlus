@@ -4,6 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { CrearUsuario } from 'src/app/models/crearUsuario';
 import { Usuario } from 'src/app/models/usuario';
 import { LoginService } from 'src/app/services/loginService/login.service';
+import { SupabaseService } from 'src/app/services/supabase_service/supabase.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 
 @Component({
@@ -26,6 +27,7 @@ export class RegistroModalComponent {
     private modalController: ModalController,
     private _usuarioService: UsuarioService,
     private _loginService: LoginService,
+    private supabaseService: SupabaseService,
     private toastController: ToastController) { }
 
   closeModal() {
@@ -93,8 +95,21 @@ export class RegistroModalComponent {
 
       console.log('Registrando nuevo usuario...');
 
-      // Llama al servicio para crear el usuario
+      // Llama al servicio para crear el usuario en tu base de datos
       await firstValueFrom(this._usuarioService.crearUsuario(newUser));
+
+      // Registrar también al usuario en Supabase
+      const { data: supabaseUser, error: supabaseError } = await this.supabaseService.auth.signUp({
+        email: this.correo, // Usar RUT como correo electrónico
+        password: passwordFinal // Usar la contraseña original (no cifrada)
+      });
+
+      if (supabaseError) {
+        this.errorMessage = 'Error al registrar el usuario en Supabase: ' + supabaseError.message;
+        console.error(this.errorMessage);
+        return;
+      }
+
       this.successMessage = 'Usuario creado exitosamente.';
       this.presentToast(this.successMessage);
       this.closeModal(); // Cierra el modal si el registro fue exitoso
