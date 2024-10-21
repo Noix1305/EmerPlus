@@ -6,4 +6,5 @@ export interface Notificacion {
     hora: string;            // Hora en que se envió la notificación (formato 'HH:mm:ss')
     tipo: string;            // Tipo de notificación (emergencia, advertencia, etc.)
     id_solicitud: number;
+    estado: string;
 }

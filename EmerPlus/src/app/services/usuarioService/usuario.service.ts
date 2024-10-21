@@ -39,9 +39,6 @@ export class UsuarioService {
         const usuario: Usuario = usuarioResponse.body[0];
         const email = usuario.correo;
 
-        console.log('Usuario encontrado:', usuario.nombre);
-        console.log('Correo:', email);
-
         const passDesencriptada = this.decryptText(usuario.password);
 
         if (email) {
@@ -181,11 +178,6 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
     );
   }
 
-  editariIdcontactoUsuario(rut: string, data: any): Observable<HttpResponse<any>> {
-    const path = `${this.path}?rut=eq.${rut}`;
-    return this.apiConfig.patch<any>(path, data);
-  }
-
   cambiarContrasena(rut: string, nuevaContrasena: string): Observable<HttpResponse<Usuario>> {
     const path = `${this.path}?rut=eq.${rut}`;
     const body = { password: nuevaContrasena }; // Asumiendo que el campo de la contraseña es 'password'
@@ -249,7 +241,6 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
     if (value) {
       const usuario = JSON.parse(value) as Usuario;
       this.usuarioSubject.next(usuario); // Emite el nuevo usuario
-      console.log('Usuario cargado:', usuario);
     }
   }
 

@@ -2,6 +2,9 @@ import { Injectable } from '@angular/core';
 import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../usuarioService/usuario.service';
+import { SupabaseService } from '../supabase_service/supabase.service';
+import { AuthResponse } from '@supabase/supabase-js';
+import { environment, keysUserBd } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -10,39 +13,87 @@ export class LoginService {
 
   // ID del rol por defecto (Usuario)
   defaultRoleId: number = 2;
+  correo: string = '';
+  correoUserBD: string = keysUserBd.correoUserBD
+  passwordUserBD: string = keysUserBd.password
 
   constructor(
-    private _usuarioService: UsuarioService) {
+    private _usuarioService: UsuarioService,
+    private supabaseService: SupabaseService) {
   }
 
   mostrarUsuarios() { }
 
   async login(rut: string, password: string): Promise<Usuario | undefined> {
     try {
-      // Obtener los usuarios con estado activo
-      const usuariosActivos: Usuario[] = await firstValueFrom(this._usuarioService.obtenerUsuarios());
-
-      // Buscar el usuario por RUT entre los usuarios activos
-      const usuarioEncontrado = usuariosActivos.find((usuario: Usuario) => usuario.rut === rut);
-
-      if (!usuarioEncontrado) {
-        console.error('Usuario no encontrado o no activo');
-        return undefined; // Usuario no encontrado o no activo
-      }
-
-      // Verificar la contraseña
-      if (usuarioEncontrado.password === password) {
-        console.log('Usuario autenticado con éxito:', usuarioEncontrado);
-        return usuarioEncontrado; // Retornar el usuario autenticado
+      // Obtener el usuario utilizando firstValueFrom
+      const usuarioResponse = await firstValueFrom(this._usuarioService.getUsuarioPorRut(rut));
+  
+      // Verificar si el usuario existe y si el password coincide
+      if (Array.isArray(usuarioResponse.body) && usuarioResponse.body.length > 0) {
+        const usuario = usuarioResponse.body[0]; // Asumimos que el primer usuario es el que buscamos
+  
+        // Validar el password
+        if (usuario.password === password) {
+          this.correo = usuario.correo; // Asignar el correo a la variable
+          console.log('Correo del usuario:', this.correo);
+  
+          // Intentar autenticación en Supabase
+          const authenticatedUser = await this.authSupabase(this.correo, password);
+          if (authenticatedUser) {
+            console.log('Usuario autenticado con éxito:', authenticatedUser);
+            return usuario; // Retornar el usuario autenticado si todo va bien
+          } else {
+            console.error('Error al autenticar con Supabase.');
+            return undefined; // Manejar el error si no se puede autenticar en Supabase
+          }
+        } else {
+          console.error('Contraseña incorrecta.');
+          return undefined; // Contraseña incorrecta
+        }
       } else {
-        console.error('Contraseña incorrecta');
-        return undefined; // Contraseña incorrecta
+        console.error('Usuario no encontrado.');
+        return undefined; // No se encontró el usuario
       }
     } catch (error) {
-      console.error('Error al loguear el usuario:', error);
-      return undefined; // Manejar error de obtención de usuarios
+      console.error('Error al obtener el usuario o durante la autenticación:', error);
+      return undefined; // Manejar errores y devolver undefined
     }
   }
+  
+  private async authSupabase(email: string, password: string): Promise<any> {
+    try {
+      const { data, error }: AuthResponse = await this.supabaseService.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+  
+      // Si ocurre un error, intentar con credenciales predeterminadas
+      if (error) {
+        console.warn('Error al iniciar sesión con las credenciales del usuario, intentando con las predeterminadas.');
+  
+        // Intentar autenticación con credenciales predeterminadas
+        const { data: defaultData, error: defaultError }: AuthResponse = await this.supabaseService.auth.signInWithPassword({
+          email: this.correoUserBD, // Correo predeterminado
+          password: this.passwordUserBD // Contraseña predeterminada
+        });
+  
+        if (defaultError) {
+          console.error('Error al iniciar sesión con las credenciales predeterminadas:', defaultError);
+          return undefined;
+        } else {
+          return defaultData.user; // Retornar el usuario autenticado con las credenciales predeterminadas
+        }
+      } else {
+        return data.user; // Retornar el usuario autenticado con las credenciales del usuario
+      }
+    } catch (error) {
+      console.error('Error al intentar iniciar sesión en Supabase:', error);
+      return undefined; // Manejar errores de autenticación
+    }
+  }
+  
+
 
   validarRUT(rut: string): boolean {
     // Valida si un RUT es correcto utilizando la fórmula de verificación del dígito verificador.

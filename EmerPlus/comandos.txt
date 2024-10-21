@@ -1,3 +1,4 @@
 npm install @capacitor/preferences
 npm install jspdf jspdf-autotable
 npm install @capacitor/geolocation
+npm install @capacitor/camera

@@ -32,7 +32,7 @@
     <ion-list *ngIf="!esAdmin">
       <ion-item>
         <ion-label>Fecha Desde</ion-label>
-        <ion-select [(ngModel)]="fechaDesde" interface="action-sheet">
+        <ion-select [(ngModel)]="fechaDesde" interface="popover">
           <ion-select-option value="hoy">Hoy</ion-select-option>
           <ion-select-option value="ayer">Ayer</ion-select-option>
           <ion-select-option value="semana">Última semana</ion-select-option>
@@ -43,7 +43,7 @@
 
       <ion-item>
         <ion-label>Fecha Hasta</ion-label>
-        <ion-select [(ngModel)]="fechaHasta" interface="action-sheet">
+        <ion-select [(ngModel)]="fechaHasta" interface="popover">
           <ion-select-option value="hoy">Hoy</ion-select-option>
           <ion-select-option value="ayer">Ayer</ion-select-option>
           <ion-select-option value="semana">Última semana</ion-select-option>
@@ -54,20 +54,21 @@
 
       <ion-item>
         <ion-label>Estado</ion-label>
-        <ion-select [(ngModel)]="estadoFiltro" interface="action-sheet">
+        <ion-select [(ngModel)]="estadoFiltro" interface="popover">
           <ion-select-option value="0">Todos</ion-select-option> <!-- Usar 0 para "Todos" -->
           <ion-select-option value="1">Atendida</ion-select-option> <!-- 1 -->
           <ion-select-option value="2">En ejecución</ion-select-option> <!-- 2 -->
           <ion-select-option value="3">Recibida</ion-select-option> <!-- 3 -->
           <ion-select-option value="4">Enviada</ion-select-option> <!-- 4 -->
+          <ion-select-option value="5">Cancelada</ion-select-option><!-- 5 -->
         </ion-select>
       </ion-item>
-
-      <ion-button (click)="filtrarSolicitudes()">Filtrar</ion-button>
+      <ion-button (click)="limpiarFiltro()">Limpiar Filtro</ion-button>
+        <ion-button (click)="filtrarSolicitudes()">Filtrar</ion-button>
     </ion-list>
 
     <!-- Mostrar solo si hay solicitudes filtradas -->
-    <ion-list *ngIf="solicitudesFiltradas.length > 0">
+    <ion-list>
       <ion-item *ngFor="let solicitud of solicitudesFiltradas">
         <ion-label>
           <h2>{{ solicitud.tipo }}</h2>
@@ -80,17 +81,7 @@
     </ion-list>
 
     <!-- Mostrar si no hay solicitudes filtradas -->
-    <ion-list *ngIf="solicitudesUsuario.length > 0 && solicitudesFiltradas.length === 0">
-      <ion-item *ngFor="let solicitud of solicitudesUsuario">
-        <ion-label>
-          <h2>{{ solicitud.tipo }}</h2>
-          <p>ID: {{ solicitud.id }}</p>
-          <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
-          <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
-          <p>Estado: {{ solicitud.estadoDescripcion }}</p>
-        </ion-label>
-      </ion-item>
-    </ion-list>
+    
 
     <ion-button (click)="generarPDF()" expand="full" *ngIf="esAdmin">Generar PDF</ion-button>
   </div>

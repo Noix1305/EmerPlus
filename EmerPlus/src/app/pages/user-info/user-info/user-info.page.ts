@@ -475,43 +475,56 @@ export class UserInfoPage {
       };
 
       try {
-        // Llama al servicio para crear el contacto
+        let response;
+        
+        // Verifica si ya existe el contacto
         if (this.contacto.id) {
-          const response = await firstValueFrom(this._contactoService.editarContacto(this.contacto.id, updatedContact));
-          this.successMessage = 'Contacto agregado con éxito, se le ha enviado una notificación.'
-
-          // Verifica si la respuesta fue exitosa
-          if (response.ok) {
-            try {
-              //Envío de notificación al contacto agregado
-              await this._usuarioService.enviarCorreoRegistroContacto(updatedContact.correo, this.usuario, updatedContact.nombre)
-            } catch (error: unknown) {
-              if (error instanceof Error) {
-                this.successMessage = 'Error durante el envío de la notificación.'
-                console.error('Error durante el envío de la notificación:', error.message);
-                alert(error.message || 'Ocurrió un error inesperado.');
-              } else {
-                console.error('Error desconocido:', error);
-                this.successMessage = 'Error durante el envío de la notificación.'
-                alert('Ocurrió un error inesperado.');
-              }
-            }
-          } else {
-            this.errorMessage = 'Ocurrió un error al crear el contacto.';
-            console.error(this.errorMessage);
-            this.presentToast(this.errorMessage, 'danger');
-          }
+          // Si existe, editar contacto
+          response = await firstValueFrom(this._contactoService.editarContacto(this.contacto.id, updatedContact));
+        } else {
+          // Si no existe, crear nuevo contacto
+          response = await firstValueFrom(this._contactoService.crearContacto(updatedContact));
+          this.successMessage = 'Nuevo contacto creado con éxito.';
         }
 
-        this.presentToast(this.successMessage, 'success');
+        // Verifica si la respuesta fue exitosa
+        if (response.ok) {
+          this.successMessage = this.contacto.id
+            ? 'Contacto actualizado con éxito, se le ha enviado una notificación.'
+            : 'Nuevo contacto creado con éxito, se le ha enviado una notificación.';
+
+          try {
+            // Envío de notificación al contacto creado o editado
+            await this._usuarioService.enviarCorreoRegistroContacto(updatedContact.correo, this.usuario, updatedContact.nombre);
+          } catch (error: unknown) {
+            if (error instanceof Error) {
+              this.errorMessage = 'Error durante el envío de la notificación.';
+              console.error('Error durante el envío de la notificación:', error.message);
+              alert(error.message || 'Ocurrió un error inesperado.');
+            } else {
+              console.error('Error desconocido:', error);
+              this.errorMessage = 'Error durante el envío de la notificación.';
+              alert('Ocurrió un error inesperado.');
+            }
+
+          }
+        } else {
+          this.errorMessage = 'Ocurrió un error al crear o editar el contacto.';
+          console.error(this.errorMessage);
+          this.presentToast(this.errorMessage, 'danger');
+        }
+
+        await this.presentToast(this.successMessage, 'success');
         this.closeEditContactModal();
+        
       } catch (error) {
-        this.errorMessage = 'Ocurrió un error al crear el contacto. Inténtalo de nuevo.';
+        this.errorMessage = 'Ocurrió un error al crear o editar el contacto. Inténtalo de nuevo.';
         console.log(this.errorMessage);
-        console.error('Error al crear contacto:', error);
+        console.error('Error al crear o editar contacto:', error);
       }
     }
-  }
+}
+
 
 
   get correoUsuario(): string {

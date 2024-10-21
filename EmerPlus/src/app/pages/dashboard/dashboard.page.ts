@@ -1,14 +1,16 @@
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { AlertController, ToastController } from '@ionic/angular';
+import { AlertController, PopoverController, ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
+import { NotificacionPopoverComponent } from 'src/app/components/notificacionPopover/notificacion-popover/notificacion-popover.component';
 import { Contacto } from 'src/app/models/contacto';
 import { Notificacion } from 'src/app/models/notificacion';
-
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
 import { Usuario } from 'src/app/models/usuario';
 import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
+import { GestorArchivosService } from 'src/app/services/gestorArchivos/gestor-archivos.service';
 import { NotificacionService } from 'src/app/services/notificacionService/notificacion.service';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
 
@@ -19,9 +21,14 @@ import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergenc
 })
 export class DashboardPage implements OnInit {
   usuario: Usuario | null = null;
-  contacto: Contacto[] | null = null;
-  notificacion: number = 8;
+  contacto: Contacto[] = [];
+  notificacion: number = 0;
   defaultEstado: number = 4;
+  notificaciones: Notificacion[] = []
+  rutaCarabineros: string = 'Carabineros'
+  rutaAmbulancia: string = 'Ambulancia'
+  rutaBomberos: string = 'Bomberos'
+  urlImage:string = 'https://ndmnmgusnnmndqwigiyp.supabase.co/storage/v1/object/public/images/Carabineros/undefined_foto_1729471801126.jpg'
 
   constructor(
     private alertController: AlertController,
@@ -29,10 +36,13 @@ export class DashboardPage implements OnInit {
     private router: Router,
     private _notificacionService: NotificacionService,
     private toastController: ToastController,
-    private _contactoService: ContactosemergenciaService
+    private _contactoService: ContactosemergenciaService,
+    private popoverController: PopoverController,
+    private _gestorArchivos: GestorArchivosService
   ) { }
 
   async ngOnInit() {
+
     // Intenta obtener el usuario desde la navegación anterior
     this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
     if (!this.usuario) {
@@ -40,87 +50,198 @@ export class DashboardPage implements OnInit {
 
       if (value) {
         this.usuario = JSON.parse(value) as Usuario; // Convierte el JSON a Usuario
-        console.log('Usuario obtenido de Preferences:', this.usuario);
       } else {
         console.log('No se encontró el usuario en Preferences.');
       }
     } else {
       console.log('Usuario obtenido desde la navegación:', this.usuario);
     }
+    await this.someFunction();
+    console.log(this.notificaciones[0].fecha)
   }
 
-  limpiarNotificaciones() {
+  limpiarNotificaciones(ev: MouseEvent) {
+    this.mostrarNotificaciones(ev)
     this.notificacion = 0;
   }
 
+  async mostrarNotificaciones(ev: MouseEvent): Promise<void> {
+    const popover = await this.popoverController.create({
+      component: NotificacionPopoverComponent,
+      event: ev, // Pasa el evento para la posición
+      componentProps: {
+        notificaciones: this.notificaciones // Pasa las notificaciones aquí
+      }
+
+    });
+
+    await popover.present();
+  }
+
+
   carabineros(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('robo')
-    this.mostrarAlerta(entidad);
+    this.enviarSolicitudDeEmergencia('robo', entidad)
   }
 
   bomberos(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('incendio')
-    this.mostrarAlerta(entidad);
+    this.enviarSolicitudDeEmergencia('incendio', entidad)
   }
 
   ambulancia(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('accidente')
-    this.mostrarAlerta(entidad);
+    this.enviarSolicitudDeEmergencia('accidente', entidad)
+
   }
 
   contactoEmergencia(entidad: string) {
     // Lógica para enviar una alerta al contacto de emergencia
   }
 
-  async enviarSolicitudDeEmergencia(tipoEmergencia: string) {
-    if (this.usuario) {
-      try {
-        // Obtener la ubicación en tiempo real
-        const ubicacion = await this.obtenerUbicacionActual();
+  async enviarSolicitudDeEmergencia(tipoEmergencia: string, ruta: string) {
+    const usuario = this.usuario;
 
-        if (ubicacion) {
-          const nuevaSolicitud: SolicitudDeEmergencia = {
-            usuario_id: this.usuario.rut,
-            latitud: ubicacion.latitud,  // Latitud obtenida
-            longitud: ubicacion.longitud, // Longitud obtenida
-            fecha: new Date().toISOString().split('T')[0], // Fecha en formato 'YYYY-MM-DD'
-            hora: new Date().toTimeString().split(' ')[0], // Hora en formato 'HH:mm:ss'
-            tipo: tipoEmergencia,
-            estado: this.defaultEstado
-          };
-
-          // Enviar la solicitud de emergencia
-          const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
-          console.log('Solicitud enviada con éxito');
-
-          // Ahora, obtén la última solicitud
-          const ultimaSolicitud = await this.emergenciaService.obtenerUltimaSolicitud();
-
-          if (ultimaSolicitud) {
-            const idSolicitud = ultimaSolicitud.id; // Asumiendo que `id` es el campo que necesitas
-            console.log('Id: ' + idSolicitud);
-
-            if (idSolicitud) {
-              this.enviarNotificacion(tipoEmergencia, idSolicitud);
-            }
-          } else {
-            console.warn('No se encontró la última solicitud.');
-          }
-        } else {
-          // Caso 3: Ubicación no disponible
-          console.error('No se pudo obtener la ubicación.');
-          alert('No se pudo obtener tu ubicación. Por favor, verifica los permisos e inténtalo de nuevo.');
-        }
-      } catch (error) {
-        // Manejo de errores
-        console.error('Error al enviar la solicitud o al obtener la ubicación:', error);
-        alert('Hubo un error al enviar la solicitud o al obtener la ubicación. Inténtalo nuevamente.');
-      }
-    } else {
+    if (!usuario) {
       console.warn('No hay usuario conectado.');
+      return;
+    }
+
+    try {
+      const alert = await this.alertController.create({
+        header: 'Agregar fotografía',
+        message: '¿Quieres agregar una fotografía a tu solicitud?',
+        buttons: [
+          {
+            text: 'No subir imagen',
+            role: 'cancel',
+            handler: () => this.procesarSolicitud(tipoEmergencia, ruta), // Procesar sin imagen
+          },
+          {
+            text: 'Tomar Foto',
+            handler: async () => {
+              const fileWithName = await this._gestorArchivos.tomarFotoDesdeCamara(); // Llama a la función para tomar la foto
+              if (fileWithName) {
+                await this.procesarSolicitud(tipoEmergencia, ruta, fileWithName); // Procesar con la imagen tomada
+              } else {
+                console.warn('No se tomó ninguna foto.');
+              }
+              await alert.dismiss(); // Cierra la alerta después de procesar
+            },
+          },
+          {
+            text: 'Galería',
+            handler: async () => {
+              const file = await this._gestorArchivos.seleccionarFotoDesdeGaleria();
+              if (file) {
+                await this.procesarSolicitud(tipoEmergencia,ruta, file);
+              }
+              await alert.dismiss(); // Cierra la alerta después de procesar
+            },
+          },
+        ],
+      });
+
+      await alert.present();
+    } catch (error) {
+      console.error('Error al mostrar la alerta:', error);
+      this.mostrarError('No se pudo mostrar la alerta.');
+    }
+  }
+
+  async descargarImagen(url: string) {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Error al descargar la imagen');
+        }
+        const blob = await response.blob();
+
+        // Crear un enlace para descargar
+        const urlBlob = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = urlBlob;
+        a.download = 'nombre-de-la-imagen.jpg'; // El nombre con el que se descargará
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(urlBlob);
+    } catch (error) {
+        console.error('Error al descargar la imagen:', error);
+    }
+}
+
+  // Función para mostrar un error
+  private async mostrarError(mensaje: string) {
+    const alert = await this.alertController.create({
+      header: 'Error',
+      message: mensaje,
+      buttons: ['OK'],
+    });
+    await alert.present(); // Presentar la alerta de error
+  }
+
+  // Nueva función para procesar la solicitud
+  async procesarSolicitud(tipoEmergencia: string, ruta: string, image?: File) {
+    try {
+      const ubicacion = await this.obtenerUbicacionActual();
+
+      if (!ubicacion) {
+        throw new Error('No se pudo obtener la ubicación. Verifica los permisos.');
+      }
+
+      // Cambiar urlImg a string | undefined
+      let urlImg: string | null = null;
+
+      // Si se obtuvo un archivo, súbelo
+      if (image) {
+        urlImg = await this._gestorArchivos.uploadPhoto(image, ruta); // Usa la función para subir la foto
+        console.log('URL Imagen: ' + urlImg);
+      }
+
+      if (!this.usuario) {
+        throw new Error('No hay usuario autenticado para procesar la solicitud.');
+      }
+
+      // Crear la nueva solicitud de emergencia
+      const nuevaSolicitud: SolicitudDeEmergencia = {
+        usuario_id: this.usuario.rut,
+        latitud: ubicacion.latitud,
+        longitud: ubicacion.longitud,
+        fecha: new Date().toISOString().split('T')[0],
+        hora: new Date().toTimeString().split(' ')[0],
+        tipo: tipoEmergencia,
+        estado: this.defaultEstado,
+        imageUrl: urlImg, // Esto ahora es compatible
+      };
+
+      // Enviar la solicitud de emergencia
+      const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
+      console.log('Solicitud enviada con éxito:', response);
+
+      // Obtener la última solicitud y enviar notificación
+      const ultimaSolicitud = await this.emergenciaService.obtenerUltimaSolicitud();
+
+      if (ultimaSolicitud) {
+        const idSolicitud = ultimaSolicitud.id; // Esto ahora es seguro
+        console.log('Id: ' + idSolicitud);
+
+        if (idSolicitud) {
+          this.enviarNotificacion(tipoEmergencia, idSolicitud);
+        }
+      } else {
+        console.warn('No se encontró la última solicitud.');
+        alert('No se pudo encontrar la última solicitud. Inténtalo nuevamente más tarde.');
+      }
+    } catch (error) {
+      console.error('Error al procesar la solicitud:', error);
+
+      if (error instanceof HttpErrorResponse) {
+        console.error('Error del servidor:', error.message);
+        console.error('Detalles del error:', error.error); // Esto puede dar más información sobre el problema
+      }
+
+      alert(error instanceof Error ? error.message : 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.');
     }
   }
 
@@ -141,29 +262,6 @@ export class DashboardPage implements OnInit {
     });
   }
 
-
-  // Simulación de función para obtener ubicación actual
-  // async obtenerUbicacionActual(): Promise<{ latitud: number; longitud: number } | null> {
-  //   try {
-  //     // Solicitar permiso para acceder a la ubicación
-  //     const permission = await Geolocation.requestPermissions();
-  //     if (permission.location === 'granted') {
-  //       // Obtener la posición actual
-  //       const position = await Geolocation.getCurrentPosition();
-  //       return {
-  //         latitud: position.coords.latitude,
-  //         longitud: position.coords.longitude,
-  //       };
-  //     } else {
-  //       console.error('Permiso de ubicación denegado');
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error('Error al obtener la ubicación:', error);
-  //     return null;
-  //   }
-  // }
-
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {
     if (this.usuario) {
       const nuevaNotificacion: Notificacion = {
@@ -172,7 +270,8 @@ export class DashboardPage implements OnInit {
         fecha: new Date().toISOString().split('T')[0],
         hora: new Date().toTimeString().split(' ')[0],
         tipo: tipo,
-        id_solicitud: nuevoIdSolicitud
+        id_solicitud: nuevoIdSolicitud,
+        estado: 'Enviada'
       };
 
       // Enviar la notificación a la base de datos
@@ -223,6 +322,55 @@ export class DashboardPage implements OnInit {
     }
   }
 
+  cargarNotificaciones(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this._notificacionService.obtenerNotificaciones().subscribe({
+        next: (notificaciones: Notificacion[]) => {
+          this.notificaciones = notificaciones;
+        },
+        error: (error) => {
+          console.error('Error al cargar las notificaciones:', error);
+          reject(error); // Rechaza la promesa si hay un error
+        },
+        complete: () => {
+          console.log('Carga de notificaciones completa.');
+          resolve(); // Resuelve la promesa al completar
+        }
+      });
+    });
+  }
+  cargarNotificacionesNuevas() {
+    const rut = this.usuario?.rut; // Utiliza el operador de encadenamiento opcional
+
+    // Verifica que el rut no sea undefined
+    if (!rut) {
+      console.error('El RUT del usuario es indefinido.');
+      return Promise.reject('RUT indefinido'); // Devuelve una promesa rechazada si el RUT es indefinido
+    }
+
+    return new Promise<void>((resolve, reject) => {
+      this._notificacionService.obtenerNotificacionesUsuario(rut).subscribe({
+        next: (response: HttpResponse<Notificacion[]>) => {
+          // Extrae las notificaciones del cuerpo de la respuesta
+          this.notificaciones = response.body || []; // Almacena las notificaciones obtenidas
+        },
+        error: (error) => {
+          console.error('Error al cargar las notificaciones:', error);
+          reject(error); // Rechaza la promesa si hay un error
+        },
+        complete: () => {
+          console.log('Carga de notificaciones completa.');
+          resolve(); // Resuelve la promesa al completar
+        }
+      });
+    });
+  }
+
+
+  async someFunction() {
+    await this.cargarNotificacionesNuevas();
+    this.notificacion = this.notificaciones.length;
+  }
 
   async mostrarAlerta(entidad: string) {
     const alert = await this.alertController.create({
@@ -250,5 +398,4 @@ export class DashboardPage implements OnInit {
     });
     toast.present();
   }
-
 }

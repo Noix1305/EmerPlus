@@ -2,9 +2,9 @@ import { Injectable } from '@angular/core';
 import { Usuario } from 'src/app/models/usuario';
 import { MailSenderService } from '../mailService/mail-sender.service';
 import { Notificacion } from 'src/app/models/notificacion';
-import { Observable } from 'rxjs';
+import { catchError, map, Observable, of, throwError } from 'rxjs';
 import { Contacto } from 'src/app/models/contacto';
-import { HttpResponse } from '@angular/common/http';
+import { HttpParams, HttpResponse } from '@angular/common/http';
 import { ApiConfigService } from '../apiConfig/api-config.service';
 
 @Injectable({
@@ -13,6 +13,8 @@ import { ApiConfigService } from '../apiConfig/api-config.service';
 export class NotificacionService {
 
   path = 'notificacion'
+
+  notificaciones: Notificacion[] = [];
 
   constructor(
     private _apiConfig: ApiConfigService,
@@ -62,4 +64,46 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
   crearNotificacion(notificacion: Notificacion): Observable<HttpResponse<Notificacion>> {
     return this._apiConfig.post(this.path, notificacion);
   }
+
+  obtenerNotificaciones(): Observable<Notificacion[]> {
+    const params = new HttpParams().set('select', '*');
+    return this._apiConfig.get<Notificacion[]>(this.path, params).pipe(
+      map(response => {
+        return response.body || [];
+      }),
+      catchError((error) => {
+        console.error('Error al obtener notificaciones:', error);
+        return throwError(() => new Error('Error al obtener notificaciones.'));
+      })
+    );
+  }
+
+  obtenerNotificacionesUsuario(id_usuario: string): Observable<HttpResponse<Notificacion[]>> {
+    // Crea los parámetros, añadiendo ambos filtros
+    const params = new HttpParams()
+      .set('usuario_id', `eq.${id_usuario}`)
+      .set('estado', `eq.Enviada`); // Agrega el nuevo parámetro para el estado
+
+    // Realiza la llamada GET con los parámetros
+    return this._apiConfig.get<Notificacion[]>(this.path, params);
+  }
+
+
+
+
+  obtenerNotificacionesFiltradas(): Observable<Notificacion[]> {
+    const params = new HttpParams().set('select', '*');
+    return this._apiConfig.get<Notificacion[]>(this.path, params).pipe(
+      map(response => {
+        // Filtramos los usuarios que están activos
+        const notificacionesNuevas = response.body?.filter(notificacion => notificacion.estado = 'Enviada');
+        return notificacionesNuevas || [];
+      }),
+      catchError((error) => {
+        console.error('Error al obtener usuarios:', error);
+        return throwError(() => new Error('Error al obtener usuarios.'));
+      })
+    );
+  }
+
 }

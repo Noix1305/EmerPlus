@@ -7,6 +7,7 @@ import { IonicModule } from '@ionic/angular';
 import { DashboardPageRoutingModule } from './dashboard-routing.module';
 
 import { DashboardPage } from './dashboard.page';
+import { NotificacionPopoverComponent } from 'src/app/components/notificacionPopover/notificacion-popover/notificacion-popover.component';
 
 @NgModule({
   imports: [
@@ -16,7 +17,8 @@ import { DashboardPage } from './dashboard.page';
     DashboardPageRoutingModule
   ],
   declarations: [
-    DashboardPage
+    DashboardPage,
+    NotificacionPopoverComponent
   ]
 })
 export class DashboardPageModule { }

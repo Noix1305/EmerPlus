@@ -25,8 +25,6 @@ export class SolicitudesPage implements OnInit {
   fechaHasta: string = '';
   estadoFiltro: string = '';
 
-  estanFiltradas: boolean = false;
-
   constructor(
     private _solicitudService: SolicitudDeEmergenciaService,
     private _usuarioService: UsuarioService,
@@ -66,12 +64,19 @@ export class SolicitudesPage implements OnInit {
 
       // Filtrar por estado usando valores numéricos
       const estadoValido = this.estadoFiltro === '0' || solicitud.estado === Number(this.estadoFiltro); // Comparar como números
-
+      console.log('Solicitudes: ' + this.solicitudesFiltradas)
       return fechaValida && hastaValida && estadoValido;
     });
 
     // Procesar las solicitudes filtradas para obtener el estado
     this.solicitudesFiltradas = await this.procesarSolicitudes(solicitudesFiltradas);
+  }
+
+  limpiarFiltro() {
+    this.fechaDesde = '';
+    this.fechaHasta = '';
+    this.estadoFiltro = '';
+    this.solicitudesFiltradas = [];
   }
 
 

@@ -9,9 +9,7 @@ export const isUsuarioGuard: CanActivateFn = async (route, state) => {
   const { value } = await Preferences.get({ key: "userInfo" });
 
   if (value) {
-    console.log('Valor recuperado de Preferences:', value); // Log para depuración
     const infoUser = JSON.parse(value);
-    console.log('Información del usuario:', infoUser); // Log para depuración
 
     // Verifica si el usuario tiene el rol de 'usuario'
     if (infoUser.rol && infoUser.rol[0] === 2) { // Asumiendo que el rol de usuario es 2

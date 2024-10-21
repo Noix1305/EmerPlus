@@ -8,4 +8,5 @@ export interface SolicitudDeEmergencia {
     tipo: string;            // Tipo de emergencia
     estado: number;
     estadoDescripcion?: string;
+    imageUrl?: string | null;
 }

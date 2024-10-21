@@ -44,10 +44,17 @@ const routes: Routes = [
     canActivate: [isAdminGuard]
   },
   {
+    path: 'ver-notificacion',
+    loadChildren: () => import('./pages/verNotificacion/ver-notificacion/ver-notificacion.module').then( m => m.VerNotificacionPageModule),
+    canActivate: [isUsuarioGuard]
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  
+
 
 
 

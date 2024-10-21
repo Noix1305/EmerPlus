@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalles de la Notificación</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card *ngIf="notificacion">
+    <ion-card-header>
+      <ion-card-title>Notificación ID:{{ notificacion.id }}</ion-card-title>
+      <ion-card-subtitle>{{ notificacion.tipo }} - {{ notificacion.fecha }} {{ notificacion.hora }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><strong>ID Solicitud:</strong> {{ notificacion.id_solicitud }}</p>
+      <p><strong>Mensaje:</strong> {{ notificacion.mensaje }}</p>
+      <p><strong>Estado:</strong> {{ notificacion.estado }}</p>
+      <p><strong>Rut Emisor:</strong> {{ notificacion.usuario_id }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="full" (click)="realizarAccion()">Realizar Acción</ion-button>
+</ion-content>
