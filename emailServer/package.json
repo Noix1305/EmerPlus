@@ -1,9 +1,15 @@
 {
   "type": "module",
   "dependencies": {
+    "axios": "^1.7.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
-    "nodemailer": "^6.9.15"
+    "nodemailer": "^6.9.15",
+    "resend": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0"
   }
 }

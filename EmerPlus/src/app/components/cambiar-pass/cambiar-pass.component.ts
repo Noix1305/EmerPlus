@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalController, NavParams, ToastController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { LoginService } from 'src/app/services/loginService/login.service';
+import { SupabaseService } from 'src/app/services/supabase_service/supabase.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 
 @Component({
@@ -24,7 +25,8 @@ export class CambiarPassComponent implements OnInit {
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
     private toastController: ToastController,
-    private navParams: NavParams
+    private navParams: NavParams,
+    private supabaseService: SupabaseService
   ) {
 
     this.rut = this.navParams.get('rut');
@@ -52,8 +54,6 @@ export class CambiarPassComponent implements OnInit {
       return;
     }
 
-
-
     // Extraer valores del formulario
     let { contrasenaActual, nuevaContrasena } = this.form.value;
 
@@ -70,8 +70,20 @@ export class CambiarPassComponent implements OnInit {
     // Encriptar la nueva contraseña antes de enviarla al servidor
     try {
       const nuevaContrasenaEncriptada = this._loginService.encryptText(nuevaContrasena);
+
+      // Actualizar la contraseña en tu sistema
       await firstValueFrom(this._usuarioService.cambiarContrasena(this.rut, nuevaContrasenaEncriptada));
-      this.successMessage = 'Contraseña cambiada con exito.';
+
+      // Actualizar la contraseña en Supabase Auth
+      const { error } = await this.supabaseService.auth.updateUser({ password: nuevaContrasena });
+
+      if (error) {
+        console.error('Error al cambiar la contraseña en Supabase:', error);
+        this.errorMsg = 'Ocurrió un error al cambiar la contraseña en Supabase.';
+        return;
+      }
+
+      this.successMessage = 'Contraseña cambiada con éxito.';
       this.presentToast(this.successMessage, 'success');
     } catch (error) {
       console.error('Error al cambiar la contraseña:', error);

@@ -13,9 +13,9 @@ export class MailSenderService {
 
   enviarCorreo(destinatario: string, asunto: string, texto: string): Observable<any> {
     const payload = {
-      destinatario,
-      asunto,
-      texto,
+      to: destinatario,   // Cambiado
+      subject: asunto,    // Cambiado
+      html: texto,        // Cambiado
     };
 
     return this.http.post(this.apiUrl, payload).pipe(

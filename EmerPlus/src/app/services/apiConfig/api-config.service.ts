@@ -103,4 +103,16 @@ export class ApiConfigService {
         catchError(this.handleError)
       );
   }
+
+  signUpUser(correo: string, password: string): Observable<HttpResponse<any>> {
+    return this.httpClient.post<any>(`${this.urlBase}/auth/v1/signup`, {
+      email: correo,
+      password: password
+    }, {
+      headers: this.getHeaders(),
+      observe: 'response'  // Importante para obtener el HttpResponse
+    }).pipe(
+      catchError(this.handleError)  // Manejo de errores
+    );
+  }
 }

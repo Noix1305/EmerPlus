@@ -1,2 +1,3 @@
 node server.js
 npm install express nodemailer cors dotenv
+npm install express resend cors dotenv
