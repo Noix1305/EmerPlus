@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
+import { Usuario } from 'src/app/models/usuario';
+import { RolService } from 'src/app/services/rolService/rol.service';
 
 @Component({
   selector: 'app-admin',
@@ -9,9 +11,26 @@ import { Preferences } from '@capacitor/preferences';
 })
 export class AdminPage {
 
-  constructor(private router: Router) { }
+  constructor(
+    private router: Router,
+    private _rolService: RolService) { }
 
-  ngOnInit() { }
+  rolUsuarioActivo: string = '';
+  usuarioActivo: Usuario | null = null;
+
+
+  async ngOnInit() {
+    const { value } = await Preferences.get({ key: 'userInfo' });
+
+    if (value) {
+      this.usuarioActivo = JSON.parse(value) as Usuario;
+      if (this.usuarioActivo) {
+        // Si obtenerNombreRol devuelve undefined, se asigna 'Desconocido' como valor por defecto
+        this.rolUsuarioActivo = await this._rolService.obtenerNombreRol(this.usuarioActivo.rol[0]) || 'Desconocido';
+      }
+    }
+  }
+
 
   // Función para ver todas las solicitudes
   verSolicitudes() {
@@ -33,6 +52,12 @@ export class AdminPage {
     this.router.navigate(['/gestor-roles']); // Redirigir a la página para gestionar roles
   }
 
+  verSolicitudesBomberos() { }
+
+  verSolicitudesPolicia() { }
+
+  verSolicitudesAmbulancia() { }
+
   // Función para salir de la sesión
 
 
@@ -49,4 +74,6 @@ export class AdminPage {
       console.error('Error al cerrar sesión:', error);
     }
   }
+
+
 }

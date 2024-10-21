@@ -58,6 +58,45 @@ export class SolicitudDeEmergenciaService {
     }
   }
 
+  async obtenerSolicitudesPorRol(rolUsuario: number): Promise<SolicitudDeEmergencia[]> {
+    const params = new HttpParams().set('select', '*');
+
+    const solicitudes$ = this._apiConfig.get<SolicitudDeEmergencia[]>(this.path, params).pipe(
+      map(response => {
+        return response.body || []; // Devuelve el body o un array vacío si no hay
+      })
+    );
+
+    try {
+      // Usa firstValueFrom para esperar la respuesta
+      const solicitudes = await firstValueFrom(solicitudes$);
+
+      // Filtrar las solicitudes según el rol del usuario
+      const solicitudesFiltradas = this.filtrarSolicitudesPorRol(solicitudes, rolUsuario);
+
+      this.solicitudes = solicitudesFiltradas; // Asigna las solicitudes filtradas a la propiedad
+      return solicitudesFiltradas; // Devuelve las solicitudes filtradas
+    } catch (error) {
+      console.error('Error al obtener solicitudes:', error);
+      return []; // Devuelve un array vacío en caso de error
+    }
+  }
+
+  // Función auxiliar para filtrar solicitudes según el rol
+  private filtrarSolicitudesPorRol(solicitudes: SolicitudDeEmergencia[], rolUsuario: number): SolicitudDeEmergencia[] {
+    if (rolUsuario === 1) {
+      return solicitudes; // Administrador puede ver todas las solicitudes
+    } else if (rolUsuario === 3) {
+      return solicitudes.filter(solicitud => solicitud.entidad === 3); // Filtrar por tipo 'Fuego' para Bomberos
+    } else if (rolUsuario === 4) {
+      return solicitudes.filter(solicitud => solicitud.entidad === 4); // Filtrar por tipo 'Seguridad' para Policía
+    } else if (rolUsuario === 5) {
+      return solicitudes.filter(solicitud => solicitud.entidad === 5); // Filtrar por tipo 'Medico' para Ambulancia
+    } else {
+      return []; // Si el rol no coincide, devolver un array vacío o manejar de otra forma
+    }
+  }
+
   // Método para actualizar una solicitud de emergencia (PATCH)
   actualizarSolicitud(id: number, solicitud: Partial<SolicitudDeEmergencia>): Observable<HttpResponse<SolicitudDeEmergencia>> {
     const updatePath = `${this.path}/${id}`;

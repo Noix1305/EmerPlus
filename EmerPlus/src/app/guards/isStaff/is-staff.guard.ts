@@ -2,7 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
 
-export const isAdminOrUserGuard: CanActivateFn = async (route, state) => {
+export const isStaffGuard: CanActivateFn = async (route, state) => {
   const router = inject(Router);
 
   // Intenta obtener el valor almacenado en Preferences
@@ -13,8 +13,7 @@ export const isAdminOrUserGuard: CanActivateFn = async (route, state) => {
     const infoUser = JSON.parse(value);
     console.log('Información del usuario:', infoUser); // Log para depuración
 
-    // Verifica si el usuario tiene el rol de 'admin'
-    if ([1, 2, 3, 4, 5].includes(infoUser.rol[0])) {
+    if ([1, 3, 4, 5].includes(infoUser.rol[0])) {
       return true;
     } else {
       // Redirigir si no es admin

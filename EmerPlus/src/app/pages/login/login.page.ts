@@ -119,8 +119,7 @@ export class LoginPage implements OnInit {
 
         this._usuarioService.actualizarUsuario(user);
 
-        // Redirecciona según el rol del usuario
-        if (user.rol[0] === 1) {
+        if ([1, 3, 4, 5].includes(user.rol[0])) {
           this.router.navigate(['admin']);
         } else if (user.rol[0] === 2) {
           this.router.navigate(['dashboard']);

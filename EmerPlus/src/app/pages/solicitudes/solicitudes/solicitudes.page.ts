@@ -20,10 +20,15 @@ export class SolicitudesPage implements OnInit {
   solicitudesFiltradas: SolicitudDeEmergencia[] = [];
   esAdmin: boolean = false;
   usuario: Usuario | null = null;
+  esUsuario: boolean = false;
+  esPolicia: boolean = false;
+  esBombero: boolean = false;
+  esAmbulancia: boolean = false;
 
   fechaDesde: string = '';
   fechaHasta: string = '';
   estadoFiltro: string = '';
+  rolUsuario: number = 0;
 
   constructor(
     private _solicitudService: SolicitudDeEmergenciaService,
@@ -36,9 +41,13 @@ export class SolicitudesPage implements OnInit {
     this._usuarioService.usuario$.subscribe((usuario) => {
       this.usuario = usuario;
       if (this.usuario && this.usuario.rol.length > 0) {
-        this.esAdmin = this.usuario.rol[0] === 1;
-      } else {
-        this.esAdmin = false; // Asegúrate de que sea un booleano
+        this.rolUsuario = this.usuario.rol[0];
+        this.esAdmin = this.rolUsuario === 1;
+        this.esUsuario = this.rolUsuario === 2;
+        this.esBombero = this.rolUsuario === 3;
+        this.esPolicia = this.rolUsuario === 4;
+        this.esAmbulancia = this.rolUsuario === 5;
+
       }
     });
   }
@@ -82,7 +91,7 @@ export class SolicitudesPage implements OnInit {
 
   async cargarSolicitudes() {
     try {
-      const solicitudes = await this._solicitudService.obtenerSolicitudes(); // Espera a que se resuelva la promesa
+      const solicitudes = await this._solicitudService.obtenerSolicitudesPorRol(this.rolUsuario); // Espera a que se resuelva la promesa
 
       if (solicitudes.length > 0) {
         this.solicitudes = solicitudes; // Almacena todas las solicitudes recibidas

@@ -25,10 +25,7 @@ export class DashboardPage implements OnInit {
   notificacion: number = 0;
   defaultEstado: number = 4;
   notificaciones: Notificacion[] = []
-  rutaCarabineros: string = 'Carabineros'
-  rutaAmbulancia: string = 'Ambulancia'
-  rutaBomberos: string = 'Bomberos'
-  urlImage:string = 'https://ndmnmgusnnmndqwigiyp.supabase.co/storage/v1/object/public/images/Carabineros/undefined_foto_1729471801126.jpg'
+  urlImage: string = 'https://ndmnmgusnnmndqwigiyp.supabase.co/storage/v1/object/public/images/Carabineros/undefined_foto_1729471801126.jpg'
 
   constructor(
     private alertController: AlertController,
@@ -81,17 +78,17 @@ export class DashboardPage implements OnInit {
 
   carabineros(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('robo', entidad)
+    this.enviarSolicitudDeEmergencia('robo', entidad, 4)
   }
 
   bomberos(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('incendio', entidad)
+    this.enviarSolicitudDeEmergencia('incendio', entidad, 3)
   }
 
   ambulancia(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('accidente', entidad)
+    this.enviarSolicitudDeEmergencia('accidente', entidad, 5)
 
   }
 
@@ -99,7 +96,7 @@ export class DashboardPage implements OnInit {
     // Lógica para enviar una alerta al contacto de emergencia
   }
 
-  async enviarSolicitudDeEmergencia(tipoEmergencia: string, ruta: string) {
+  async enviarSolicitudDeEmergencia(tipoEmergencia: string, ruta: string, entidad: number) {
     const usuario = this.usuario;
 
     if (!usuario) {
@@ -115,14 +112,14 @@ export class DashboardPage implements OnInit {
           {
             text: 'No subir imagen',
             role: 'cancel',
-            handler: () => this.procesarSolicitud(tipoEmergencia, ruta), // Procesar sin imagen
+            handler: () => this.procesarSolicitud(tipoEmergencia, ruta, entidad), // Procesar sin imagen
           },
           {
             text: 'Tomar Foto',
             handler: async () => {
               const fileWithName = await this._gestorArchivos.tomarFotoDesdeCamara(); // Llama a la función para tomar la foto
               if (fileWithName) {
-                await this.procesarSolicitud(tipoEmergencia, ruta, fileWithName); // Procesar con la imagen tomada
+                await this.procesarSolicitud(tipoEmergencia, ruta, entidad, fileWithName); // Procesar con la imagen tomada
               } else {
                 console.warn('No se tomó ninguna foto.');
               }
@@ -134,7 +131,7 @@ export class DashboardPage implements OnInit {
             handler: async () => {
               const file = await this._gestorArchivos.seleccionarFotoDesdeGaleria();
               if (file) {
-                await this.procesarSolicitud(tipoEmergencia,ruta, file);
+                await this.procesarSolicitud(tipoEmergencia, ruta, entidad, file);
               }
               await alert.dismiss(); // Cierra la alerta después de procesar
             },
@@ -151,25 +148,25 @@ export class DashboardPage implements OnInit {
 
   async descargarImagen(url: string) {
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('Error al descargar la imagen');
-        }
-        const blob = await response.blob();
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Error al descargar la imagen');
+      }
+      const blob = await response.blob();
 
-        // Crear un enlace para descargar
-        const urlBlob = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = urlBlob;
-        a.download = 'nombre-de-la-imagen.jpg'; // El nombre con el que se descargará
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(urlBlob);
+      // Crear un enlace para descargar
+      const urlBlob = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = urlBlob;
+      a.download = 'nombre-de-la-imagen.jpg'; // El nombre con el que se descargará
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(urlBlob);
     } catch (error) {
-        console.error('Error al descargar la imagen:', error);
+      console.error('Error al descargar la imagen:', error);
     }
-}
+  }
 
   // Función para mostrar un error
   private async mostrarError(mensaje: string) {
@@ -182,7 +179,7 @@ export class DashboardPage implements OnInit {
   }
 
   // Nueva función para procesar la solicitud
-  async procesarSolicitud(tipoEmergencia: string, ruta: string, image?: File) {
+  async procesarSolicitud(tipoEmergencia: string, ruta: string, entidad: number, image?: File) {
     try {
       const ubicacion = await this.obtenerUbicacionActual();
 
@@ -213,6 +210,7 @@ export class DashboardPage implements OnInit {
         tipo: tipoEmergencia,
         estado: this.defaultEstado,
         imageUrl: urlImg, // Esto ahora es compatible
+        entidad: entidad
       };
 
       // Enviar la solicitud de emergencia

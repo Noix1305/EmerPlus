@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../usuarioService/usuario.service';
 import { SupabaseService } from '../supabase_service/supabase.service';
 import { AuthResponse } from '@supabase/supabase-js';
-import { environment, keysUserBd } from 'src/environments/environment';
+import { keysUserBd } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'

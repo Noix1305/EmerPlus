@@ -8,32 +8,47 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <h2>Bienvenido, Administrador</h2>
+  <h2>Bienvenido, {{ rolUsuarioActivo }}</h2>
   <p>Selecciona una de las siguientes acciones:</p>
 
   <ion-list>
-    <!-- Ver todas las solicitudes de emergencia -->
-    <ion-item button (click)="verSolicitudes()">
+    <!-- Para Administrador -->
+    <ion-item *ngIf="rolUsuarioActivo === 'Administrador'" button (click)="verSolicitudes()">
       <ion-icon name="list-outline" slot="start"></ion-icon>
       Ver todas las solicitudes de emergencia
     </ion-item>
 
-    <!-- Agregar usuario -->
-    <ion-item button (click)="agregarUsuario()">
+    <ion-item *ngIf="rolUsuarioActivo === 'Administrador'" button (click)="agregarUsuario()">
       <ion-icon name="person-add-outline" slot="start"></ion-icon>
       Agregar usuario
     </ion-item>
 
-    <!-- Ver estadísticas -->
-    <ion-item button (click)="verEstadisticas()"> 
+    <ion-item *ngIf="rolUsuarioActivo === 'Administrador'" button (click)="verEstadisticas()">
       <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
       Ver estadísticas* (Próximamente)
     </ion-item>
 
-    <!-- Gestionar roles de usuario -->
-    <ion-item button (click)="gestionarRoles()">
+    <ion-item *ngIf="rolUsuarioActivo === 'Administrador'" button (click)="gestionarRoles()">
       <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
       Gestionar roles de usuario
+    </ion-item>
+
+    <!-- Para Bombero -->
+    <ion-item *ngIf="rolUsuarioActivo === 'Bombero'" button (click)="verSolicitudes()">
+      <ion-icon name="flame-outline" slot="start"></ion-icon>
+      Ver solicitudes de emergencia para bomberos
+    </ion-item>
+
+    <!-- Para Policía -->
+    <ion-item *ngIf="rolUsuarioActivo === 'Policia'" button (click)="verSolicitudes()">
+      <ion-icon name="flash-outline" slot="start"></ion-icon>
+      Ver solicitudes de emergencia para policía
+    </ion-item>
+
+    <!-- Para Ambulancia -->
+    <ion-item *ngIf="rolUsuarioActivo === 'Ambulancia'" button (click)="verSolicitudes()">
+      <ion-icon name="medkit-outline" slot="start"></ion-icon>
+      Ver solicitudes de emergencia para ambulancia
     </ion-item>
   </ion-list>
 </ion-content>
