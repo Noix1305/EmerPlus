@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
@@ -90,11 +89,19 @@ export class SolicitudesPage implements OnInit {
 
 
   async cargarSolicitudes() {
+    let solicitudesFiltradas;
     try {
-      const solicitudes = await this._solicitudService.obtenerSolicitudesPorRol(this.rolUsuario); // Espera a que se resuelva la promesa
+      const solicitudes = await this._solicitudService.obtenerSolicitudes();
+      // Espera a que se resuelva la promesa
 
-      if (solicitudes.length > 0) {
-        this.solicitudes = solicitudes; // Almacena todas las solicitudes recibidas
+      if (this.esAdmin) {
+        this.solicitudes = solicitudes
+      } else {
+        solicitudesFiltradas = solicitudes.filter((solicitud) => { return solicitud.entidad === this.rolUsuario; });
+      }
+      if (solicitudesFiltradas && solicitudesFiltradas.length > 0) {
+        this.solicitudes = solicitudesFiltradas;
+        // Almacena todas las solicitudes recibidas
         this.solicitudesUsuario = await this.procesarSolicitudes(solicitudes);
       } else {
         console.warn('No se encontraron solicitudes.');
