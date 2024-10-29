@@ -13,6 +13,7 @@ import { ContactosemergenciaService } from 'src/app/services/contactos/contactos
 import { GestorArchivosService } from 'src/app/services/gestorArchivos/gestor-archivos.service';
 import { NotificacionService } from 'src/app/services/notificacionService/notificacion.service';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-dashboard',
@@ -28,7 +29,7 @@ export class DashboardPage implements OnInit {
   rutaCarabineros: string = 'Carabineros'
   rutaAmbulancia: string = 'Ambulancia'
   rutaBomberos: string = 'Bomberos'
-  urlImage:string = 'https://ndmnmgusnnmndqwigiyp.supabase.co/storage/v1/object/public/images/Carabineros/undefined_foto_1729471801126.jpg'
+  urlImage: string = 'https://ndmnmgusnnmndqwigiyp.supabase.co/storage/v1/object/public/images/Carabineros/undefined_foto_1729471801126.jpg'
 
   constructor(
     private alertController: AlertController,
@@ -134,7 +135,7 @@ export class DashboardPage implements OnInit {
             handler: async () => {
               const file = await this._gestorArchivos.seleccionarFotoDesdeGaleria();
               if (file) {
-                await this.procesarSolicitud(tipoEmergencia,ruta, file);
+                await this.procesarSolicitud(tipoEmergencia, ruta, file);
               }
               await alert.dismiss(); // Cierra la alerta después de procesar
             },
@@ -151,25 +152,25 @@ export class DashboardPage implements OnInit {
 
   async descargarImagen(url: string) {
     try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('Error al descargar la imagen');
-        }
-        const blob = await response.blob();
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Error al descargar la imagen');
+      }
+      const blob = await response.blob();
 
-        // Crear un enlace para descargar
-        const urlBlob = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = urlBlob;
-        a.download = 'nombre-de-la-imagen.jpg'; // El nombre con el que se descargará
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        window.URL.revokeObjectURL(urlBlob);
+      // Crear un enlace para descargar
+      const urlBlob = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = urlBlob;
+      a.download = 'nombre-de-la-imagen.jpg'; // El nombre con el que se descargará
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(urlBlob);
     } catch (error) {
-        console.error('Error al descargar la imagen:', error);
+      console.error('Error al descargar la imagen:', error);
     }
-}
+  }
 
   // Función para mostrar un error
   private async mostrarError(mensaje: string) {
@@ -245,23 +246,29 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  private obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
-    return new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          resolve({
-            latitud: position.coords.latitude,
-            longitud: position.coords.longitude
-          });
-        }, (error) => {
-          reject(error); // Si no se puede obtener la ubicación
-        });
-      } else {
-        reject(null); // El navegador no soporta geolocalización
+  private async obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
+    try {
+      // Verifica si se tienen los permisos de ubicación
+      const status = await Geolocation.checkPermissions();
+      if (status.location !== 'granted') {
+        const request = await Geolocation.requestPermissions();
+        if (request.location !== 'granted') {
+          console.error('Permiso de ubicación no concedido.');
+          return null;
+        }
       }
-    });
-  }
 
+      // Obtiene la ubicación actual
+      const position = await Geolocation.getCurrentPosition();
+      return {
+        latitud: position.coords.latitude,
+        longitud: position.coords.longitude
+      };
+    } catch (error) {
+      console.error('Error al obtener la ubicación:', error);
+      return null; // Maneja el error según sea necesario
+    }
+  }
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {
     if (this.usuario) {
       const nuevaNotificacion: Notificacion = {

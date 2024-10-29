@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../usuarioService/usuario.service';
 import { SupabaseService } from '../supabase_service/supabase.service';
 import { AuthResponse } from '@supabase/supabase-js';
-import { environment, keysUserBd } from 'src/environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -14,8 +14,8 @@ export class LoginService {
   // ID del rol por defecto (Usuario)
   defaultRoleId: number = 2;
   correo: string = '';
-  correoUserBD: string = keysUserBd.correoUserBD
-  passwordUserBD: string = keysUserBd.password
+  correoUserBD: string = environment.correoUserBD
+  passwordUserBD: string = environment.password
 
   constructor(
     private _usuarioService: UsuarioService,
