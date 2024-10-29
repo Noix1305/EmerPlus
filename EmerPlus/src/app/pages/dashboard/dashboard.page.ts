@@ -13,6 +13,7 @@ import { ContactosemergenciaService } from 'src/app/services/contactos/contactos
 import { GestorArchivosService } from 'src/app/services/gestorArchivos/gestor-archivos.service';
 import { NotificacionService } from 'src/app/services/notificacionService/notificacion.service';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
+import { Geolocation } from '@capacitor/geolocation';
 
 @Component({
   selector: 'app-dashboard',
@@ -243,21 +244,17 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  private obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
-    return new Promise((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          resolve({
-            latitud: position.coords.latitude,
-            longitud: position.coords.longitude
-          });
-        }, (error) => {
-          reject(error); // Si no se puede obtener la ubicación
-        });
-      } else {
-        reject(null); // El navegador no soporta geolocalización
-      }
-    });
+  private async obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
+    try {
+      const position = await Geolocation.getCurrentPosition();
+      return {
+        latitud: position.coords.latitude,
+        longitud: position.coords.longitude
+      };
+    } catch (error) {
+      console.error('Error al obtener la ubicación:', error);
+      return null; // Devuelve null en caso de error
+    }
   }
 
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {

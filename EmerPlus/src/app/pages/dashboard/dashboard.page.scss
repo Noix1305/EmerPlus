@@ -194,3 +194,16 @@ ion-content {
     /* Ajusta el tamaño de la fuente según sea necesario */
 }
 
+/* Evitar que la alerta se vuelva invisible */
+.swal2-custom-popup {
+    max-width: 90vw; /* Limita el ancho a un 90% del ancho de la pantalla */
+    width: auto; /* Permite que el ancho se ajuste automáticamente */
+    padding: 1rem; /* Ajusta el padding para que no sea demasiado grande */
+    font-size: 1rem; /* Ajusta el tamaño de la fuente */
+    background-color: white; /* Asegúrate de que el fondo sea blanco */
+    color: black; /* Asegúrate de que el texto sea visible */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Agrega sombra para distinguir el cuadro */
+  }
+  
+  
+
