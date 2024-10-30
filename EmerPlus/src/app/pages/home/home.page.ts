@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import { ModalController, ToastController } from '@ionic/angular';
 import { Usuario } from 'src/app/models/usuario';
 import { Preferences } from '@capacitor/preferences';
 import { CrearUsuario } from 'src/app/models/crearUsuario';
