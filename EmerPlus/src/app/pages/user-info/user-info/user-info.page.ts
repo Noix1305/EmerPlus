@@ -16,6 +16,7 @@ import { LoginService } from 'src/app/services/loginService/login.service';
 import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-user-info',
@@ -324,39 +325,34 @@ export class UserInfoPage {
   }
 
   async eliminarCuenta() {
-    const alert = await this.alertController.create({
-      header: 'Eliminar Cuenta',
-      message: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('Cancelado');
-          }
-        }, {
-          text: 'Eliminar',
-          handler: async () => {
-            if (this.usuario) {
-              try {
-                // Llama al servicio para eliminar el usuario
-                await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
-                this.successMessage = 'Cuenta eliminada exitosamente.';
-                await this.presentToast(this.successMessage, 'success');
-                this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
-              } catch (error) {
-                console.error('Error al eliminar la cuenta:', error);
-                this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
-                await this.presentToast(this.errorMessage, 'danger');
-              }
-            }
-          }
-        }
-      ]
+    const result = await Swal.fire({
+      title: 'Eliminar Cuenta',
+      text: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      heightAuto: false, // Para evitar problemas de visualización en Ionic
+      reverseButtons: true, // Coloca el botón de cancelar a la izquierda
     });
 
-    await alert.present();
+    if (result.isConfirmed) {
+      if (this.usuario) {
+        try {
+          // Llama al servicio para eliminar el usuario
+          await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
+          this.successMessage = 'Cuenta eliminada exitosamente.';
+          await this.presentToast(this.successMessage, 'success');
+          this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
+        } catch (error) {
+          console.error('Error al eliminar la cuenta:', error);
+          this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
+          await this.presentToast(this.errorMessage, 'danger');
+        }
+      }
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      console.log('Cancelado');
+    }
   }
 
   async mostrarContacto() {
@@ -476,7 +472,7 @@ export class UserInfoPage {
 
       try {
         let response;
-        
+
         // Verifica si ya existe el contacto
         if (this.contacto.id) {
           // Si existe, editar contacto
@@ -516,14 +512,14 @@ export class UserInfoPage {
 
         await this.presentToast(this.successMessage, 'success');
         this.closeEditContactModal();
-        
+
       } catch (error) {
         this.errorMessage = 'Ocurrió un error al crear o editar el contacto. Inténtalo de nuevo.';
         console.log(this.errorMessage);
         console.error('Error al crear o editar contacto:', error);
       }
     }
-}
+  }
 
 
 

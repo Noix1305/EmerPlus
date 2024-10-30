@@ -5,7 +5,6 @@ import { IonicModule } from '@ionic/angular';
 
 import { HomePage } from './home.page';
 import { HomePageRoutingModule } from './home-routing.module';
-import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
 
 
 
@@ -17,8 +16,6 @@ import { RegistroModalComponent } from 'src/app/components/registro-modal/regist
     HomePageRoutingModule
   ],
   declarations: [
-    HomePage,
-    RegistroModalComponent
-  ]
+    HomePage  ]
 })
 export class HomePageModule { }

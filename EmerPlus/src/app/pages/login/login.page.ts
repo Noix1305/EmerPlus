@@ -5,7 +5,6 @@ import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom } from 'rxjs';
-import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
 import { Preferences } from '@capacitor/preferences';
 import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
 import { Contacto } from 'src/app/models/contacto';
@@ -36,18 +35,6 @@ export class LoginPage implements OnInit {
     private router: Router,
     private _contactoService: ContactosemergenciaService
   ) { }
-
-
-  async openRegistroModal() {
-    const modal = await this.modalController.create({
-      component: RegistroModalComponent,
-    });
-    return await modal.present();
-  }
-
-  closeModal() {
-    this.modalController.dismiss();
-  }
 
   togglePasswordRecovery() {
     this.errorMessage = ''; // Reinicia mensaje de error
@@ -145,15 +132,6 @@ export class LoginPage implements OnInit {
 
   contraseñaOlvidada() {
 
-  }
-
-  rutNotRegistrado() {
-    this.closeModal();
-    if (this.openRegistroModal) {
-      this.openRegistroModal(); // Llama solo si está definido
-    } else {
-      console.error('openRegistroModal no está definido');
-    }
   }
 }
 

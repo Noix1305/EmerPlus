@@ -75,14 +75,14 @@
           (click)="openEditContactModal()">Editar
           Contacto</ion-button>
         <ion-button (click)="openChangePasswordModal()" class="blue-button-gl">Cambiar Contraseña</ion-button>
-
-        <ion-button color="danger" (click)="eliminarCuenta()">
-          Eliminar Cuenta
-        </ion-button>
       </div>
     </ion-grid>
   </ion-card>
 </ion-content>
+
+<ion-button color="danger" (click)="eliminarCuenta()">
+  Eliminar Cuenta
+</ion-button>
 
 <ion-modal #modalContacto>
   <ng-template>
