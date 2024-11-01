@@ -29,7 +29,7 @@
           <ion-button expand="block" type="submit">Iniciar Sesión</ion-button>
 
           <div *ngIf="rutNoRegistrado">
-            <p>{{ rutNoRegistrado }} <em><a style="font-weight: bold;">Registrate</a></em>
+            <p>{{ rutNoRegistrado }} <em><a style="font-weight: bold;" (click)="mostrarFormularioRegistro()">Registrate</a></em>
               para ingresar.</p>
           </div>
         </form>

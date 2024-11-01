@@ -1,90 +1,77 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-back-button defaultHref="/dashboard" slot="start"></ion-back-button>
-    <ion-buttons slot="end">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-<ion-content>
-  <p class="perfil-titulo">PERFIL DEL USUARIO</p>
-  <ion-card style="border: none;">
-    <ion-grid>
-      <ion-row class="gridStyle">
-        <ion-col>
-          <ion-list [inset]="true">
-            <!-- Fila para el nombre del usuario -->
-            <ion-item>
-              <ion-label><strong>Nombre</strong></ion-label>
-              <ion-label *ngIf="usuario">{{ usuario.nombre ? usuario.nombre: 'Sin información...' }}</ion-label>
-              <ion-label *ngIf="!usuario">No hay información disponible</ion-label>
-            </ion-item>
-            <!-- Fila para los apellidos del usuario -->
-            <ion-item>
-              <ion-label><strong>Apellidos</strong></ion-label>
-              <ion-label *ngIf="usuario">{{ usuario.papellido ? usuario.papellido : 'Sin información...' }} {{
-                usuario.sapellido }}</ion-label>
-              <ion-label *ngIf="!usuario">No hay información disponible</ion-label>
-            </ion-item>
+<mat-card class="metallic-background">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-back-button default-href="/dashboard"></ion-back-button>
+      </ion-buttons>
 
-            <!-- Fila para el teléfono del usuario -->
-            <ion-item>
-              <ion-label><strong>Teléfono</strong></ion-label>
-              <ion-label *ngIf="usuario">{{ usuario.telefono ? usuario.telefono: 'Sin información...' }}</ion-label>
-              <ion-label *ngIf="!usuario">0</ion-label>
-            </ion-item>
-
-            <ion-item>
-              <ion-label><strong>Correo</strong></ion-label>
-              <ion-label *ngIf="usuario">{{ usuario.correo ? usuario.correo: 'Sin información...' }}</ion-label>
-              <ion-label *ngIf="!usuario">0</ion-label>
-            </ion-item>
-            <!-- Fila para la comuna del usuario -->
-            <ion-item>
-              <ion-label><strong>Comuna</strong></ion-label>
-              <ion-label>
-                {{ comunaUsuario ? comunaUsuario.nombre : 'Sin información...' }}
-              </ion-label>
-            </ion-item>
-            <!-- Fila para la región del usuario -->
-            <ion-item>
-              <ion-label><strong>Región</strong></ion-label>
-              <ion-label>{{ regionUsuario ? regionUsuario.nombre : 'Sin información...' }}</ion-label>
-            </ion-item>
-            <!-- Fila para el contacto de emergencia del usuario -->
-            <ion-item>
-              <ion-label><strong>Contacto Emergencia</strong></ion-label>
-              <!-- Si el usuario tiene contacto de emergencia, muestra el botón para visualizar -->
-              <ion-button *ngIf="usuario?.contactoEmergencia; else agregarContacto" (click)="mostrarContacto()"
-                class="blue-button-gl mostrarContacto">
-                Mostrar Contacto
-              </ion-button>
-              <ng-template #agregarContacto>
-                <ion-button class="blue-button-gl" id="editarContactoEmergencia" (click)="openEditContactModal()">
-                  Agregar Contacto Emergencia
-                </ion-button>
-              </ng-template>
-            </ion-item>
-          </ion-list>
-        </ion-col>
-      </ion-row>
-      <div class="button-container">
-        <ion-button class="blue-button-gl" id="agregarContactoEmergencia" (click)="openEditUserModal()">Editar
-          Usuario</ion-button>
-        <ion-button *ngIf='usuario?.contactoEmergencia' class="blue-button-gl" id="editarContactoEmergencia"
-          (click)="openEditContactModal()">Editar
-          Contacto</ion-button>
-        <ion-button (click)="openChangePasswordModal()" class="blue-button-gl">Cambiar Contraseña</ion-button>
+      <div style="flex: 1; display: flex; align-items: center; justify-content: center;">
+        <mat-card-title style="margin: 0;">PERFIL DEL USUARIO</mat-card-title>
       </div>
-    </ion-grid>
-  </ion-card>
-</ion-content>
 
-<ion-button color="danger" (click)="eliminarCuenta()">
-  Eliminar Cuenta
-</ion-button>
+      <ion-buttons slot="end">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-modal #modalContacto>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item>
+        <span><strong>Nombre:</strong></span>
+        <span *ngIf="usuario">{{ usuario.nombre || 'Sin información...' }}</span>
+        <span *ngIf="!usuario">No hay información disponible</span>
+      </mat-list-item>
+      <mat-list-item>
+        <span><strong>Apellidos:</strong></span>
+        <span *ngIf="usuario">{{ usuario.papellido || 'Sin información...' }} {{ usuario.sapellido }}</span>
+        <span *ngIf="!usuario">No hay información disponible</span>
+      </mat-list-item>
+      <mat-list-item>
+        <span><strong>Teléfono:</strong></span>
+        <span *ngIf="usuario">{{ usuario.telefono || 'Sin información...' }}</span>
+        <span *ngIf="!usuario">0</span>
+      </mat-list-item>
+      <mat-list-item>
+        <span><strong>Correo:</strong></span>
+        <span *ngIf="usuario">{{ usuario.correo || 'Sin información...' }}</span>
+        <span *ngIf="!usuario">0</span>
+      </mat-list-item>
+      <mat-list-item>
+        <span><strong>Comuna:</strong></span>
+        <span>{{ comunaUsuario ? comunaUsuario.nombre : 'Sin información...' }}</span>
+      </mat-list-item>
+      <mat-list-item>
+        <span><strong>Región:</strong></span>
+        <span>{{ regionUsuario ? regionUsuario.nombre : 'Sin información...' }}</span>
+      </mat-list-item>
+      <mat-list-item>
+        <span><strong>Contacto Emergencia:</strong></span>
+        <ng-container *ngIf="usuario?.contactoEmergencia; else agregarContacto">
+          <button mat-raised-button (click)="mostrarContacto()" class="rounded-button mostrarContacto">Mostrar Contacto</button>
+        </ng-container>
+        <ng-template #agregarContacto>
+          <button mat-raised-button (click)="openEditContactModal()" class="rounded-button">Agregar Contacto Emergencia</button>
+        </ng-template>
+      </mat-list-item>
+    </mat-list>
+
+    <div class="button-container">
+      <button mat-raised-button color="primary" (click)="openEditUserModal()" class="rounded-button">Editar
+        Usuario</button>
+      <button mat-raised-button *ngIf="usuario?.contactoEmergencia" (click)="openEditContactModal()"
+        class="rounded-button">Editar
+        Contacto</button>
+      <button mat-raised-button color="accent" (click)="openChangePasswordModal()" class="rounded-button">Cambiar
+        Contraseña</button>
+    </div>
+  </mat-card-content>
+  <ion-button color="danger" (click)="eliminarCuenta()" class="rounded-button">
+    Eliminar Cuenta
+  </ion-button>
+</mat-card>
+
+<ion-modal #modalContacto class="custom-modal">
   <ng-template>
     <ion-header>
       <ion-toolbar>
@@ -94,9 +81,9 @@
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
-    <ion-content>
-      <ion-list *ngIf="contacto">
-        <ion-item>
+    <mat-card-content class="metallic-background">
+      <ion-list *ngIf="contacto" lines="none" style="background: transparent;">
+        <ion-item class="swal-input">
           <ion-label>
             <strong>Nombre:</strong>
             <ng-container *ngIf="contacto.nombre">{{ contacto.nombre }}</ng-container>
@@ -104,23 +91,20 @@
             <ng-container *ngIf="contacto.amaterno"> {{ contacto.amaterno }}</ng-container>
           </ion-label>
         </ion-item>
-        <ion-item>
-          <ion-label><strong>Teléfono:</strong> {{
-            contacto.telefono }}</ion-label>
+        <ion-item class="swal-input">
+          <ion-label><strong>Teléfono:</strong> {{ contacto.telefono }}</ion-label>
         </ion-item>
-        <ion-item>
-          <ion-label><strong>Correo:</strong> {{
-            contacto.correo
-            }}</ion-label>
+        <ion-item class="swal-input">
+          <ion-label><strong>Correo:</strong> {{ contacto.correo }}</ion-label>
         </ion-item>
-        <ion-item>
-          <ion-label><strong>Relación:</strong> {{
-            contacto.relacion }}</ion-label>
+        <ion-item class="swal-input">
+          <ion-label><strong>Relación:</strong> {{ contacto.relacion }}</ion-label>
         </ion-item>
       </ion-list>
-    </ion-content>
+    </mat-card-content>
   </ng-template>
 </ion-modal>
+
 
 <!-- Modal para editar usuario -->
 <ion-modal #modalEditUser>
@@ -135,16 +119,16 @@
     </ion-header>
     <ion-content>
       <form #editUserForm="ngForm" (ngSubmit)="formularioEditUsuario($event)" novalidate>
-        <ion-list>
-          <ion-item>
+        <ion-list lines="none" class="metallic-background">
+          <ion-item class="swal-input">
             <ion-label position="floating">Nombre</ion-label>
-            <ion-input name="nombre" type="text" [(ngModel)]="usuarioNombre" required minlength="2">
+            <ion-input name="nombre" type="text" [(ngModel)]="usuarioNombre" required minlength="2" no-lines>
             </ion-input>
             <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['nombre']?.valid" color="danger">
               El nombre es requerido y debe tener al menos 2 caracteres.
             </ion-note>
           </ion-item>
-          <ion-item>
+          <ion-item class="swal-input">
             <ion-label position="floating">Primer Apellido</ion-label>
             <ion-input name="pApellido" type="text" [(ngModel)]="usuario1erApellido" required>
             </ion-input>
@@ -152,7 +136,7 @@
               El primer apellido es requerido.
             </ion-note>
           </ion-item>
-          <ion-item>
+          <ion-item class="swal-input">
             <ion-label position="floating">Segundo Apellido</ion-label>
             <ion-input name="sApellido" type="text" [(ngModel)]="usuario2doApellido" required>
             </ion-input>
@@ -160,7 +144,7 @@
               El segundo apellido es requerido.
             </ion-note>
           </ion-item>
-          <ion-item>
+          <ion-item class="swal-input">
             <ion-label position="floating">Teléfono</ion-label>
             <ion-input name="telefono" type="text" [(ngModel)]="usuarioTelefono" required pattern="^[0-9]+$">
             </ion-input>
@@ -168,7 +152,7 @@
               El teléfono es requerido y debe ser numérico.
             </ion-note>
           </ion-item>
-          <ion-item>
+          <ion-item class="swal-input">
             <ion-label position="floating">Correo</ion-label>
             <ion-input name="correo" type="email" [(ngModel)]="correoUsuario" required>
             </ion-input>
@@ -176,7 +160,7 @@
               Un correo válido es requerido.
             </ion-note>
           </ion-item>
-          <ion-item>
+          <ion-item class="swal-input">
             <ion-label>Región</ion-label>
             <ion-select name="region" [(ngModel)]="selectedRegion" required (ionChange)="onRegionChange()">
               <ion-select-option *ngFor="let region of regiones" [value]="region">
@@ -187,7 +171,7 @@
               Selecciona una región.
             </ion-note>
           </ion-item>
-          <ion-item>
+          <ion-item class="swal-input">
             <ion-label>Selecciona una Comuna</ion-label>
             <ion-select name="comuna" [(ngModel)]="selectedComuna" required>
               <ion-select-option *ngFor="let comuna of comunas" [value]="comuna">
@@ -204,6 +188,7 @@
             </ion-buttons>
           </ion-item>
         </ion-list>
+
         <ion-button expand="full" type="submit" [disabled]="!editUserForm.form.valid">Guardar Cambios</ion-button>
       </form>
     </ion-content>
@@ -221,42 +206,41 @@
       </ion-toolbar>
     </ion-header>
 
-    <ion-content>
+    <mat-card-content class="metallic-background">
       <form (ngSubmit)="handleEditContactSubmit($event)">
-        <ion-item>
+        <ion-item class="swal-input" lines="none">
           <ion-label position="floating"></ion-label>
           <ion-input [(ngModel)]="contacto.nombre" name="nombre" required placeholder="Nombre"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item class="swal-input" lines="none">
           <ion-label position="floating"></ion-label>
           <ion-input [(ngModel)]="contacto.apaterno" name="apaterno" required
             placeholder="Apellido Paterno"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item class="swal-input" lines="none">
           <ion-label position="floating"></ion-label>
           <ion-input [(ngModel)]="contacto.amaterno" name="amaterno"
             placeholder="Apellido Materno (Opcional)"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item class="swal-input" lines="none">
           <ion-label position="floating">Teléfono</ion-label>
           <ion-input [(ngModel)]="contacto.telefono" name="telefono" type="text" required
             placeholder="Teléfono"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item class="swal-input" lines="none">
           <ion-label position="floating"></ion-label>
           <ion-input [(ngModel)]="contacto.correo" name="correo" type="email" required
             placeholder="Correo Electrónico"></ion-input>
         </ion-item>
-        <ion-item>
+        <ion-item class="swal-input" lines="none">
           <ion-label position="floating"></ion-label>
           <ion-input [(ngModel)]="contacto.relacion" name="relacion" required
-            placeholder="Relacíon con el contacto ('Padre', 'Amigo', etc...')"></ion-input>
+            placeholder="Relación con el contacto ('Padre', 'Amigo', etc...)"></ion-input>
         </ion-item>
-        <ion-footer>
+        <ion-footer style="box-shadow: none;">
           <ion-button expand="full" type="submit">Guardar</ion-button>
         </ion-footer>
       </form>
-    </ion-content>
-
+    </mat-card-content>
   </ng-template>
 </ion-modal>

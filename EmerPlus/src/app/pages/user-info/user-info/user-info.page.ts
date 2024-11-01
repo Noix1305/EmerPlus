@@ -16,7 +16,7 @@ import { LoginService } from 'src/app/services/loginService/login.service';
 import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
   selector: 'app-user-info',
@@ -82,7 +82,6 @@ export class UserInfoPage {
   form: FormGroup;
 
   constructor(private router: Router,
-    private alertController: AlertController,
     private _rolService: RolService,
     private _usuarioService: UsuarioService,
     private _regionComunaService: RegionComunaService,
@@ -276,7 +275,7 @@ export class UserInfoPage {
     try {
       await firstValueFrom(this._usuarioService.editarUsuario(updatedUser.rut, updatedUser));
       this.successMessage = 'Usuario editado con éxito';
-      this.presentToast(this.successMessage, this.colorVerde);
+      this.activarSwal('Exito', this.successMessage, 'success', 'OK');
       this.usuario = updatedUser;
 
       await Preferences.set({
@@ -314,16 +313,6 @@ export class UserInfoPage {
     }
   }
 
-  async presentToast(successMessage: string, color: string) {
-    const toast = await this.toastController.create({
-      message: successMessage,
-      duration: 2000, // Duración en milisegundos
-      position: 'top', // Posición del Toast
-      color: color, // Color del Toast, puedes cambiarlo según tus necesidades
-    });
-    toast.present();
-  }
-
   async eliminarCuenta() {
     const result = await Swal.fire({
       title: 'Eliminar Cuenta',
@@ -342,12 +331,15 @@ export class UserInfoPage {
           // Llama al servicio para eliminar el usuario
           await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
           this.successMessage = 'Cuenta eliminada exitosamente.';
-          await this.presentToast(this.successMessage, 'success');
+
+          this.activarSwal('Éxito', this.successMessage, 'success', 'OK');
+
           this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
         } catch (error) {
           console.error('Error al eliminar la cuenta:', error);
           this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
-          await this.presentToast(this.errorMessage, 'danger');
+
+          this.activarSwal('Error', this.errorMessage, 'error', 'OK')
         }
       }
     } else if (result.dismiss === Swal.DismissReason.cancel) {
@@ -359,13 +351,8 @@ export class UserInfoPage {
     if (this.usuario.contactoEmergencia) {
       await this.modalContacto.present();
     } else {
-      const alert = await this.alertController.create({
-        header: 'Sin Contacto de Emergencia',
-        message: 'No se ha registrado información de contacto de emergencia.',
-        buttons: ['OK']
-      });
-
-      await alert.present();
+      this.errorMessage = 'No se ha registrado información de contacto de emergencia.'
+      this.activarSwal('Sin Contacto de Emergencia', this.errorMessage, 'error', 'OK');
     }
   }
 
@@ -412,37 +399,6 @@ export class UserInfoPage {
     const ev = event as CustomEvent<OverlayEventDetail<string>>;
     if (ev.detail.role === 'confirm') {
     }
-  }
-
-  // Función genérica para abrir un modal
-  openModal(modal: IonModal) {
-    modal.present();
-  }
-
-  // Función genérica para cerrar un modal
-  closeModal(modal: IonModal) {
-    modal.dismiss();
-  }
-
-  openEditUserModal() {
-    this.openModal(this.modalEditUser);
-  }
-
-  closeEditUserModal() {
-    this.closeModal(this.modalEditUser);
-  }
-
-  openEditContactModal() {
-    this.openModal(this.modalEditContact);
-  }
-
-  closeEditContactModal() {
-    this.closeModal(this.modalEditContact);
-  }
-
-  closeModalContacto() {
-    this.closeModal(this.modalContacto);
-
   }
 
   async handleEditContactSubmit(event: Event) {
@@ -495,30 +451,73 @@ export class UserInfoPage {
           } catch (error: unknown) {
             if (error instanceof Error) {
               this.errorMessage = 'Error durante el envío de la notificación.';
-              console.error('Error durante el envío de la notificación:', error.message);
-              alert(error.message || 'Ocurrió un error inesperado.');
+              this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+
             } else {
               console.error('Error desconocido:', error);
               this.errorMessage = 'Error durante el envío de la notificación.';
-              alert('Ocurrió un error inesperado.');
-            }
 
+              this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+            }
           }
         } else {
           this.errorMessage = 'Ocurrió un error al crear o editar el contacto.';
           console.error(this.errorMessage);
-          this.presentToast(this.errorMessage, 'danger');
+          this.activarSwal('Error', this.errorMessage, 'error', 'OK');
         }
 
-        await this.presentToast(this.successMessage, 'success');
+        this.activarSwal('Éxito', this.successMessage, 'success', 'OK');
+
         this.closeEditContactModal();
 
       } catch (error) {
         this.errorMessage = 'Ocurrió un error al crear o editar el contacto. Inténtalo de nuevo.';
-        console.log(this.errorMessage);
+        this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+
         console.error('Error al crear o editar contacto:', error);
       }
     }
+  }
+
+  async activarSwal(titulo: string, mensaje: string, icono: SweetAlertIcon, textoBoton: string) {
+    await Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: icono,  // Ahora es del tipo correcto
+      confirmButtonText: textoBoton,
+      heightAuto: false, // Para evitar problemas de visualización en Ionic
+    });
+  }
+
+  // Función genérica para abrir un modal
+  openModal(modal: IonModal) {
+    modal.present();
+  }
+
+  // Función genérica para cerrar un modal
+  closeModal(modal: IonModal) {
+    modal.dismiss();
+  }
+
+  openEditUserModal() {
+    this.openModal(this.modalEditUser);
+  }
+
+  closeEditUserModal() {
+    this.closeModal(this.modalEditUser);
+  }
+
+  openEditContactModal() {
+    this.openModal(this.modalEditContact);
+  }
+
+  closeEditContactModal() {
+    this.closeModal(this.modalEditContact);
+  }
+
+  closeModalContacto() {
+    this.closeModal(this.modalContacto);
+
   }
 
 
@@ -544,4 +543,3 @@ export class UserInfoPage {
   }
 
 }
-

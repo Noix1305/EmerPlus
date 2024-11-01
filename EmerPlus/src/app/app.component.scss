@@ -1,0 +1,9 @@
+app-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: yellow !important;
+    color: white; /* Cambia el color del texto si es necesario */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2); /* Sombra para el footer */
+  }

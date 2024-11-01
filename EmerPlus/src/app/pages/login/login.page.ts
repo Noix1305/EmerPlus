@@ -1,13 +1,11 @@
 import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
-import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
-import { Contacto } from 'src/app/models/contacto';
+import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
 
 @Component({
   selector: 'app-login',
@@ -29,11 +27,9 @@ export class LoginPage implements OnInit {
   }
 
   constructor(
-    private modalController: ModalController,
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
     private router: Router,
-    private _contactoService: ContactosemergenciaService
   ) { }
 
   togglePasswordRecovery() {
@@ -46,6 +42,10 @@ export class LoginPage implements OnInit {
     this.rutNoRegistrado = '';
     this.msgContrasenaOlvidada = '';
     this.isPasswordRecovery = !this.isPasswordRecovery; // Alterna el estado
+  }
+
+  async mostrarFormularioRegistro() {
+    mostrarFormularioRegistro(this._usuarioService, this._loginService);
   }
 
   async onSubmitForgotPassword(event: Event): Promise<void> {
@@ -90,7 +90,7 @@ export class LoginPage implements OnInit {
 
       if (!usuarioExistente) {
         // Si el usuario no existe, solicita el registro
-        this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado. Por favor, regístrate.';
+        this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado. ';
         return false; // Salir de la función temprano
       }
 

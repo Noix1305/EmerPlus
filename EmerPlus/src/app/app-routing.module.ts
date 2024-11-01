@@ -12,8 +12,7 @@ const routes: Routes = [
   },
   {
     path: 'user-info',
-    loadChildren: () => import('./pages/user-info/user-info/user-info.module').then(m => m.UserInfoPageModule),
-    canActivate: [isUsuarioGuard]
+    loadChildren: () => import('./pages/user-info/user-info/user-info.module').then(m => m.UserInfoPageModule)
   },
   {
     path: 'login',
