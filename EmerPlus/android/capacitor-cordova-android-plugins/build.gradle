@@ -34,8 +34,11 @@ android {
 }
 
 repositories {
-  mavenCentral()
-  google()
+    google()
+    mavenCentral()
+    flatDir{
+        dirs 'src/main/libs', 'libs'
+    }
 }
 
 dependencies {
