@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
+import { Router } from '@angular/router';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
@@ -20,27 +20,82 @@ export class SolicitudesPage implements OnInit {
   solicitudesFiltradas: SolicitudDeEmergencia[] = [];
   esAdmin: boolean = false;
   usuario: Usuario | null = null;
+  esUsuario: boolean = false;
+  esPolicia: boolean = false;
+  esBombero: boolean = false;
+  esAmbulancia: boolean = false;
 
   fechaDesde: string = '';
   fechaHasta: string = '';
   estadoFiltro: string = '';
+  rolUsuario: number = 0;
 
   constructor(
     private _solicitudService: SolicitudDeEmergenciaService,
     private _usuarioService: UsuarioService,
-    private _estadoSolicitudService: EstadoSolicitudService) { }
+    private _estadoSolicitudService: EstadoSolicitudService,
+    private router: Router) { }
 
   ngOnInit() {
+    this.solicitudes = [];
+    this.solicitudesUsuario = []; 
+    this.solicitudesFiltradas = [];
+
     this.cargarSolicitudes();
 
     this._usuarioService.usuario$.subscribe((usuario) => {
       this.usuario = usuario;
       if (this.usuario && this.usuario.rol.length > 0) {
-        this.esAdmin = this.usuario.rol[0] === 1;
-      } else {
-        this.esAdmin = false; // Asegúrate de que sea un booleano
+        this.rolUsuario = this.usuario.rol[0];
+        this.esAdmin = this.rolUsuario === 1;
+        this.esUsuario = this.rolUsuario === 2;
+        this.esBombero = this.rolUsuario === 3;
+        this.esPolicia = this.rolUsuario === 4;
+        this.esAmbulancia = this.rolUsuario === 5;
       }
     });
+  }
+
+  async filtrar() {
+    await this.cargarSolicitudes(); // Cargar las solicitudes primero
+    await this.filtrarSolicitudes(); // Luego filtrar las solicitudes
+  }
+
+  async cargarSolicitudes() {
+    try {
+      const solicitudes = await this._solicitudService.obtenerSolicitudes();
+
+      // Filtrar solicitudes según rol
+      if (this.esAdmin) {
+        // Si es admin, obtiene todas las solicitudes
+        this.solicitudes = solicitudes;
+        this.solicitudesUsuario = await this.procesarSolicitudes(solicitudes); // Procesar todas las solicitudes para el admin
+      } else if (this.esUsuario) {
+        // Si es un usuario normal (rol 2), filtra por RUT
+        const rutUsuario = this.usuario?.rut; // Asumiendo que el RUT del usuario está en this.usuario
+        const solicitudesFiltradas = solicitudes.filter((solicitud) => {
+          return solicitud.usuario_id === rutUsuario; // Filtrar por RUT
+        });
+
+        this.solicitudes = solicitudesFiltradas; // Solo solicitudes del usuario por RUT
+        this.solicitudesUsuario = await this.procesarSolicitudes(solicitudesFiltradas); // Procesar las solicitudes filtradas
+      } else {
+        // Para otros roles, filtra por entidad
+        const solicitudesFiltradas = solicitudes.filter((solicitud) => {
+          return solicitud.entidad === this.rolUsuario; // Filtrar por rol
+        });
+
+        this.solicitudes = solicitudesFiltradas; // Solo solicitudes del rol del usuario
+        this.solicitudesUsuario = await this.procesarSolicitudes(solicitudesFiltradas); // Procesar las solicitudes filtradas
+      }
+
+      // Verifica si hay solicitudes cargadas
+      if (!this.solicitudes.length) {
+        console.warn('No se encontraron solicitudes.');
+      }
+    } catch (error) {
+      console.error('Error al cargar las solicitudes:', error);
+    }
   }
 
   async filtrarSolicitudes() {
@@ -64,7 +119,7 @@ export class SolicitudesPage implements OnInit {
 
       // Filtrar por estado usando valores numéricos
       const estadoValido = this.estadoFiltro === '0' || solicitud.estado === Number(this.estadoFiltro); // Comparar como números
-      console.log('Solicitudes: ' + this.solicitudesFiltradas)
+
       return fechaValida && hastaValida && estadoValido;
     });
 
@@ -79,27 +134,10 @@ export class SolicitudesPage implements OnInit {
     this.solicitudesFiltradas = [];
   }
 
-
-  async cargarSolicitudes() {
-    try {
-      const solicitudes = await this._solicitudService.obtenerSolicitudes(); // Espera a que se resuelva la promesa
-
-      if (solicitudes.length > 0) {
-        this.solicitudes = solicitudes; // Almacena todas las solicitudes recibidas
-        this.solicitudesUsuario = await this.procesarSolicitudes(solicitudes);
-      } else {
-        console.warn('No se encontraron solicitudes.');
-      }
-    } catch (error) {
-      console.error('Error al cargar las solicitudes:', error);
-    }
-  }
-
   async procesarSolicitudes(solicitudes: SolicitudDeEmergencia[]) {
     return Promise.all(
       solicitudes.map(async (solicitud) => {
         const estadoDescripcion = await this._estadoSolicitudService.obtenerNombreRol(solicitud.estado); // Obtener la descripción del estado
-        console.log('Estado: ' + estadoDescripcion)
         return {
           ...solicitud,
           estadoDescripcion: estadoDescripcion || 'Desconocido', // Asigna la descripción del estado
@@ -133,5 +171,13 @@ export class SolicitudesPage implements OnInit {
       startY: 20, // Para comenzar la tabla debajo del título (ajusta según sea necesario)
     });
     doc.save('solicitudes_emergencia.pdf');
+  }
+
+  navegar() {
+    if (this.esAdmin) {
+      this.router.navigate(['/admin']);
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
   }
 }

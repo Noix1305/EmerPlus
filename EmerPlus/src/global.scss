@@ -24,6 +24,9 @@
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+@import 'sweetalert2/dist/sweetalert2.min.css';
+
+
 
 
 /**
@@ -44,7 +47,8 @@
 // }
 
 :root {
-    --ion-color-moss: #8A9A5B; /* Verde musgo */
+    --ion-color-moss: #8A9A5B;
+    /* Verde musgo */
 }
 
 body {
@@ -103,7 +107,8 @@ ion-button {
     font-weight: bold;
     color: #d32f2f;
     margin-bottom: 16px;
-    cursor: pointer; /* Hace que sea clickeable */
+    cursor: pointer;
+    /* Hace que sea clickeable */
 }
 
 /* Colores personalizados para el botón */
@@ -113,3 +118,25 @@ ion-button {
     --background-focused: #43a047;
 }
 
+ion-toolbar {
+    --background: linear-gradient(135deg, white, #FFC107, white, #FFC107, white);
+}
+
+ion-content{
+    --background: linear-gradient(135deg, #00bfff 0%, #d3d3d3 50%, #b0e0e6 100%);
+}
+
+ion-item-sliding {
+    // Cambia el fondo del sliding
+    background-color: #f0f0f0;
+  
+    // Añade un efecto de sombra
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+  }
+
+  ion-item-options {
+    // Estilos para los botones de las opciones
+    --background: #3880ff; // Cambia el color de fondo
+    --color: white; // Cambia el color del texto
+  }

@@ -14,8 +14,8 @@ export const isAdminOrUserGuard: CanActivateFn = async (route, state) => {
     console.log('Información del usuario:', infoUser); // Log para depuración
 
     // Verifica si el usuario tiene el rol de 'admin'
-    if (infoUser.rol && infoUser.rol[0] === 1 || infoUser.rol[0] === 2) {
-      return true; // Permitir el acceso
+    if ([1, 2, 3, 4, 5].includes(infoUser.rol[0])) {
+      return true;
     } else {
       // Redirigir si no es admin
       console.log('Acceso denegado: usuario no es admin o user'); // Log para depuración

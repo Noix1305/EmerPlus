@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { AlertController, PopoverController, ToastController } from '@ionic/angular';
+import { AlertController, PopoverController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { NotificacionPopoverComponent } from 'src/app/components/notificacionPopover/notificacion-popover/notificacion-popover.component';
 import { Contacto } from 'src/app/models/contacto';
@@ -15,6 +15,9 @@ import { NotificacionService } from 'src/app/services/notificacionService/notifi
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
 import { Geolocation } from '@capacitor/geolocation';
 
+import Swal, { SweetAlertIcon } from 'sweetalert2';
+
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.page.html',
@@ -26,17 +29,12 @@ export class DashboardPage implements OnInit {
   notificacion: number = 0;
   defaultEstado: number = 4;
   notificaciones: Notificacion[] = []
-  rutaCarabineros: string = 'Carabineros'
-  rutaAmbulancia: string = 'Ambulancia'
-  rutaBomberos: string = 'Bomberos'
-  urlImage: string = 'https://ndmnmgusnnmndqwigiyp.supabase.co/storage/v1/object/public/images/Carabineros/undefined_foto_1729471801126.jpg'
 
   constructor(
     private alertController: AlertController,
     private emergenciaService: SolicitudDeEmergenciaService,
     private router: Router,
     private _notificacionService: NotificacionService,
-    private toastController: ToastController,
     private _contactoService: ContactosemergenciaService,
     private popoverController: PopoverController,
     private _gestorArchivos: GestorArchivosService
@@ -82,17 +80,17 @@ export class DashboardPage implements OnInit {
 
   carabineros(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('robo', entidad)
+    this.enviarSolicitudDeEmergencia('robo', entidad, 4)
   }
 
   bomberos(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('incendio', entidad)
+    this.enviarSolicitudDeEmergencia('incendio', entidad, 3)
   }
 
   ambulancia(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('accidente', entidad)
+    this.enviarSolicitudDeEmergencia('accidente', entidad, 5)
 
   }
 
@@ -100,7 +98,7 @@ export class DashboardPage implements OnInit {
     // Lógica para enviar una alerta al contacto de emergencia
   }
 
-  async enviarSolicitudDeEmergencia(tipoEmergencia: string, ruta: string) {
+  async enviarSolicitudDeEmergencia(tipoEmergencia: string, ruta: string, entidad: number) {
     const usuario = this.usuario;
 
     if (!usuario) {
@@ -109,44 +107,46 @@ export class DashboardPage implements OnInit {
     }
 
     try {
-      const alert = await this.alertController.create({
-        header: 'Agregar fotografía',
-        message: '¿Quieres agregar una fotografía a tu solicitud?',
-        buttons: [
-          {
-            text: 'No subir imagen',
-            role: 'cancel',
-            handler: () => this.procesarSolicitud(tipoEmergencia, ruta), // Procesar sin imagen
-          },
-          {
-            text: 'Tomar Foto',
-            handler: async () => {
-              const fileWithName = await this._gestorArchivos.tomarFotoDesdeCamara(); // Llama a la función para tomar la foto
-              if (fileWithName) {
-                await this.procesarSolicitud(tipoEmergencia, ruta, fileWithName); // Procesar con la imagen tomada
-              } else {
-                console.warn('No se tomó ninguna foto.');
-              }
-              await alert.dismiss(); // Cierra la alerta después de procesar
-            },
-          },
-          {
-            text: 'Galería',
-            handler: async () => {
-              const file = await this._gestorArchivos.seleccionarFotoDesdeGaleria();
-              if (file) {
-                await this.procesarSolicitud(tipoEmergencia, ruta, file);
-              }
-              await alert.dismiss(); // Cierra la alerta después de procesar
-            },
-          },
-        ],
+
+      const { value: option } = await Swal.fire({
+        title: 'Agregar fotografía',
+        text: '¿Quieres agregar una fotografía a tu solicitud?',
+        showCancelButton: true,
+        confirmButtonText: 'Tomar Foto',
+        cancelButtonText: 'No subir imagen',
+        // Puedes agregar un botón adicional para Galería si lo deseas
+        footer: '<ion-button id="galeria-button" color="secondary">Galería</ion-button>',
+        heightAuto: false,
+
       });
 
-      await alert.present();
+      if (option) {
+        // Si el usuario seleccionó "Tomar Foto"
+        const fileWithName = await this._gestorArchivos.tomarFotoDesdeCamara();
+        if (fileWithName) {
+          await this.procesarSolicitud(tipoEmergencia, ruta, entidad, fileWithName); // Procesar con la imagen tomada
+        } else {
+          console.warn('No se tomó ninguna foto.');
+        }
+      } else {
+        // Si el usuario seleccionó "No subir imagen"
+        this.procesarSolicitud(tipoEmergencia, ruta, entidad); // Procesar sin imagen
+      }
+
+      // Agregar evento para el botón de Galería
+      const galeriaButton = document.getElementById('galeria-button');
+      if (galeriaButton) {
+        galeriaButton.addEventListener('click', async () => {
+          const file = await this._gestorArchivos.seleccionarFotoDesdeGaleria();
+          if (file) {
+            await this.procesarSolicitud(tipoEmergencia, ruta, entidad, file);
+          }
+          Swal.close(); // Cierra la alerta después de procesar
+        });
+      }
     } catch (error) {
       console.error('Error al mostrar la alerta:', error);
-      this.mostrarError('No se pudo mostrar la alerta.');
+      this.mostrarSwal('error', 'Error', 'No se pudo mostrar la alerta.');
     }
   }
 
@@ -172,22 +172,13 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  // Función para mostrar un error
-  private async mostrarError(mensaje: string) {
-    const alert = await this.alertController.create({
-      header: 'Error',
-      message: mensaje,
-      buttons: ['OK'],
-    });
-    await alert.present(); // Presentar la alerta de error
-  }
-
   // Nueva función para procesar la solicitud
-  async procesarSolicitud(tipoEmergencia: string, ruta: string, image?: File) {
+  async procesarSolicitud(tipoEmergencia: string, ruta: string, entidad: number, image?: File) {
     try {
       const ubicacion = await this.obtenerUbicacionActual();
 
       if (!ubicacion) {
+        this.mostrarSwal('warning', 'Error', 'No se pudo obtener la ubicación. Verifica los permisos.')
         throw new Error('No se pudo obtener la ubicación. Verifica los permisos.');
       }
 
@@ -201,7 +192,9 @@ export class DashboardPage implements OnInit {
       }
 
       if (!this.usuario) {
+        this.mostrarSwal('warning', 'Error', 'No hay usuario autenticado para procesar la solicitud.')
         throw new Error('No hay usuario autenticado para procesar la solicitud.');
+
       }
 
       // Crear la nueva solicitud de emergencia
@@ -214,11 +207,13 @@ export class DashboardPage implements OnInit {
         tipo: tipoEmergencia,
         estado: this.defaultEstado,
         imageUrl: urlImg, // Esto ahora es compatible
+        entidad: entidad
       };
 
       // Enviar la solicitud de emergencia
       const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
       console.log('Solicitud enviada con éxito:', response);
+      this.mostrarSwal('success', 'Éxito', 'Solicitud enviada con éxito.')
 
       // Obtener la última solicitud y enviar notificación
       const ultimaSolicitud = await this.emergenciaService.obtenerUltimaSolicitud();
@@ -231,32 +226,37 @@ export class DashboardPage implements OnInit {
           this.enviarNotificacion(tipoEmergencia, idSolicitud);
         }
       } else {
-        console.warn('No se encontró la última solicitud.');
-        alert('No se pudo encontrar la última solicitud. Inténtalo nuevamente más tarde.');
+        this.mostrarSwal('warning', 'Error', 'No se pudo encontrar la última solicitud. Inténtalo nuevamente más tarde.')
       }
     } catch (error) {
       console.error('Error al procesar la solicitud:', error);
+      this.mostrarSwal('error', 'Error', 'Error al procesar la solicitud.')
 
       if (error instanceof HttpErrorResponse) {
         console.error('Error del servidor:', error.message);
+        this.mostrarSwal('error', 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
         console.error('Detalles del error:', error.error); // Esto puede dar más información sobre el problema
       }
 
-      alert(error instanceof Error ? error.message : 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.');
+      this.mostrarSwal('error', 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
+
     }
   }
 
   private async obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
     try {
-      // Verifica si se tienen los permisos de ubicación
-      const status = await Geolocation.checkPermissions();
-      if (status.location !== 'granted') {
-        const request = await Geolocation.requestPermissions();
-        if (request.location !== 'granted') {
-          console.error('Permiso de ubicación no concedido.');
-          return null;
-        }
-      }
+
+      const position = await Geolocation.getCurrentPosition();
+      return {
+        latitud: position.coords.latitude,
+        longitud: position.coords.longitude
+      };
+    } catch (error) {
+      this.mostrarSwal('warning', 'Error', 'Error al obtener la ubicación.')
+      return null; // Devuelve null en caso de error
+    }
+  }
+
 
       // Obtiene la ubicación actual
       const position = await Geolocation.getCurrentPosition();
@@ -285,7 +285,7 @@ export class DashboardPage implements OnInit {
       this._notificacionService.crearNotificacion(nuevaNotificacion).subscribe({
         next: (response) => {
           console.log('Notificación enviada exitosamente:', response.body);
-          this.presentToast('Notificación enviada exitosamente.', 'success');
+          this.mostrarSwal('success', 'Éxito', 'Notificación enviada exitosamente.')
 
           // Ahora buscamos el contacto por parámetro
           if (this.usuario) {
@@ -306,26 +306,24 @@ export class DashboardPage implements OnInit {
                   }
                 } else {
                   console.warn('No se encontraron contactos o el formato es incorrecto.');
-                  this.presentToast('No se encontraron contactos.', 'info');
+                  this.mostrarSwal('warning', 'Error', 'No se encontraron contactos.')
+
                 }
               },
               error: (error) => {
                 console.error('Error al obtener contactos:', error);
-                this.presentToast('Error al obtener contactos.', 'danger');
+                this.mostrarSwal('error', 'Error', 'Error al obtener contactos.')
               }
             });
           }
         },
         error: (error) => {
           console.error('Error al enviar la notificación:', error);
-          this.presentToast('Error al enviar la notificación.', 'danger');
+          this.mostrarSwal('error', 'Error', 'Error al enviar la notificación.')
         }
       });
-
-
-
     } else {
-      console.error('No se encontró el usuario para enviar la notificación.');
+      this.mostrarSwal('error', 'Error', 'No se encontró el usuario para enviar la notificación.')
     }
   }
 
@@ -379,30 +377,12 @@ export class DashboardPage implements OnInit {
     this.notificacion = this.notificaciones.length;
   }
 
-  async mostrarAlerta(entidad: string) {
-    const alert = await this.alertController.create({
-      header: 'Notificación Enviada a ' + entidad,
-      message: 'La Notificación ya fue enviada',
-      buttons: [
-        {
-          text: 'OK',
-          role: 'accept',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('OK');
-          }
-        }]
-    })
-    await alert.present();
-  }
-
-  async presentToast(successMessage: string, color: string) {
-    const toast = await this.toastController.create({
-      message: successMessage,
-      duration: 2000, // Duración en milisegundos
-      position: 'top', // Posición del Toast
-      color: color, // Color del Toast, puedes cambiarlo según tus necesidades
+  async mostrarSwal(icon: SweetAlertIcon, tittle: string, text: string) {
+    await Swal.fire({
+      icon: icon,
+      title: tittle,
+      text: text,
+      heightAuto: false
     });
-    toast.present();
   }
 }

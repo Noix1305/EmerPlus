@@ -1,0 +1,73 @@
+@import '~sweetalert2/dist/sweetalert2.min.css';
+
+ion-content {
+    --background: linear-gradient(135deg, #b0e0e6 100%, #00bfff 0%, #d3d3d3 50%, #b0e0e6 100%) !important;
+    padding: 20px;
+    height: 100vh;
+
+    ion-select {
+        // Asegúrate de que la selección tenga un fondo y un borde adecuado
+        --background:  #f8f3f3 !important; // Fondo transparente
+        border-radius: 5px; // Bordes redondeados
+        padding: 10px; // Espaciado interno
+        text-align: right; // Alinear el texto a la izquierda
+    
+        // Estilo para el texto seleccionado
+        .select-text {
+            text-align: right; // Alinear el texto a la izquierda
+            color: #424141; // Color del texto
+        }
+    
+        // Estilo para la etiqueta que se muestra cuando no hay selección
+        ion-label {
+            color: #aaa; // Color de la etiqueta
+            text-align: right; // Alinear el texto de la etiqueta
+        }
+    }
+
+    form {
+        border-radius: 8px;
+        box-shadow: none;
+        padding: 20px;
+        height: 100%;
+    }
+
+    ion-list {
+        background: transparent !important;
+    }
+
+    ion-item {
+        margin-bottom: 15px;
+        --background: transparent !important;
+
+        ion-input {
+            background-color: #f5f4f4;
+            border-radius: 5px;
+            padding: 10px;
+            color: #000;
+
+            // Aplica manualmente estilos de Swal
+            border: 1px solid #ccc; // Añadir un borde similar a Swal
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); // Añadir sombra
+            padding: 10px 15px; // Ajustar el padding
+
+            &:focus {
+                border-color: #007bff; // Cambiar el color del borde al enfocarse
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); // Añadir sombra al enfocar
+            }
+        }
+    }
+
+    ion-button {
+        margin-top: 20px;
+        background-color: transparent;
+        color: white;
+        border-radius: 5px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+        &:hover {
+            background-color: #3171e0;
+            transition: background-color 0.3s;
+        }
+    }
+}

@@ -1,14 +1,12 @@
 import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
-import { ModalController } from '@ionic/angular';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom } from 'rxjs';
-import { RegistroModalComponent } from 'src/app/components/registro-modal/registro-modal.component';
 import { Preferences } from '@capacitor/preferences';
-import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
-import { Contacto } from 'src/app/models/contacto';
+import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -30,24 +28,10 @@ export class LoginPage implements OnInit {
   }
 
   constructor(
-    private modalController: ModalController,
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
     private router: Router,
-    private _contactoService: ContactosemergenciaService
   ) { }
-
-
-  async openRegistroModal() {
-    const modal = await this.modalController.create({
-      component: RegistroModalComponent,
-    });
-    return await modal.present();
-  }
-
-  closeModal() {
-    this.modalController.dismiss();
-  }
 
   togglePasswordRecovery() {
     this.errorMessage = ''; // Reinicia mensaje de error
@@ -61,6 +45,10 @@ export class LoginPage implements OnInit {
     this.isPasswordRecovery = !this.isPasswordRecovery; // Alterna el estado
   }
 
+  async mostrarFormularioRegistro() {
+    mostrarFormularioRegistro(this._usuarioService, this._loginService);
+  }
+
   async onSubmitForgotPassword(event: Event): Promise<void> {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
@@ -68,7 +56,14 @@ export class LoginPage implements OnInit {
     const rut = formData.get('rut') as string;
 
     if (!rut) {
+      this.errorMessage = 'RUT es requerido';
       console.error('RUT es requerido');
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: this.errorMessage,
+        heightAuto: false
+      });
       return;
     }
 
@@ -103,7 +98,7 @@ export class LoginPage implements OnInit {
 
       if (!usuarioExistente) {
         // Si el usuario no existe, solicita el registro
-        this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado. Por favor, regístrate.';
+        this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado. ';
         return false; // Salir de la función temprano
       }
 
@@ -119,8 +114,7 @@ export class LoginPage implements OnInit {
 
         this._usuarioService.actualizarUsuario(user);
 
-        // Redirecciona según el rol del usuario
-        if (user.rol[0] === 1) {
+        if ([1, 3, 4, 5].includes(user.rol[0])) {
           this.router.navigate(['admin']);
         } else if (user.rol[0] === 2) {
           this.router.navigate(['dashboard']);
@@ -141,20 +135,6 @@ export class LoginPage implements OnInit {
     }
 
     return false; // Valor por defecto al final de la función
-  }
-
-
-  contraseñaOlvidada() {
-
-  }
-
-  rutNotRegistrado() {
-    this.closeModal();
-    if (this.openRegistroModal) {
-      this.openRegistroModal(); // Llama solo si está definido
-    } else {
-      console.error('openRegistroModal no está definido');
-    }
   }
 }
 

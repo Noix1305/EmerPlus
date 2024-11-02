@@ -11,100 +11,14 @@
 .blue-button-gl {
   @extend .blue-button !optional;
 }
-
-.modal-wrapper{
-  height: auto;
-}
-
 ion-content {
-  /* Opcional: establece el color de fondo */
+  --background: linear-gradient(135deg, #00bfff 0%, #d3d3d3 50%, #b0e0e6 100%); /* Fondo semi-transparente */
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  /* Ocupa toda la altura de la ventana del navegador */
+  height: 50%;
 }
 
-.image-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: auto;
-  /* Permite que el contenedor ajuste su altura según el contenido */
-  padding: 20px;
-  /* Añade espacio alrededor del contenido */
-}
-
-.title {
-  font-family: 'Georgia', cursive;
-  font-weight: bold;
-  font-size: 3rem;
-  /* Hace el texto en negrita */
-  margin-bottom: 20px;
-  /* Espacio entre el texto y el contenedor de imágenes */
-  text-align: center;
-  /* Centra el texto horizontalmente */
-}
-
-.image-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  /* Espacio entre las imágenes */
-}
-
-.image-container img {
-  width: 100px;
-  /* Ajusta el tamaño según lo necesites */
-  height: 100px;
-  /* Ajusta el tamaño según lo necesites */
-  object-fit: cover;
-  /* Mantiene la proporción de la imagen sin distorsionarla */
-  border-radius: 8px;
-  /* Opcional: añade bordes redondeados */
-}
-
-.footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  padding: 10px;
-  background-color: transparent;
-  border-top: 1px solid #e7e7e7;
-}
-
-
-.footer p {
-  margin: 0;
-  /* Elimina el margen por defecto del párrafo */
-  color: #333;
-  /* Color del texto */
-  font-size: 14px;
-  /* Tamaño de la fuente */
-}
-//Quitar
-ion-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-ion-content {
-  --background: linear-gradient(135deg, rgba(240, 174, 207, 0.5), rgba(180, 230, 243, 0.5)); /* Fondo semi-transparente */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-ion-card {
-  width: 80%;
-  max-width: 400px;
-  background: white; /* Fondo blanco para la card */
-  border-radius: 10px;
-}
 
 .primary-button {
   --background: #3880ff;
@@ -122,7 +36,6 @@ p {
   align-items: center;
   justify-content: center;
   text-align: center;
-  height: 100%;
   padding: 16px;
 }
 
@@ -137,7 +50,6 @@ p {
 
 .hero-image {
   max-width: 80%; /* Ajusta el tamaño de la imagen según sea necesario */
-  height: auto;
   margin-bottom: 16px; /* Espacio entre la imagen y el texto */
 }
 
@@ -146,22 +58,9 @@ p {
   justify-content: center;
   /* Centra horizontalmente */
   align-items: center;
-  /* Centra verticalmente si es necesario */
-  height: 100%;
-  /* Asegura que el contenedor ocupe todo el espacio disponible */
 }
 
-.error-message {
-  color: red; /* Ajusta el color según tus necesidades */
-  font-size: 16px;
-  margin-top: 10px;
-}
 
-.custom-modal {
-  --width: 90%; /* Ancho del modal */
-  --max-width: 600px; /* Ancho máximo */
-  --height: auto; /* Altura automática */
-}
 
 
 

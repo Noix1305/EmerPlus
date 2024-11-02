@@ -1,0 +1,27 @@
+.metallic-background {
+    background: linear-gradient(135deg, #b0c4de 0%, #f0f8ff 50%, #add8e6 100%);
+    border-radius: 8px; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); 
+    padding: 16px; 
+    height: 100vh; /* Ocupa toda la altura de la pantalla */
+    display: flex; /* Para permitir que el contenido interno use flexbox */
+    flex-direction: column; /* Organiza los hijos en columna */
+  }
+
+.swal-input {
+    background: linear-gradient(135deg, #ffffff, #e0e0e0);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 12px; /* Espaciado entre elementos */
+  }
+  
+  .swal-input ion-label {
+    color: #555; /* Cambiar el color de las etiquetas si es necesario */
+  }
+  
+  .swal-input ion-note {
+    margin-top: 4px; /* Espaciado entre el input y el mensaje de error */
+  }
+
+  

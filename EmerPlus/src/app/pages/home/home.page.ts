@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
-import { ModalController } from '@ionic/angular';
-import { RegistroModalComponent } from '../../components/registro-modal/registro-modal.component';
-import { Usuario } from 'src/app/models/usuario';
 import { Preferences } from '@capacitor/preferences';
+import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import { LoginService } from 'src/app/services/loginService/login.service';
+import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
+import { LoadingController } from '@ionic/angular';
+
 
 @Component({
   selector: 'app-home',
@@ -10,31 +12,28 @@ import { Preferences } from '@capacitor/preferences';
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
-  placeholderVisible: boolean = true;
-  usuarios: Usuario[] = [];
 
   constructor(
-    private modalController: ModalController,
+    private _usuarioService: UsuarioService,
+    private _loginService: LoginService,
+    private loadingController: LoadingController
+    
   ) { }
 
   async ngOnInit() {
-    await Preferences.remove({ key: 'userInfo' });
+    await Preferences.clear();
+    await this.presentLoading();
   }
 
-  async openRegistroModal() {
-    const modal = await this.modalController.create({
-      component: RegistroModalComponent,
+  async mostrarFormularioRegistro() {
+    mostrarFormularioRegistro(this._usuarioService, this._loginService);
+  }
+
+  async presentLoading() {
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+      duration: 1000,
     });
-    return await modal.present();
+    await loading.present();
   }
-
-  // Método de cierre para cualquier modal
-  async closeModal(modal: HTMLIonModalElement) {
-    if (modal) {
-      await modal.dismiss();
-    } else {
-      console.error('El modal no está disponible para cerrar.');
-    }
-  }
-
 }

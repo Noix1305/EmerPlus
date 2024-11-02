@@ -16,6 +16,7 @@ import { LoginService } from 'src/app/services/loginService/login.service';
 import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
   selector: 'app-user-info',
@@ -81,7 +82,6 @@ export class UserInfoPage {
   form: FormGroup;
 
   constructor(private router: Router,
-    private alertController: AlertController,
     private _rolService: RolService,
     private _usuarioService: UsuarioService,
     private _regionComunaService: RegionComunaService,
@@ -275,7 +275,7 @@ export class UserInfoPage {
     try {
       await firstValueFrom(this._usuarioService.editarUsuario(updatedUser.rut, updatedUser));
       this.successMessage = 'Usuario editado con éxito';
-      this.presentToast(this.successMessage, this.colorVerde);
+      this.activarSwal('Exito', this.successMessage, 'success', 'OK');
       this.usuario = updatedUser;
 
       await Preferences.set({
@@ -313,63 +313,46 @@ export class UserInfoPage {
     }
   }
 
-  async presentToast(successMessage: string, color: string) {
-    const toast = await this.toastController.create({
-      message: successMessage,
-      duration: 2000, // Duración en milisegundos
-      position: 'top', // Posición del Toast
-      color: color, // Color del Toast, puedes cambiarlo según tus necesidades
-    });
-    toast.present();
-  }
-
   async eliminarCuenta() {
-    const alert = await this.alertController.create({
-      header: 'Eliminar Cuenta',
-      message: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('Cancelado');
-          }
-        }, {
-          text: 'Eliminar',
-          handler: async () => {
-            if (this.usuario) {
-              try {
-                // Llama al servicio para eliminar el usuario
-                await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
-                this.successMessage = 'Cuenta eliminada exitosamente.';
-                await this.presentToast(this.successMessage, 'success');
-                this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
-              } catch (error) {
-                console.error('Error al eliminar la cuenta:', error);
-                this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
-                await this.presentToast(this.errorMessage, 'danger');
-              }
-            }
-          }
-        }
-      ]
+    const result = await Swal.fire({
+      title: 'Eliminar Cuenta',
+      text: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+      heightAuto: false, // Para evitar problemas de visualización en Ionic
+      reverseButtons: true, // Coloca el botón de cancelar a la izquierda
     });
 
-    await alert.present();
+    if (result.isConfirmed) {
+      if (this.usuario) {
+        try {
+          // Llama al servicio para eliminar el usuario
+          await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
+          this.successMessage = 'Cuenta eliminada exitosamente.';
+
+          this.activarSwal('Éxito', this.successMessage, 'success', 'OK');
+
+          this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
+        } catch (error) {
+          console.error('Error al eliminar la cuenta:', error);
+          this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
+
+          this.activarSwal('Error', this.errorMessage, 'error', 'OK')
+        }
+      }
+    } else if (result.dismiss === Swal.DismissReason.cancel) {
+      console.log('Cancelado');
+    }
   }
 
   async mostrarContacto() {
     if (this.usuario.contactoEmergencia) {
       await this.modalContacto.present();
     } else {
-      const alert = await this.alertController.create({
-        header: 'Sin Contacto de Emergencia',
-        message: 'No se ha registrado información de contacto de emergencia.',
-        buttons: ['OK']
-      });
-
-      await alert.present();
+      this.errorMessage = 'No se ha registrado información de contacto de emergencia.'
+      this.activarSwal('Sin Contacto de Emergencia', this.errorMessage, 'error', 'OK');
     }
   }
 
@@ -418,6 +401,94 @@ export class UserInfoPage {
     }
   }
 
+  async handleEditContactSubmit(event: Event) {
+    event.preventDefault(); // Prevenir el envío por defecto del formulario
+
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const telefonoString = formData.get('telefono') as string;
+    const telefono = parseInt(telefonoString, 10);
+
+    if (isNaN(telefono)) {
+      console.error('El teléfono ingresado no es válido.');
+      return;
+    }
+
+    if (this.usuario) {
+      const updatedContact: Contacto = {
+        rut_usuario: this.usuario.rut,
+        nombre: formData.get('nombre') as string,
+        apaterno: formData.get('apaterno') as string,
+        amaterno: formData.get('amaterno') as string,
+        telefono: telefono,
+        correo: formData.get('correo') as string,
+        relacion: formData.get('relacion') as string,
+      };
+
+      try {
+        let response;
+
+        // Verifica si ya existe el contacto
+        if (this.contacto.id) {
+          // Si existe, editar contacto
+          response = await firstValueFrom(this._contactoService.editarContacto(this.contacto.id, updatedContact));
+        } else {
+          // Si no existe, crear nuevo contacto
+          response = await firstValueFrom(this._contactoService.crearContacto(updatedContact));
+          this.successMessage = 'Nuevo contacto creado con éxito.';
+        }
+
+        // Verifica si la respuesta fue exitosa
+        if (response.ok) {
+          this.successMessage = this.contacto.id
+            ? 'Contacto actualizado con éxito, se le ha enviado una notificación.'
+            : 'Nuevo contacto creado con éxito, se le ha enviado una notificación.';
+
+          try {
+            // Envío de notificación al contacto creado o editado
+            await this._usuarioService.enviarCorreoRegistroContacto(updatedContact.correo, this.usuario, updatedContact.nombre);
+          } catch (error: unknown) {
+            if (error instanceof Error) {
+              this.errorMessage = 'Error durante el envío de la notificación.';
+              this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+
+            } else {
+              console.error('Error desconocido:', error);
+              this.errorMessage = 'Error durante el envío de la notificación.';
+
+              this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+            }
+          }
+        } else {
+          this.errorMessage = 'Ocurrió un error al crear o editar el contacto.';
+          console.error(this.errorMessage);
+          this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+        }
+
+        this.activarSwal('Éxito', this.successMessage, 'success', 'OK');
+
+        this.closeEditContactModal();
+
+      } catch (error) {
+        this.errorMessage = 'Ocurrió un error al crear o editar el contacto. Inténtalo de nuevo.';
+        this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+
+        console.error('Error al crear o editar contacto:', error);
+      }
+    }
+  }
+
+  async activarSwal(titulo: string, mensaje: string, icono: SweetAlertIcon, textoBoton: string) {
+    await Swal.fire({
+      title: titulo,
+      text: mensaje,
+      icon: icono,  // Ahora es del tipo correcto
+      confirmButtonText: textoBoton,
+      heightAuto: false, // Para evitar problemas de visualización en Ionic
+    });
+  }
+
   // Función genérica para abrir un modal
   openModal(modal: IonModal) {
     modal.present();
@@ -449,82 +520,6 @@ export class UserInfoPage {
 
   }
 
-  async handleEditContactSubmit(event: Event) {
-    event.preventDefault(); // Prevenir el envío por defecto del formulario
-
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
-
-    const telefonoString = formData.get('telefono') as string;
-    const telefono = parseInt(telefonoString, 10);
-
-    if (isNaN(telefono)) {
-      console.error('El teléfono ingresado no es válido.');
-      return;
-    }
-
-    if (this.usuario) {
-      const updatedContact: Contacto = {
-        rut_usuario: this.usuario.rut,
-        nombre: formData.get('nombre') as string,
-        apaterno: formData.get('apaterno') as string,
-        amaterno: formData.get('amaterno') as string,
-        telefono: telefono,
-        correo: formData.get('correo') as string,
-        relacion: formData.get('relacion') as string,
-      };
-
-      try {
-        let response;
-        
-        // Verifica si ya existe el contacto
-        if (this.contacto.id) {
-          // Si existe, editar contacto
-          response = await firstValueFrom(this._contactoService.editarContacto(this.contacto.id, updatedContact));
-        } else {
-          // Si no existe, crear nuevo contacto
-          response = await firstValueFrom(this._contactoService.crearContacto(updatedContact));
-          this.successMessage = 'Nuevo contacto creado con éxito.';
-        }
-
-        // Verifica si la respuesta fue exitosa
-        if (response.ok) {
-          this.successMessage = this.contacto.id
-            ? 'Contacto actualizado con éxito, se le ha enviado una notificación.'
-            : 'Nuevo contacto creado con éxito, se le ha enviado una notificación.';
-
-          try {
-            // Envío de notificación al contacto creado o editado
-            await this._usuarioService.enviarCorreoRegistroContacto(updatedContact.correo, this.usuario, updatedContact.nombre);
-          } catch (error: unknown) {
-            if (error instanceof Error) {
-              this.errorMessage = 'Error durante el envío de la notificación.';
-              console.error('Error durante el envío de la notificación:', error.message);
-              alert(error.message || 'Ocurrió un error inesperado.');
-            } else {
-              console.error('Error desconocido:', error);
-              this.errorMessage = 'Error durante el envío de la notificación.';
-              alert('Ocurrió un error inesperado.');
-            }
-
-          }
-        } else {
-          this.errorMessage = 'Ocurrió un error al crear o editar el contacto.';
-          console.error(this.errorMessage);
-          this.presentToast(this.errorMessage, 'danger');
-        }
-
-        await this.presentToast(this.successMessage, 'success');
-        this.closeEditContactModal();
-        
-      } catch (error) {
-        this.errorMessage = 'Ocurrió un error al crear o editar el contacto. Inténtalo de nuevo.';
-        console.log(this.errorMessage);
-        console.error('Error al crear o editar contacto:', error);
-      }
-    }
-}
-
 
 
   get correoUsuario(): string {
@@ -548,4 +543,3 @@ export class UserInfoPage {
   }
 
 }
-

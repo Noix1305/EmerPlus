@@ -1,19 +1,48 @@
-ion-content {
-    h2 {
+.custom-content {
+    --background: linear-gradient(135deg,#b0e0e6 100%, #00bfff 0%, #d3d3d3 50%, #b0e0e6 100%) !important;
+    height: 90vh;
+
+    .welcome-title {
+        text-align: center; // Centra el título
+        font-size: 1.8rem; // Tamaño de fuente más grande
+        font-weight: bold; // Negrita para el título
+        color: #353333; // Color gris oscuro
+        margin-bottom: 12px; // Margen inferior
+    }
+
+    .description {
+        text-align: center; // Centra la descripción
+        color: #353333; // Color gris más claro
+        margin-bottom: 24px; // Margen inferior más grande
         font-weight: bold;
-        text-align: center;
-        margin-bottom: 1rem;
     }
 
     ion-list {
-        ion-item {
-            --background: var(--ion-color-light);
-            --border-color: var(--ion-color-primary);
-        }
+        margin: 0; // Eliminar margen por defecto
+        background-color: transparent;
     }
 
-    ion-icon {
-        font-size: 20px;
-        margin-right: 10px;
+    ion-item {
+        border-radius: 8px; // Bordes redondeados
+        margin-bottom: 10px; // Espacio entre items
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); // Sombra sutil
+        transition: transform 0.3s, box-shadow 0.3s, background-color 0.3s; // Transición suave
+
+        // Color de fondo normal
+        --background: #e0f7fa; // Cambia este color a lo que necesites
+
+        &:hover {
+            transform: translateY(-2px); // Levanta el item al pasar el mouse
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); // Aumenta la sombra
+            --background: #b2ebf2; // Cambia este color a lo que necesites para el hover
+        }
+
+        ion-icon {
+            color: #3880ff; // Color del icono
+        }
     }
+}
+
+ion-toolbar {
+    --background: linear-gradient(135deg, white, #FFC107, white, #FFC107, white);
 }

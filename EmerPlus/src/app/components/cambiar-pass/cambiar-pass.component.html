@@ -1,46 +1,47 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Cambiar Contraseña</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="closeModal()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Cambiar Contraseña</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="closeModal()">Cerrar</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
 
-<ion-content>
-  <form [formGroup]="form" (ngSubmit)="cambiarContrasena()">
-    <ion-item>
-      <ion-label>Contraseña Actual</ion-label>
-      <ion-input type="password" formControlName="contrasenaActual" required>
-        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-      </ion-input>
-    </ion-item>
-    <div *ngIf="form.get('contrasenaActual')?.invalid && form.get('contrasenaActual')?.touched">
-      <ion-text color="danger">La contraseña actual es requerida</ion-text>
-    </div>
-    <div *ngIf="errorMsg">
-      <ion-text color="danger">{{errorMsg}}</ion-text>
-    </div>
-    <ion-item>
-      <ion-label>Nueva Contraseña</ion-label>
-      <ion-input type="password" formControlName="nuevaContrasena" required>
-        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-      </ion-input>
-    </ion-item>
-    <div *ngIf="form.get('nuevaContrasena')?.invalid && form.get('nuevaContrasena')?.touched">
-      <ion-text color="danger">La nueva contraseña es requerida y debe tener al menos 6 caracteres</ion-text>
-    </div>
+  <mat-card-content class="metallic-background">
+    <form [formGroup]="form" (ngSubmit)="cambiarContrasena()" >
+      <ion-item class="swal-input" lines="none">
+        <ion-label >Contraseña Actual</ion-label>
+        <ion-input type="password" formControlName="contrasenaActual" required >
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+      <div *ngIf="form.get('contrasenaActual')?.invalid && form.get('contrasenaActual')?.touched">
+        <ion-text color="danger">La contraseña actual es requerida</ion-text>
+      </div>
+      <div *ngIf="errorMsg">
+        <ion-text color="danger">{{errorMsg}}</ion-text>
+      </div>
 
-    <ion-item>
-      <ion-label>Confirmar Nueva Contraseña</ion-label>
-      <ion-input type="password" formControlName="confirmarContrasena" required>
-        <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-      </ion-input>
-    </ion-item>
-    <div *ngIf="form.errors?.['mismatch'] && form.get('confirmarContrasena')?.touched">
-      <ion-text color="danger">Las contraseñas no coinciden.</ion-text>
-    </div>
+      <ion-item class="swal-input" lines="none">
+        <ion-label>Nueva Contraseña</ion-label>
+        <ion-input type="password" formControlName="nuevaContrasena" required>
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+      <div *ngIf="form.get('nuevaContrasena')?.invalid && form.get('nuevaContrasena')?.touched">
+        <ion-text color="danger">La nueva contraseña es requerida y debe tener al menos 6 caracteres</ion-text>
+      </div>
 
-    <ion-button type="submit" expand="full" [disabled]="form.invalid">Cambiar Contraseña</ion-button>
-  </form>
-</ion-content>
+      <ion-item class="swal-input" lines="none">
+        <ion-label >Confirmar Nueva Contraseña</ion-label>
+        <ion-input type="password" formControlName="confirmarContrasena" required >
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+      <div *ngIf="form.errors?.['mismatch'] && form.get('confirmarContrasena')?.touched">
+        <ion-text color="danger">Las contraseñas no coinciden.</ion-text>
+      </div>
+
+      <ion-button type="submit" expand="full" [disabled]="form.invalid">Cambiar Contraseña</ion-button>
+    </form>
+  </mat-card-content>

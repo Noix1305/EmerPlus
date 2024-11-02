@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ToastController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { Usuario } from 'src/app/models/usuario';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
   selector: 'app-agregar-usuario-admin',
@@ -24,16 +25,15 @@ export class AgregarUsuarioAdminPage implements OnInit {
 
 
   constructor(
+    private loadingController: LoadingController,
     private _usuarioService: UsuarioService,
-    private _loginService: LoginService,
-    private toastController: ToastController) { }
+    private _loginService: LoginService) { }
 
   ngOnInit() {
   }
 
   async formularioRegistroAdmin(event: Event) {
     event.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-    
 
     this.errorMessage = ''; // Reiniciar el mensaje de error
     this.successMessage = ''; // Reiniciar el mensaje de éxito
@@ -42,19 +42,19 @@ export class AgregarUsuarioAdminPage implements OnInit {
     // Validar campos
     if (!this.rut || !this.password || !this.repeatPassword) {
       this.errorMessage = 'Todos los campos son obligatorios.';
-      this.presentToast(this.errorMessage, this.colorRojo);
+      this.mostrarSwal('error', 'Error', this.errorMessage);
       return;
     }
 
     if (this.password !== this.repeatPassword) {
       this.errorMessage = 'Las contraseñas no coinciden.';
-      this.presentToast(this.errorMessage, this.colorRojo);
+      this.mostrarSwal('error', 'Error', this.errorMessage);
       return;
     }
 
     if (!this._loginService.validarRUT(this.rut)) {
       this.errorMessage = 'El RUT ingresado no es válido.';
-      this.presentToast(this.errorMessage, this.colorRojo);
+      this.mostrarSwal('error', 'Error', this.errorMessage);
       return;
     }
 
@@ -67,26 +67,38 @@ export class AgregarUsuarioAdminPage implements OnInit {
       estado: 1
     };
 
+    // Muestra el loading
+    const loading = await this.loadingController.create({
+      message: 'Creando usuario...',
+    });
+    await loading.present(); // Presenta el loading
+
     try {
       // Llama al servicio para crear el usuario
       await firstValueFrom(this._usuarioService.crearUsuario(newUser)); // Asegúrate de que la función `crearUsuario` devuelva un Observable
       this.successMessage = 'Usuario creado exitosamente.';
-      this.presentToast(this.successMessage, this.colorVerde);
+      this.mostrarSwal('success', 'Éxito', this.successMessage);
+
     } catch (error) {
+
       console.error('Error al crear usuario:', error);
       this.errorMessage = 'Ocurrió un error al crear el usuario. Inténtalo de nuevo.';
-      this.presentToast(this.errorMessage, this.colorRojo);
+      this.mostrarSwal('error', 'Error', this.errorMessage);
+
+    } finally {
+      // Cierra el loading después de procesar la solicitud
+      loading.dismiss();
     }
   }
 
-  async presentToast(successMessage: string, color: string) {
-    const toast = await this.toastController.create({
-      message: successMessage,
-      duration: 2000, // Duración en milisegundos
-      position: 'top', // Posición del Toast
-      color: color, // Color del Toast, puedes cambiarlo según tus necesidades
+  async mostrarSwal(icon: SweetAlertIcon, tittle: string, text: string) {
+    await Swal.fire({
+      icon: icon,
+      title: tittle,
+      text: text,
+      heightAuto: false
     });
-    toast.present();
   }
+
 
 }

@@ -1,57 +1,42 @@
-<ion-app>
-  <ion-header>
+<ion-header>
     <ion-toolbar class="header">
       <ion-title>Emerplus</ion-title>
       <ion-buttons slot="end">
-        <div class="notification-icon notificacion">
-          <ion-button (click)="limpiarNotificaciones($event)">
-            <ion-icon name="notifications" style="color: blue;"></ion-icon>
-            <ion-badge class="notification-badge" *ngIf="notificacion >0">{{ notificacion }}</ion-badge>
-          </ion-button>
-        </div>
+        <button mat-icon-button (click)="limpiarNotificaciones($event)">
+          <mat-icon style="color: blue;">notifications</mat-icon>
+          <span *ngIf="notificacion > 0" matBadge="{{ notificacion }}" matBadgeColor="warn"></span>
+        </button>
         <ion-menu-button></ion-menu-button>
       </ion-buttons>
     </ion-toolbar>
-  </ion-header>
+</ion-header>
 
-  <!-- Main Content -->
-  <ion-content class="ion-padding" fullscreen>
-
-    <!-- <img [src]="urlImage" alt="Imagen" *ngIf="urlImage" /> -->
-    <!-- Contenedor del logo -->
-    <div class="logo-container">
-      <img src="/assets/imgs/logo.png" alt="EmerPlus Logo" class="logo">
+<!-- Contenedor principal -->
+<ion-content class="mat-content ion-padding">
+  <!-- Botones de acción rápida -->
+  <div class="button-container">
+    <div class="button-square colorVerdeMusgo">
+      <ion-button mat-raised-button (click)="carabineros('Carabineros')">
+        <mat-icon>call</mat-icon> Carabineros
+      </ion-button>
     </div>
 
-    <!-- Botones de acción rápida -->
-    <div class="button-container">
-      <div class="button-square colorVerdeMusgo">
-        <ion-button expand="full" (click)="carabineros('Carabineros')">
-          <ion-icon name="call" slot="start"></ion-icon>
-          Carabineros
-        </ion-button>
-      </div>
-
-      <div class="button-square colorDanger">
-        <ion-button expand="full" (click)="bomberos('Bomberos')">
-          <ion-icon name="call" slot="start"></ion-icon>
-          Bomberos
-        </ion-button>
-      </div>
-
-      <div class="button-square colorPrimary">
-        <ion-button expand="full" (click)="ambulancia('Ambulancia')">
-          <ion-icon name="call" slot="start"></ion-icon>
-          Ambulancia
-        </ion-button>
-      </div>
-
-      <div class="button-square colorWarning">
-        <ion-button expand="full" (click)="contactoEmergencia('Contacto Emergencia')">
-          <ion-icon name="alert" slot="start"></ion-icon>
-          Contacto Emergencia
-        </ion-button>
-      </div>
+    <div class="button-square colorDanger">
+      <ion-button mat-raised-button color="warn" (click)="bomberos('Bomberos')">
+        <mat-icon>call</mat-icon> Bomberos
+      </ion-button>
     </div>
-  </ion-content>
-</ion-app>
+
+    <div class="button-square colorPrimary">
+      <ion-button mat-raised-button color="accent" (click)="ambulancia('Ambulancia')">
+        <mat-icon>call</mat-icon> Ambulancia
+      </ion-button>
+    </div>
+
+    <div class="button-square colorWarning">
+      <ion-button mat-raised-button (click)="contactoEmergencia('Contacto Emergencia')">
+        <mat-icon>alert</mat-icon> Contacto Emergencia
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

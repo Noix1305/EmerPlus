@@ -15,6 +15,13 @@
   /* Texto oscuro */
 }
 
+ion-content {
+  --overflow: auto;
+  /* Asegúrate de que el contenido se desplace */
+  height: auto;
+  /* Permite que el contenido se ajuste automáticamente */
+}
+
 ion-app {
   font-family: Arial, sans-serif;
 }
@@ -23,28 +30,19 @@ ion-header {
   --background: var(--ion-color-secondary);
   /* Naranja vibrante para el header */
   color: white;
+  border-radius: 8px !important;
+  
 }
 
 ion-toolbar {
-  --background: var(--ion-color-secondary);
   /* Naranja vibrante */
-  --color: white;
-}
-
-/* Estilo del título de perfil */
-.perfil-titulo {
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-align: center;
-  margin: 20px 0;
-  color: var(--ion-color-dark);
-  /* Texto oscuro */
+  --color: rgb(37, 36, 36);
+  border-radius: 8px !important;
 }
 
 /* Botones */
 ion-button {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  --background: #4CAF50;
   font-size: 1rem;
   /* Tamaño de fuente más pequeño */
   padding: 8px 16px;
@@ -55,7 +53,6 @@ ion-button {
   /* El ancho se ajusta automáticamente */
   border-radius: 8px;
   font-weight: bold;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 ion-button:hover {
@@ -68,15 +65,6 @@ ion-button:hover {
 ion-button[color="danger"] {
   --background: var(--ion-color-danger);
   /* Botón rojo para eliminar */
-}
-
-/* Contenedor de los botones */
-.button-container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-  gap: 10px;
-  /* Espacio entre botones */
 }
 
 /* Estilo de las tarjetas */
@@ -116,22 +104,73 @@ ion-footer ion-button {
   margin-top: 20px;
 }
 
+/* Estilo del título de perfil */
+.perfil-titulo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 20px 0;
+  color: var(--ion-color-dark);
+  /* Texto oscuro */
+}
+
+/* Contenedor de los botones */
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+  /* Espacio entre botones */
+}
+
 .cardContent {
   display: flex;
   justify-content: space-around;
   padding: 10px;
 }
 
-#editarContactoEmergencia:hover {
-  transform: scale(1.05);
-  /* Efecto hover */
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  /* Sombra */
+.swal-input {
+  background: linear-gradient(135deg, #ffffff, #e0e0e0) !important;
+  /* Color de fondo */
+  border: 1px solid #ccc;
+  /* Borde */
+  border-radius: 8px;
+  /* Bordes redondeados */
+  padding: 16px;
+  /* Espaciado interno */
+  margin-bottom: 12px;
+  /* Espaciado inferior */
+  font-size: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-.mostrarContacto{
-  width: 150px;
-  height: 50px;
-  align-self: center;
-  font-size: 0.75rem;
+.swal-input ion-label {
+  color: #333;
+  /* Color de la etiqueta */
+}
+
+.swal-input ion-note {
+  font-size: 12px;
+  /* Tamaño de fuente del mensaje de error */
+}
+
+.metallic-background {
+  background: linear-gradient(135deg, #00bfff 0%, #d3d3d3 50%, #b0e0e6 100%);
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  height: 100vh; // Ocupa toda la altura de la pantalla
+  display: flex; // Para permitir que el contenido interno use flexbox
+  flex-direction: column; // Organiza los hijos en columna
+
+  // Añade las siguientes propiedades para permitir el scroll
+  overflow-y: auto; // Permite el desplazamiento vertical
+  overflow-x: hidden; // Oculta el desplazamiento horizontal si no es necesario
+  margin-bottom: auto;
+}
+
+
+.rounded-button {
+  border-radius: 8px !important;
+  margin: 10px; /* Ajusta el valor según lo necesites */
 }

@@ -22,7 +22,29 @@
             "inlineStyleLanguage": "scss",
             "allowedCommonJsDependencies": [
               "ws",
-              "@supabase/realtime-js"
+              "@supabase/realtime-js",
+              "sweetalert2",
+              "jspdf-autotable",
+              "raf",
+              "core-js/modules/web.dom-collections.iterator.js",
+              "core-js/modules/es.string.trim.js",
+              "core-js/modules/es.string.starts-with.js",
+              "core-js/modules/es.string.replace.js",
+              "core-js/modules/es.string.match.js",
+              "core-js/modules/es.string.starts-with.js",
+              "core-js/modules/es.string.split.js",
+              "core-js/modules/es.promise.js",
+              "core-js/modules/es.array.reverse.js",
+              "core-js/modules/es.array.index-of.js",
+              "core-js/modules/es.array.iterator.js",
+              "core-js/modules/es.array.reduce.js",
+              "core-js/modules/es.array.reverse.js",
+              "core-js/modules/es.promise.js",
+              "core-js/modules/es.regexp.to-string.js",
+              "core-js/modules/es.string.ends-with.js",
+              "core-js/modules/es.string.includes.js",
+              "core-js/modules/es.string.split.js",
+              "rgbcolor"
             ],
             "assets": [
               {
@@ -37,6 +59,7 @@
               }
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/global.scss",
               "src/theme/variables.scss"
             ],
@@ -52,8 +75,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "15kb",
-                  "maximumError": "30kb"
+                  "maximumWarning": "50kb",
+                  "maximumError": "100kb"
                 }
               ],
               "fileReplacements": [
@@ -120,6 +143,7 @@
               }
             ],
             "styles": [
+              "@angular/material/prebuilt-themes/azure-blue.css",
               "src/global.scss",
               "src/theme/variables.scss"
             ],

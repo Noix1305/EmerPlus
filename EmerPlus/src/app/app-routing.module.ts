@@ -3,6 +3,7 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { isUsuarioGuard } from './guards/isUsuario/is-usuario.guard';
 import { isAdminGuard } from './guards/isAdmin/is-admin.guard';
 import { isAdminOrUserGuard } from './guards/isAdminOrUser/is-admin-or-user.guard';
+import { isStaffGuard } from './guards/isStaff/is-staff.guard';
 
 const routes: Routes = [
   {
@@ -11,8 +12,7 @@ const routes: Routes = [
   },
   {
     path: 'user-info',
-    loadChildren: () => import('./pages/user-info/user-info/user-info.module').then(m => m.UserInfoPageModule),
-    canActivate: [isUsuarioGuard]
+    loadChildren: () => import('./pages/user-info/user-info/user-info.module').then(m => m.UserInfoPageModule)
   },
   {
     path: 'login',
@@ -26,7 +26,7 @@ const routes: Routes = [
   {
     path: 'admin',
     loadChildren: () => import('./pages/admin/admin/admin.module').then(m => m.AdminPageModule),
-    canActivate: [isAdminGuard]
+    canActivate: [isStaffGuard]
   },
   {
     path: 'solicitudes',
@@ -45,7 +45,7 @@ const routes: Routes = [
   },
   {
     path: 'ver-notificacion',
-    loadChildren: () => import('./pages/verNotificacion/ver-notificacion/ver-notificacion.module').then( m => m.VerNotificacionPageModule),
+    loadChildren: () => import('./pages/verNotificacion/ver-notificacion/ver-notificacion.module').then(m => m.VerNotificacionPageModule),
     canActivate: [isUsuarioGuard]
   },
   {
@@ -53,12 +53,6 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
-  
-
-
-
-
-
 
 ];
 

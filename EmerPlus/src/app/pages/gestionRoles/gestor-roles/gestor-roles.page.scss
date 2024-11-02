@@ -1,0 +1,65 @@
+.role-button {
+    margin: 5px;
+    padding: 10px 20px;
+    /* Ajusta el padding según sea necesario */
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    /* Asegura que los botones sean tratados como elementos en línea */
+    width: 100px;
+    /* Ajusta el ancho según sea necesario */
+    text-align: center;
+    /* Centra el texto */
+}
+
+.role-button.selected {
+    background-color: #28a745;
+    /* Cambia a verde cuando se selecciona */
+}
+
+/* Asegúrate de que el botón de Ionic tenga un tamaño similar */
+ion-button {
+    width: 100px;
+    /* Ajusta el ancho según sea necesario */
+    margin-top: 10px;
+    /* Añadir espacio entre el botón de Ionic y otros elementos si es necesario */
+}
+
+/* Estilos para la barra de búsqueda */
+ion-searchbar {
+    --background: #ffffff;
+    /* Color de fondo */
+    --color: #1d1c1c;
+    /* Color del texto */
+    --placeholder-color: #999;
+    /* Color del placeholder */
+    --border-color: #007bff;
+    /* Color del borde */
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* Sombra del cuadro */
+    border-radius: 5px;
+    /* Bordes redondeados */
+    margin: auto;
+    /* Espaciado superior */
+}
+
+ion-searchbar .searchbar-input {
+    font-size: 16px;
+    /* Tamaño de la fuente del texto de búsqueda */
+    padding: 10px;
+    /* Espaciado interno de la caja de texto */
+}
+
+/* Hacer que el fondo de ion-item, ion-label e ion-list sea transparente */
+ion-item, ion-label, ion-list {
+    background-color: transparent !important; /* Asegúrate de que el fondo sea transparente */
+    --background: transparent; /* Para asegurar compatibilidad con Ionic */
+}
+
+p{
+    font-size: 1rem;
+    color: #1d1c1c;
+}
