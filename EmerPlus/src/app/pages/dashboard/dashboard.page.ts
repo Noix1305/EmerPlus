@@ -14,7 +14,9 @@ import { GestorArchivosService } from 'src/app/services/gestorArchivos/gestor-ar
 import { NotificacionService } from 'src/app/services/notificacionService/notificacion.service';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
 import { Geolocation } from '@capacitor/geolocation';
+
 import Swal, { SweetAlertIcon } from 'sweetalert2';
+
 
 @Component({
   selector: 'app-dashboard',
@@ -105,6 +107,7 @@ export class DashboardPage implements OnInit {
     }
 
     try {
+
       const { value: option } = await Swal.fire({
         title: 'Agregar fotografía',
         text: '¿Quieres agregar una fotografía a tu solicitud?',
@@ -114,6 +117,7 @@ export class DashboardPage implements OnInit {
         // Puedes agregar un botón adicional para Galería si lo deseas
         footer: '<ion-button id="galeria-button" color="secondary">Galería</ion-button>',
         heightAuto: false,
+
       });
 
       if (option) {
@@ -241,6 +245,7 @@ export class DashboardPage implements OnInit {
 
   private async obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
     try {
+
       const position = await Geolocation.getCurrentPosition();
       return {
         latitud: position.coords.latitude,
@@ -252,6 +257,18 @@ export class DashboardPage implements OnInit {
     }
   }
 
+
+      // Obtiene la ubicación actual
+      const position = await Geolocation.getCurrentPosition();
+      return {
+        latitud: position.coords.latitude,
+        longitud: position.coords.longitude
+      };
+    } catch (error) {
+      console.error('Error al obtener la ubicación:', error);
+      return null; // Maneja el error según sea necesario
+    }
+  }
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {
     if (this.usuario) {
       const nuevaNotificacion: Notificacion = {
@@ -358,23 +375,6 @@ export class DashboardPage implements OnInit {
   async someFunction() {
     await this.cargarNotificacionesNuevas();
     this.notificacion = this.notificaciones.length;
-  }
-
-  async mostrarAlerta(entidad: string) {
-    const alert = await this.alertController.create({
-      header: 'Notificación Enviada a ' + entidad,
-      message: 'La Notificación ya fue enviada',
-      buttons: [
-        {
-          text: 'OK',
-          role: 'accept',
-          cssClass: 'secondary',
-          handler: () => {
-            console.log('OK');
-          }
-        }]
-    })
-    await alert.present();
   }
 
   async mostrarSwal(icon: SweetAlertIcon, tittle: string, text: string) {

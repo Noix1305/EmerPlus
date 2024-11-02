@@ -13,7 +13,12 @@ export const keysUserBd = {
   production: false,
   correoUserBD: 'admin@gmail.com',
   password: '!a%i&dmi#m0e%sn123'
-}
+};
+
+// export const keysUserBd = {
+//   production: false,
+  
+// }
 
 /*
  * For easier debugging in development mode, you can import the following file
