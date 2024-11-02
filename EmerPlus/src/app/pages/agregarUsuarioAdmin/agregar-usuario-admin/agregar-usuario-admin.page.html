@@ -4,31 +4,30 @@
       <ion-back-button defaultHref="/admin"></ion-back-button>
     </ion-buttons>
     <ion-title>Agregar Usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
   <form (ngSubmit)="formularioRegistroAdmin($event)">
-    <ion-list>
+    <ion-list lines="none">
       <ion-item>
-        <ion-label position="floating">RUT</ion-label>
-        <ion-input [(ngModel)]="rut" name="rut" type="text" required></ion-input>
+        <ion-input [(ngModel)]="rut" name="rut" type="text" required class="swal2-input"
+          placeholder="RUT: ej: 11111111-1"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Contraseña</ion-label>
-        <ion-input [(ngModel)]="password" name="password" type="password" required>
-          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
-        </ion-input>
+        <ion-input [(ngModel)]="password" name="password" type="password" required class="swal2-input"
+          placeholder="Ingresa tu contraseña"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label position="floating">Repetir Contraseña</ion-label>
-        <ion-input [(ngModel)]="repeatPassword" name="repeatPassword" type="password" required>
-          <ion-input-password-toggle slot="end" style="--background: black"></ion-input-password-toggle>
-        </ion-input>
+        <ion-input [(ngModel)]="repeatPassword" name="repeatPassword" type="password" required class="swal2-input"
+          placeholder="Repite la contraseña"></ion-input>
       </ion-item>
       <ion-item>
-        <ion-label>Rol</ion-label>
-        <ion-select [(ngModel)]="roleId" name="roleId" placeholder="Seleccione un rol">
+        <ion-label class="swal2-input">Rol</ion-label>
+        <ion-select [(ngModel)]="roleId" name="roleId" placeholder="Seleccione un rol" class="swal2-input">
           <ion-select-option value="1">Administrador</ion-select-option>
           <ion-select-option value="2">Usuario</ion-select-option>
           <ion-select-option value="3">Bombero</ion-select-option>

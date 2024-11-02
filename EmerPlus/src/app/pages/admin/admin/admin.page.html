@@ -1,15 +1,15 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Panel de Administración</ion-title>
-    <ion-buttons slot="start">
+    <ion-buttons slot="end">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <h2>Bienvenido, {{ rolUsuarioActivo }}</h2>
-  <p>Selecciona una de las siguientes acciones:</p>
+<ion-content class="ion-padding custom-content">
+  <h2 class="welcome-title">Bienvenido, {{ rolUsuarioActivo }}</h2>
+  <p class="description">Selecciona una de las siguientes acciones:</p>
 
   <ion-list>
     <!-- Para Administrador -->

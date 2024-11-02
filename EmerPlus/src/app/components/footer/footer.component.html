@@ -1,3 +1,6 @@
-  <ion-toolbar class="custom-footer" color="secondary">
+<ion-footer *ngIf="showFooter" (click)="ocultarFooter()" >
+  <ion-toolbar class="custom-footer" color="secondary" >
     <em style="font-size: 0.75rem;">Powered by Ionic - Version 0.0.1 - 2024</em>
   </ion-toolbar>
+</ion-footer>
+

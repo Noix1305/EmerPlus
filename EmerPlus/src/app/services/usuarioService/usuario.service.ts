@@ -6,6 +6,7 @@ import { BehaviorSubject, catchError, firstValueFrom, map, Observable, throwErro
 import { MailSenderService } from '../mailService/mail-sender.service';
 import { ActualizarRol } from 'src/app/models/actualizarRol';
 import { Preferences } from '@capacitor/preferences';
+import Swal from 'sweetalert2';
 
 
 
@@ -45,9 +46,22 @@ export class UsuarioService {
           // Enviar la contraseña al correo
           await this.enviarCorreoConContraseña(email, passDesencriptada);
         } else {
+          await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'El correo electrónico no está disponible para el usuario.',
+            heightAuto: false
+          });
           throw new Error('El correo electrónico no está disponible para el usuario.');
+          
         }
       } else {
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Usuario no encontrado.',
+          heightAuto: false
+        });
         throw new Error('Usuario no encontrado.');
       }
     } else if (email) {
@@ -60,73 +74,80 @@ export class UsuarioService {
   // Método para enviar el correo (puedes usar una librería como nodemailer)
   private async enviarCorreoConContraseña(email: string, contraseña: string): Promise<void> {
     const asunto = 'Recuperación de Contraseña';
-    const texto = `
-Estimado/a Usuario,
-
-Esperamos que se encuentre bien. 
-
-Hemos recibido una solicitud para recuperar su contraseña asociada a su cuenta. A continuación, encontrará la información necesaria para acceder nuevamente a su cuenta:
-
-**Su contraseña es:** ${contraseña}
-
-Le recordamos que es importante mantener su contraseña segura y privada. Si tiene sospechas de que alguien más pueda tener acceso a su cuenta, le recomendamos seguir estos pasos:
-
-1. Cambie su contraseña de inmediato.
-2. Asegúrese de utilizar una contraseña única que no haya sido utilizada anteriormente.
-3. Habilite la autenticación de dos factores en su cuenta, si está disponible, para una mayor seguridad.
-4. No comparta su contraseña con nadie.
-
-Si necesita más ayuda o tiene alguna otra consulta, no dude en ponerse en contacto con nuestro equipo de soporte.
-
-Atentamente,  
-El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la necesitas.
-`;
+    const html = `
+      <p>Estimado/a Usuario,</p>
+      <p>Esperamos que se encuentre bien.</p>
+      <p>Hemos recibido una solicitud para recuperar su contraseña asociada a su cuenta. A continuación, encontrará la información necesaria para acceder nuevamente a su cuenta:</p>
+      <p><strong>Su contraseña es:</strong> ${contraseña}</p>
+      <p>Le recordamos que es importante mantener su contraseña segura y privada. Si tiene sospechas de que alguien más pueda tener acceso a su cuenta, le recomendamos seguir estos pasos:</p>
+      <ol>
+        <li>Cambie su contraseña de inmediato.</li>
+        <li>Asegúrese de utilizar una contraseña única que no haya sido utilizada anteriormente.</li>
+        <li>Habilite la autenticación de dos factores en su cuenta, si está disponible, para una mayor seguridad.</li>
+        <li>No comparta su contraseña con nadie.</li>
+      </ol>
+      <p>Si necesita más ayuda o tiene alguna otra consulta, no dude en ponerse en contacto con nuestro equipo de soporte.</p>
+      <p>Atentamente,<br>El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la necesitas.</p>
+    `;
 
     // Enviar el correo utilizando MailSenderService
-    this.mailSenderService.enviarCorreo(email, asunto, texto).subscribe({
+    this.mailSenderService.enviarCorreo(email, asunto, html).subscribe({
       next: () => {
-        alert('Correo enviado con éxito');
+        Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: 'Se ha enviado un correo con la recuperación de contraseña.',
+          heightAuto: false
+        });
       },
       error: (error) => {
         console.error('Error al enviar el correo:', error);
-        alert('Hubo un error al enviar el correo.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al enviar el correo de recuperación',
+          heightAuto: false
+        });
       }
     });
   }
+
 
 
   async enviarCorreoRegistroContacto(email: string, usuario: Usuario, nombreContacto: string): Promise<void> {
     const asunto = 'Registro como Contacto de Emergencia';
-    const texto = `
-Estimado/a ${nombreContacto},
-
-Esperamos que se encuentre bien.
-
-Le informamos que ha sido registrado/a como **contacto de emergencia** en nuestro servicio por el usuario ${usuario.nombre} ${usuario.papellido}.
-Esto significa que, en caso de emergencia, usted será notificado/a y podrá ser contactado/a en situaciones donde se necesite su ayuda.
-
-A continuación, le ofrecemos algunos detalles adicionales:
-
-1. **Servicio de Emergencia**: Este registro permite al usuario confiar en usted como parte importante de su red de apoyo.
-2. **Acciones a tomar**: En caso de recibir notificaciones, por favor, responda lo más pronto posible para brindar asistencia.
-3. **Confidencialidad y Seguridad**: La información proporcionada se maneja de forma confidencial y está protegida por nuestras políticas de seguridad.
-
-Si tiene alguna pregunta o necesita más información, no dude en ponerse en contacto con nuestro equipo de soporte.
-
-Atentamente,  
-El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la necesitas.
-`;
+    const html = `
+      <p>Estimado/a ${nombreContacto},</p>
+      <p>Esperamos que se encuentre bien.</p>
+      <p>Le informamos que ha sido registrado/a como <strong>contacto de emergencia</strong> en nuestro servicio por el usuario ${usuario.nombre} ${usuario.papellido}.
+      Esto significa que, en caso de emergencia, usted será notificado/a y podrá ser contactado/a en situaciones donde se necesite su ayuda.</p>
+      <p>A continuación, le ofrecemos algunos detalles adicionales:</p>
+      <ol>
+        <li><strong>Servicio de Emergencia:</strong> Este registro permite al usuario confiar en usted como parte importante de su red de apoyo.</li>
+        <li><strong>Acciones a tomar:</strong> En caso de recibir notificaciones, por favor, responda lo más pronto posible para brindar asistencia.</li>
+        <li><strong>Confidencialidad y Seguridad:</strong> La información proporcionada se maneja de forma confidencial y está protegida por nuestras políticas de seguridad.</li>
+      </ol>
+      <p>Si tiene alguna pregunta o necesita más información, no dude en ponerse en contacto con nuestro equipo de soporte.</p>
+      <p>Atentamente,<br>El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la necesitas.</p>
+    `;
 
     // Enviar el correo utilizando MailSenderService
-    this.mailSenderService.enviarCorreo(email, asunto, texto).subscribe({
+    this.mailSenderService.enviarCorreo(email, asunto, html).subscribe({
       next: () => {
+        // Puedes agregar alguna acción si se envía con éxito
       },
       error: (error) => {
         console.error('Error al enviar el correo:', error);
-        alert('Hubo un error al enviar el correo.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error al enviar el correo',
+          heightAuto: false
+        });
       }
     });
   }
+
 
 
   obtenerUsuarios(): Observable<Usuario[]> {

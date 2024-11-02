@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
+import { LoadingController } from '@ionic/angular';
 import { Usuario } from 'src/app/models/usuario';
 import { RolService } from 'src/app/services/rolService/rol.service';
 
@@ -13,13 +14,15 @@ export class AdminPage {
 
   constructor(
     private router: Router,
-    private _rolService: RolService) { }
+    private _rolService: RolService,
+    private loadingController: LoadingController) { }
 
   rolUsuarioActivo: string = '';
   usuarioActivo: Usuario | null = null;
 
 
   async ngOnInit() {
+    await this.presentLoading();
     const { value } = await Preferences.get({ key: 'userInfo' });
 
     if (value) {
@@ -65,7 +68,7 @@ export class AdminPage {
     console.log('Cerrando sesión...'); // Asegúrate de que esto se imprima en la consola
     try {
       // Eliminar datos específicos de Preferences
-      await Preferences.remove({ key: 'userInfo' }); // Elimina solo el campo userInfo
+      await Preferences.clear(); // Elimina solo el campo userInfo
 
       // Redirigir al usuario a la página de inicio
       this.router.navigate(['/home']);
@@ -73,6 +76,14 @@ export class AdminPage {
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
     }
+  }
+
+  async presentLoading() {
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+      duration: 1000,
+    });
+    await loading.present();
   }
 
 

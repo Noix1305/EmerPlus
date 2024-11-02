@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -36,6 +36,7 @@ import { FooterComponent } from './components/footer/footer.component';
     MatMenuModule,  // Asegúrate de agregarlo aquí
     MatIconModule,
   ],
+  
   exports: [BrowserAnimationsModule,
     MatCardModule,
     MatButtonModule,
@@ -44,8 +45,17 @@ import { FooterComponent } from './components/footer/footer.component';
     MatOptionModule,
     MatDialogModule,  // Asegúrate de agregarlo aquí
     MatMenuModule,  // Asegúrate de agregarlo aquí
-    MatIconModule],
+    MatIconModule,
+    MatCardModule,
+    MatButtonModule,
+    MatListModule,
+    MatSelectModule,   // Asegúrate de agregarlo aquí
+    MatOptionModule,
+    MatDialogModule,  // Asegúrate de agregarlo aquí
+    MatMenuModule,  // Asegúrate de agregarlo aquí
+    ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideHttpClient(withInterceptorsFromDi()), provideAnimationsAsync()],
   bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
 export class AppModule { }

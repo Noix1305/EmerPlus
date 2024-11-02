@@ -6,6 +6,7 @@ import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -55,7 +56,14 @@ export class LoginPage implements OnInit {
     const rut = formData.get('rut') as string;
 
     if (!rut) {
+      this.errorMessage = 'RUT es requerido';
       console.error('RUT es requerido');
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: this.errorMessage,
+        heightAuto: false
+      });
       return;
     }
 
@@ -127,11 +135,6 @@ export class LoginPage implements OnInit {
     }
 
     return false; // Valor por defecto al final de la función
-  }
-
-
-  contraseñaOlvidada() {
-
   }
 }
 

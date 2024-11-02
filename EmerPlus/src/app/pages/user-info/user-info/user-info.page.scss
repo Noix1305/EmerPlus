@@ -35,16 +35,14 @@ ion-header {
 }
 
 ion-toolbar {
-  --background: var(--ion-color-secondary);
   /* Naranja vibrante */
-  --color: white;
+  --color: rgb(37, 36, 36);
   border-radius: 8px !important;
 }
 
 /* Botones */
 ion-button {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  --background: #4CAF50;
   font-size: 1rem;
   /* Tamaño de fuente más pequeño */
   padding: 8px 16px;
@@ -161,19 +159,18 @@ ion-footer ion-button {
   border-radius: 8px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
   padding: 16px;
-  height: 100vh;
-  /* Ocupa toda la altura de la pantalla */
-  display: flex;
-  /* Para permitir que el contenido interno use flexbox */
-  flex-direction: column;
-  /* Organiza los hijos en columna */
+  height: 100vh; // Ocupa toda la altura de la pantalla
+  display: flex; // Para permitir que el contenido interno use flexbox
+  flex-direction: column; // Organiza los hijos en columna
+
+  // Añade las siguientes propiedades para permitir el scroll
+  overflow-y: auto; // Permite el desplazamiento vertical
+  overflow-x: hidden; // Oculta el desplazamiento horizontal si no es necesario
+  margin-bottom: auto;
 }
+
 
 .rounded-button {
   border-radius: 8px !important;
   margin: 10px; /* Ajusta el valor según lo necesites */
-}
-
-.mostrarContacto{
-  width: 100vh;
 }
