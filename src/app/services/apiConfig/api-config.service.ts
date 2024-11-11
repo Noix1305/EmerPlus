@@ -7,14 +7,16 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root'
 })
 export class ApiConfigService {
-  public urlBase = environment.supabaseUrl;
+
+
+  public urlBase = environment.API_URL;
 
   constructor(private httpClient: HttpClient) { }
 
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({
-      'apiKey': environment.supabaseKey,
-      'Authorization': 'Bearer ' + environment.supabaseKey
+      'apiKey': environment.API_KEY_SUPABASE,
+      'Authorization': 'Bearer ' + environment.API_KEY_SUPABASE
     });
   }
 
