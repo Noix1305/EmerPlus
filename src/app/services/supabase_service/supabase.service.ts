@@ -10,7 +10,8 @@ export class SupabaseService {
   bucket: string = 'images'
 
   constructor() {
-    this.supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+    console.log(environment.API_URL)
+    this.supabase = createClient(environment.API_URL, environment.API_KEY_SUPABASE);
   }
 
   get client() {
@@ -27,7 +28,7 @@ export class SupabaseService {
 
     // Si hay un error, retornarlo
     if (error) {
-        return { url: null, error };
+      return { url: null, error };
     }
 
     // Si la carga fue exitosa, obtenemos la URL pública
@@ -35,6 +36,6 @@ export class SupabaseService {
 
     // Retornamos la URL pública y el posible error
     return { url: publicUrl, error: null };
-}
+  }
 
 }

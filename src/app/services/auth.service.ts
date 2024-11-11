@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment'; // Asegúrate de q
   providedIn: 'root'
 })
 export class AuthService {
-  private supabase = createClient(environment.supabaseUrl, environment.supabaseKey);
+  private supabase = createClient(environment.API_URL, environment.API_KEY_SUPABASE);
 
   constructor() {}
 
