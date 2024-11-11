@@ -10,7 +10,7 @@
     "serve:prod": "ENV=production LOCAL_ENV=true npm run generate-env && ionic serve",
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
-    "build": "ng build",
+    "build": "ENV=production npm run generate-env && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
