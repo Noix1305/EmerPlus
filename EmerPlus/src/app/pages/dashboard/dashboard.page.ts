@@ -177,9 +177,14 @@ export class DashboardPage implements OnInit {
     try {
       const ubicacion = await this.obtenerUbicacionActual();
 
+      if (!this.usuario) {
+
+        return this.mostrarSwal('warning', 'Error', 'No hay usuario autenticado para procesar la solicitud.');
+      }
+
       if (!ubicacion) {
-        this.mostrarSwal('warning', 'Error', 'No se pudo obtener la ubicación. Verifica los permisos.')
-        throw new Error('No se pudo obtener la ubicación. Verifica los permisos.');
+
+        return this.mostrarSwal('warning', 'Error', 'No se pudo obtener la ubicación. Verifica los permisos.');
       }
 
       // Cambiar urlImg a string | undefined
@@ -189,12 +194,6 @@ export class DashboardPage implements OnInit {
       if (image) {
         urlImg = await this._gestorArchivos.uploadPhoto(image, ruta); // Usa la función para subir la foto
         console.log('URL Imagen: ' + urlImg);
-      }
-
-      if (!this.usuario) {
-        this.mostrarSwal('warning', 'Error', 'No hay usuario autenticado para procesar la solicitud.')
-        throw new Error('No hay usuario autenticado para procesar la solicitud.');
-
       }
 
       // Crear la nueva solicitud de emergencia
@@ -245,30 +244,21 @@ export class DashboardPage implements OnInit {
 
   private async obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
     try {
-
       const position = await Geolocation.getCurrentPosition();
       return {
         latitud: position.coords.latitude,
         longitud: position.coords.longitude
       };
     } catch (error) {
-      this.mostrarSwal('warning', 'Error', 'Error al obtener la ubicación.')
-      return null; // Devuelve null en caso de error
-    }
-  }
-
-
-      // Obtiene la ubicación actual
-      const position = await Geolocation.getCurrentPosition();
-      return {
-        latitud: position.coords.latitude,
-        longitud: position.coords.longitude
-      };
-    } catch (error) {
+      this.mostrarSwal('warning', 'Error', 'Error al obtener la ubicación.');
       console.error('Error al obtener la ubicación:', error);
       return null; // Maneja el error según sea necesario
     }
   }
+
+
+
+
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {
     if (this.usuario) {
       const nuevaNotificacion: Notificacion = {
@@ -285,7 +275,6 @@ export class DashboardPage implements OnInit {
       this._notificacionService.crearNotificacion(nuevaNotificacion).subscribe({
         next: (response) => {
           console.log('Notificación enviada exitosamente:', response.body);
-          this.mostrarSwal('success', 'Éxito', 'Notificación enviada exitosamente.')
 
           // Ahora buscamos el contacto por parámetro
           if (this.usuario) {

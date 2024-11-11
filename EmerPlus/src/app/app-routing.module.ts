@@ -12,7 +12,7 @@ const routes: Routes = [
   },
   {
     path: 'user-info',
-    loadChildren: () => import('./pages/user-info/user-info/user-info.module').then(m => m.UserInfoPageModule)
+    loadChildren: () => import('./pages/user-info/user-info.module').then(m => m.UserInfoPageModule)
   },
   {
     path: 'login',
@@ -25,28 +25,32 @@ const routes: Routes = [
   },
   {
     path: 'admin',
-    loadChildren: () => import('./pages/admin/admin/admin.module').then(m => m.AdminPageModule),
+    loadChildren: () => import('./pages/admin/admin.module').then(m => m.AdminPageModule),
     canActivate: [isStaffGuard]
   },
   {
     path: 'solicitudes',
-    loadChildren: () => import('./pages/solicitudes/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule),
+    loadChildren: () => import('./pages/solicitudes/solicitudes.module').then(m => m.SolicitudesPageModule),
     canActivate: [isAdminOrUserGuard]
   },
   {
     path: 'gestor-roles',
-    loadChildren: () => import('./pages/gestionRoles/gestor-roles/gestor-roles.module').then(m => m.GestorRolesPageModule),
+    loadChildren: () => import('./pages/gestionRoles/gestor-roles.module').then(m => m.GestorRolesPageModule),
     canActivate: [isAdminGuard]
   },
   {
     path: 'agregar-usuario-admin',
-    loadChildren: () => import('./pages/agregarUsuarioAdmin/agregar-usuario-admin/agregar-usuario-admin.module').then(m => m.AgregarUsuarioAdminPageModule),
+    loadChildren: () => import('./pages/agregarUsuarioAdmin/agregar-usuario-admin.module').then(m => m.AgregarUsuarioAdminPageModule),
     canActivate: [isAdminGuard]
   },
   {
     path: 'ver-notificacion',
-    loadChildren: () => import('./pages/verNotificacion/ver-notificacion/ver-notificacion.module').then(m => m.VerNotificacionPageModule),
+    loadChildren: () => import('./pages/verNotificacion/ver-notificacion.module').then(m => m.VerNotificacionPageModule),
     canActivate: [isUsuarioGuard]
+  },
+  {
+    path: 'ubicacion',
+    loadChildren: () => import('./pages/ubicacion/ubicacion.module').then(m => m.UbicacionPageModule)
   },
   {
     path: '',

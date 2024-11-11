@@ -18,7 +18,7 @@
             <ion-icon slot="start" name="person" color="secondary"></ion-icon>
             <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
             <ion-label>Perfil</ion-label></ion-item>
-          <ion-item *ngIf="isUser">
+          <ion-item (click)="navigateAndCloseMenu('/ubicacion')" *ngIf="isUser">
             <ion-icon slot="start" name="location" color="secondary"></ion-icon>
             <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
             <ion-label>Ubicación</ion-label>

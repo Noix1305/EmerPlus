@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button default-href="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mi Ubicación</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<div id="map" class="map-container"></div>
+<ion-button expand="full" (click)="actualizarUbicacion()" style="position: absolute; bottom: 20px; left: 20px;">
+  Actualizar Ubicación
+</ion-button>

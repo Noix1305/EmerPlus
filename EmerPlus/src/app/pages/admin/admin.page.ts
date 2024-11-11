@@ -32,6 +32,7 @@ export class AdminPage {
         this.rolUsuarioActivo = await this._rolService.obtenerNombreRol(this.usuarioActivo.rol[0]) || 'Desconocido';
       }
     }
+    console.log(this.rolUsuarioActivo)
   }
 
 

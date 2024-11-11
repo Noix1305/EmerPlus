@@ -44,6 +44,7 @@
               "core-js/modules/es.string.ends-with.js",
               "core-js/modules/es.string.includes.js",
               "core-js/modules/es.string.split.js",
+              "mapbox-gl",
               "rgbcolor"
             ],
             "assets": [
@@ -61,7 +62,8 @@
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
               "src/global.scss",
-              "src/theme/variables.scss"
+              "src/theme/variables.scss",
+              "node_modules/mapbox-gl/dist/mapbox-gl.css"
             ],
             "scripts": []
           },
@@ -75,8 +77,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "50kb",
-                  "maximumError": "100kb"
+                  "maximumWarning": "100kb",
+                  "maximumError": "150kb"
                 }
               ],
               "fileReplacements": [

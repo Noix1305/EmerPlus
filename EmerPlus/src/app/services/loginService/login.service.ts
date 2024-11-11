@@ -16,8 +16,8 @@ export class LoginService {
   // ID del rol por defecto (Usuario)
   defaultRoleId: number = 2;
   correo: string = '';
-  correoUserBD: string = environment.correoUserBD
-  passwordUserBD: string = environment.password
+  correoUserBD: string = keysUserBd.correoUserBD
+  passwordUserBD: string = keysUserBd.password
 
   constructor(
     private _usuarioService: UsuarioService,
