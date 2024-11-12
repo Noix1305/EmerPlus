@@ -23,6 +23,7 @@ if (!isAppflow && envFilePath) {
  envConfig = parse(readFileSync(envFilePath));
 
 } else {
+    console.log("Tntrando al Else");
 
  // Usa process.env directamente en Appflow
 
