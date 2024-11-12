@@ -22,40 +22,44 @@ let envConfig = {};
 
 if (!isAppflow && envFilePath) {
 
- envConfig = dotenv.parse(fs.readFileSync(envFilePath));
+    envConfig = dotenv.parse(fs.readFileSync(envFilePath));
 
 } else {
 
- // Usa process.env directamente en Appflow
+    // Usa process.env directamente en Appflow
 
- envConfig = {
+    envConfig = {
 
-  production: true,
+        production: true,
 
-  API_URL: process.env.API_URL || '',
+        API_URL: process.env.API_URL || '',
 
-  API_KEY_SUPABASE: process.env.API_KEY_SUPABASE || '',
+        API_KEY_SUPABASE: process.env.API_KEY_SUPABASE || '',
 
-  CORREO_USER_DB: process.env.CORREO_USER_DB || '',
+        CORREO_USER_DB: process.env.CORREO_USER_DB || '',
 
-  PASSWORD_DB: process.env.PASSWORD_DB || ''
+        PASSWORD_DB: process.env.PASSWORD_DB || ''
 
 
- };
+    };
 
 }
 
+console.log("Creando carpeta de entornos...");
 if (!fs.existsSync('./src/environments')) {
     fs.mkdirSync('./src/environments', { recursive: true });
+    console.log("Carpeta creada.");
+} else {
+    console.log("La carpeta ya existe.");
 }
 
 // Genera el archivo de entorno para Angular
 
 fs.writeFileSync(
 
- `./src/environments/${environmentFile}`,
+    `./src/environments/${environmentFile}`,
 
- 'export const environment = ' + JSON.stringify(envConfig) + ';'
+    'export const environment = ' + JSON.stringify(envConfig) + ';'
 
 );
 
