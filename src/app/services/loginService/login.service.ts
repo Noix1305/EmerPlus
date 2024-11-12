@@ -5,6 +5,7 @@ import { UsuarioService } from '../usuarioService/usuario.service';
 import { SupabaseService } from '../supabase_service/supabase.service';
 import { AuthResponse } from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
+import Swal from 'sweetalert2';
 
 
 
@@ -56,6 +57,12 @@ export class LoginService {
         }
       } else {
         console.error('Usuario no encontrado.');
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Usuario no encontrado.',
+          heightAuto: false
+        });
         return undefined; // No se encontró el usuario
       }
     } catch (error) {
