@@ -1,6 +1,8 @@
-import { readFileSync, writeFileSync } from 'fs';
+const fs = require('fs');
 
-import { parse } from 'dotenv';
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 
 
@@ -20,10 +22,9 @@ let envConfig = {};
 
 if (!isAppflow && envFilePath) {
 
- envConfig = parse(readFileSync(envFilePath));
+ envConfig = dotenv.parse(fs.readFileSync(envFilePath));
 
 } else {
-    console.log("Tntrando al Else");
 
  // Usa process.env directamente en Appflow
 
@@ -48,7 +49,7 @@ if (!isAppflow && envFilePath) {
 
 // Genera el archivo de entorno para Angular
 
-writeFileSync(
+fs.writeFileSync(
 
  `./src/environments/${environmentFile}`,
 

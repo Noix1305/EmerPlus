@@ -16,7 +16,7 @@
     "lint": "ng lint"
   },
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
     "@angular/animations": "^18.2.10",
     "@angular/cdk": "^18.2.11",
@@ -55,7 +55,9 @@
     "sweetalert2": "^11.14.4",
     "swiper": "^11.1.14",
     "tslib": "^2.3.0",
-    "zone.js": "~0.14.2"
+    "zone.js": "~0.14.2",
+    "fs": "^0.0.1"
+    
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.11",
