@@ -52,6 +52,7 @@ yarn-error.log
 !.vscode/extensions.json
 .history/*
 .env
+environment.prod.ts
 
 # Miscellaneous
 /.angular

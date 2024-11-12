@@ -1,8 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Capacitor } from '@capacitor/core';
-import { Geolocation } from '@capacitor/geolocation';
-import { LoadingController, ToastController } from '@ionic/angular';
-import mapboxgl from 'mapbox-gl';
+import { Loader } from '@googlemaps/js-api-loader';
 
 @Component({
   selector: 'app-ubicacion',
@@ -10,141 +7,93 @@ import mapboxgl from 'mapbox-gl';
   styleUrls: ['./ubicacion.page.scss'],
 })
 export class UbicacionPage implements OnInit {
-  map: mapboxgl.Map | undefined;
-  markers: mapboxgl.Marker[] = [];
+  map: google.maps.Map | undefined;
+  markers: google.maps.Marker[] = [];
+  currentMarker: google.maps.Marker | undefined; // Para mantener el marcador actual
 
-  constructor(private loadingController: LoadingController, private toastController: ToastController) { }
+  ngOnInit() {
+    const loader = new Loader({
+      apiKey: 'AIzaSyA3DnwSGKX33LN88ZILdR-6chgnorim2PA', // Reemplaza con tu API Key
+      version: 'weekly',
+      libraries: ['places', 'geometry', 'drawing'], // Asegúrate de incluir otras librerías necesarias
+    });
 
-  async ngOnInit() {
-    await this.presentLoading();
-    (mapboxgl as any).accessToken = 'pk.eyJ1IjoianBpbm8yNjEwIiwiYSI6ImNtMzBnaTF4YjBsYzgyaXB1b3A4MTF4MDgifQ.UHAesxhHmXsudPvRFjmsZg';
+    loader.load().then(() => {
+      this.initMap();
+    }).catch((error) => {
+      console.error('Error al cargar la API de Google Maps: ', error);
+    });
+  }
 
-    // Obtener la ubicación antes de inicializar el mapa
-    const ubicacion = await this.obtenerUbicacionActual();
+  initMap() {
+    // Verificar si la geolocalización está disponible
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Obtener la ubicación actual
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
 
-    if (ubicacion) {
-        const { latitud, longitud } = ubicacion;
-        this.mostrarToast(''+ubicacion.latitud + ubicacion.longitud);
+          // Crear un objeto LatLng para la ubicación del usuario
+          const userLatLng = new google.maps.LatLng(lat, lng);
 
-        // Inicializa el mapa con la ubicación obtenida
-        this.map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [longitud, latitud], // Usa la ubicación obtenida
-            zoom: 14 // Zoom deseado
-        });
+          // Inicializar el mapa con la ubicación actual
+          const mapOptions: google.maps.MapOptions = {
+            center: userLatLng,  // Usar la ubicación del usuario
+            zoom: 15,  // Aumentar el zoom para acercarse a la ubicación
+          };
 
-        // Añade un marcador en la ubicación inicial
-        const marker = new mapboxgl.Marker()
-            .setLngLat([longitud, latitud])
-            .addTo(this.map);
-        this.markers.push(marker);
+          // Crear el mapa en el elemento HTML con la id 'map'
+          this.map = new google.maps.Map(document.getElementById('map') as HTMLElement, mapOptions);
+
+          // Crear un marcador en la ubicación del usuario
+          this.currentMarker = new google.maps.Marker({
+            position: userLatLng,
+            map: this.map,
+          });
+
+          this.markers.push(this.currentMarker);
+        },
+        (error) => {
+          console.error('Error al obtener la ubicación: ', error);
+          // Si no se puede obtener la ubicación, mostrar un mensaje de error o usar una ubicación predeterminada
+          alert('No se pudo obtener la ubicación.');
+        }
+      );
     } else {
-        this.mostrarToast('No se pudo obtener la ubicación. Mostrando una ubicación predeterminada.');
-
-        // Inicializa el mapa en una ubicación predeterminada
-        this.map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/streets-v11',
-            center: [-74.5, 40], // Coordenadas predeterminadas
-            zoom: 12
-        });
+      alert('La geolocalización no es compatible con este navegador.');
     }
-}
+  }
 
-private async obtenerUbicacionActual(): Promise<{ latitud: number, longitud: number } | null> {
-    try {
-        // Verifica si la plataforma es nativa y solicita permisos
-        if (Capacitor.isNativePlatform()) {
-            const permission = await Geolocation.checkPermissions();
-            if (permission.location !== 'granted') {
-                const requestPermission = await Geolocation.requestPermissions();
-                if (requestPermission.location !== 'granted') {
-                    this.mostrarToast('Acceso a la ubicación denegado.');
-                    return null;
-                }
-            }
+  // Función para actualizar la ubicación
+  actualizarUbicacion() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          // Obtener la nueva ubicación
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          // Crear el nuevo LatLng
+          const newLatLng = new google.maps.LatLng(lat, lng);
+
+          // Actualizar el centro del mapa
+          if (this.map) {
+            this.map.setCenter(newLatLng);
+          }
+
+          // Mover el marcador a la nueva ubicación
+          if (this.currentMarker) {
+            this.currentMarker.setPosition(newLatLng);
+          }
+        },
+        (error) => {
+          console.error('Error al obtener la ubicación: ', error);
+          alert('No se pudo obtener la ubicación.');
         }
-
-        // Obtener la ubicación
-        const position = await Geolocation.getCurrentPosition();
-        return { latitud: position.coords.latitude, longitud: position.coords.longitude };
-
-    } catch (error) {
-        console.error('Error al obtener la ubicación:', error);
-        this.mostrarToast('Error al obtener la ubicación.');
-        return null;
-    }
-}
-
-  async verificarYObtenerUbicacion() {
-    // Verifica si estamos en un entorno de Capacitor
-    if (Capacitor.isNativePlatform()) {
-      const permission = await Geolocation.checkPermissions();
-
-      if (permission.location !== 'granted') {
-        const requestPermission = await Geolocation.requestPermissions();
-        if (requestPermission.location !== 'granted') {
-          this.mostrarToast('Acceso a la ubicación denegado. No se puede acceder a GPS.');
-          return;
-        }
-      }
-    }
-
-    // Si estamos en un navegador o se han otorgado los permisos, carga la ubicación en el mapa
-    await this.cargarUbicacionEnMapa();
-  }
-
-  async cargarUbicacionEnMapa() {
-    const ubicacion = await this.obtenerUbicacionActual();
-    try {
-      if (ubicacion) {
-        const { latitud, longitud } = ubicacion;
-
-        console.log('Coordenadas obtenidas:', ubicacion);
-
-        if (this.map) {
-          this.map.setCenter([longitud, latitud]);
-          this.map.setZoom(14);
-
-          // Crea un nuevo marcador y lo añade al mapa
-          const marker = new mapboxgl.Marker()
-            .setLngLat([longitud, latitud])
-            .addTo(this.map);
-
-          this.markers.push(marker);
-        } else {
-          console.error('El mapa no está inicializado');
-        }
-      } else {
-        console.error('No se pudo obtener la ubicación.');
-        this.mostrarToast('No se pudo obtener la ubicación.');
-      }
-    } catch (error) {
-      console.error('Error al cargar la ubicación en el mapa:', error);
-      this.mostrarToast('Error al cargar la ubicación en el mapa.');
+      );
+    } else {
+      alert('La geolocalización no es compatible con este navegador.');
     }
   }
-
-  async presentLoading() {
-    const loading = await this.loadingController.create({
-      message: 'Cargando...',
-      duration: 1000,
-    });
-    await loading.present();
-  }
-
-  async mostrarToast(mensaje: string) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: 60000,
-      position: 'bottom'
-    });
-    toast.present();
-  }
-
-  async actualizarUbicacion() {
-    await this.cargarUbicacionEnMapa(); // Vuelve a cargar la ubicación en el mapa
-}
-
 }
