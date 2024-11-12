@@ -55,8 +55,7 @@
     "sweetalert2": "^11.14.4",
     "swiper": "^11.1.14",
     "tslib": "^2.3.0",
-    "zone.js": "~0.14.2",
-    "fs": "^0.0.1"
+    "zone.js": "~0.14.2"
     
   },
   "devDependencies": {
