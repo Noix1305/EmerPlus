@@ -5,9 +5,9 @@ import { Resend } from 'resend';
 
 dotenv.config(); // Carga las variables de entorno
 
-const resend = new Resend(process.env.RESEND_API_KEY); // Inicializa Resend con tu clave API
+const resend = new Resend('re_8iD8Ahsf_8eP8hAbquPyF1F3dQXtRgE7H'); // Inicializa Resend con tu clave API
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
 app.use(cors()); // Permite todas las solicitudes
 

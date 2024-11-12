@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { createClient } from '@supabase/supabase-js';
-import { environment } from '../../environments/environment'; // Asegúrate de que esta ruta es correcta
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
