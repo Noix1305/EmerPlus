@@ -45,6 +45,13 @@ if (!isAppflow && envFilePath) {
 
 }
 
+console.log("Creando carpeta de entornos...");
+if (!fs.existsSync('./src/environments')) {
+    fs.mkdirSync('./src/environments', { recursive: true });
+    console.log("Carpeta creada.");
+} else {
+    console.log("La carpeta ya existe.");
+}
 
 // Genera el archivo de entorno para Angular
 
