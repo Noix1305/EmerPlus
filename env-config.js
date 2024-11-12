@@ -45,7 +45,9 @@ if (!isAppflow && envFilePath) {
 
 }
 
-
+if (!fs.existsSync('./src/environments')) {
+    fs.mkdirSync('./src/environments', { recursive: true });
+}
 
 // Genera el archivo de entorno para Angular
 
