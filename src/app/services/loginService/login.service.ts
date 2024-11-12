@@ -4,7 +4,7 @@ import { firstValueFrom } from 'rxjs';
 import { UsuarioService } from '../usuarioService/usuario.service';
 import { SupabaseService } from '../supabase_service/supabase.service';
 import { AuthResponse } from '@supabase/supabase-js';
-import { keysUserBd } from 'src/environments/environment.prod';
+import { environment } from 'src/environments/environment';
 
 
 
@@ -17,8 +17,8 @@ export class LoginService {
   // ID del rol por defecto (Usuario)
   defaultRoleId: number = 2;
   correo: string = '';
-  correoUserBD: string = keysUserBd.CORREO_USER_DB
-  passwordUserBD: string = keysUserBd.PASSWORD_DB
+  correoUserBD: string = environment.CORREO_USER_DB
+  passwordUserBD: string = environment.PASSWORD_DB
 
   constructor(
     private _usuarioService: UsuarioService,
