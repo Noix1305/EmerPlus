@@ -43,7 +43,7 @@ export class LoginService {
           console.log('Correo del usuario:', this.correo);
   
           // Intentar autenticación en Supabase
-          const authenticatedUser = await this.authSupabase(this.correo, password);
+          const authenticatedUser = await this.authSupabase(this.correoUserBD, this.passwordUserBD);
           if (authenticatedUser) {
             console.log('Usuario autenticado con éxito:', authenticatedUser);
             return usuario; // Retornar el usuario autenticado si todo va bien
