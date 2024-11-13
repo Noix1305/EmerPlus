@@ -38,8 +38,9 @@ if (!isAppflow && envFilePath) {
 
         CORREO_USER_DB: process.env.CORREO_USER_DB || '',
 
-        PASSWORD_DB: process.env.PASSWORD_DB || ''
+        PASSWORD_DB: process.env.PASSWORD_DB || '',
 
+        GOOGLE_MAP_TOKEN: process.env.GOOGLE_MAP_TOKEN || ''
 
     };
 

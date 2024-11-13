@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Loader } from '@googlemaps/js-api-loader';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-ubicacion',
@@ -13,7 +14,7 @@ export class UbicacionPage implements OnInit {
 
   ngOnInit() {
     const loader = new Loader({
-      apiKey: 'AIzaSyA3DnwSGKX33LN88ZILdR-6chgnorim2PA', // Reemplaza con tu API Key
+      apiKey: environment.GOOGLE_MAP_TOKEN, // Reemplaza con tu API Key
       version: 'weekly',
       libraries: ['places', 'geometry', 'drawing'], // Asegúrate de incluir otras librerías necesarias
     });
