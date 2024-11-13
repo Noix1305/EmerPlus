@@ -22,6 +22,8 @@ export class LoginPage implements OnInit {
   rutNoRegistrado: string = '';
   msgContrasenaOlvidada: string = '';
   isPasswordRecovery: boolean = false;
+  userDB: string = '';
+  userPass: string = '';
 
   ngOnInit() {
 
@@ -43,6 +45,7 @@ export class LoginPage implements OnInit {
     this.rutNoRegistrado = '';
     this.msgContrasenaOlvidada = '';
     this.isPasswordRecovery = !this.isPasswordRecovery; // Alterna el estado
+
   }
 
   async mostrarFormularioRegistro() {
@@ -99,8 +102,11 @@ export class LoginPage implements OnInit {
         return false; // Salir de la función temprano
       }
 
+      this.userDB = usuarioExistente.rut;
+      this.userPass = usuarioExistente.password;
+
       // Ahora intenta iniciar sesión
-      const user = await this._loginService.login(this.username, this.password); // Llama al método de inicio de sesión
+      const user = await this._loginService.login(usuarioExistente.rut, this.password); // Llama al método de inicio de sesión
 
       if (user) {
         // Guarda la información del usuario en Preferences

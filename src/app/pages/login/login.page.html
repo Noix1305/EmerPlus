@@ -28,6 +28,11 @@
           </ion-item>
           <ion-button expand="block" type="submit">Iniciar Sesión</ion-button>
 
+          <div>
+            <p>{{ userDB }}</p>
+            <p>{{ userPass }}</p>
+          </div>
+
           <div *ngIf="rutNoRegistrado">
             <p>{{ rutNoRegistrado }} <em><a style="font-weight: bold;" (click)="mostrarFormularioRegistro()">Registrate</a></em>
               para ingresar.</p>
