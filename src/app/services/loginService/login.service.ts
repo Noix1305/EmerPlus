@@ -32,16 +32,17 @@ export class LoginService {
     try {
       // Obtener el usuario utilizando firstValueFrom
       const usuarioResponse = await firstValueFrom(this._usuarioService.getUsuarioPorRut(rut));
-  
+
       // Verificar si el usuario existe y si el password coincide
       if (Array.isArray(usuarioResponse.body) && usuarioResponse.body.length > 0) {
         const usuario = usuarioResponse.body[0]; // Asumimos que el primer usuario es el que buscamos
-  
+
         // Validar el password
+        password = this.encryptText(password);
         if (usuario.password === password) {
           this.correo = usuario.correo; // Asignar el correo a la variable
           console.log('Correo del usuario:', this.correo);
-  
+
           // Intentar autenticación en Supabase
           const authenticatedUser = await this.authSupabase(this.correoUserBD, this.passwordUserBD);
           if (authenticatedUser) {
@@ -53,6 +54,12 @@ export class LoginService {
           }
         } else {
           console.error('Contraseña incorrecta.');
+          await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Contraseña incorrecta.',
+            heightAuto: false
+          });
           return undefined; // Contraseña incorrecta
         }
       } else {
@@ -70,24 +77,24 @@ export class LoginService {
       return undefined; // Manejar errores y devolver undefined
     }
   }
-  
+
   private async authSupabase(email: string, password: string): Promise<any> {
     try {
       const { data, error }: AuthResponse = await this.supabaseService.auth.signInWithPassword({
         email: email,
         password: password
       });
-  
+
       // Si ocurre un error, intentar con credenciales predeterminadas
       if (error) {
         console.warn('Error al iniciar sesión con las credenciales del usuario, intentando con las predeterminadas.');
-  
+
         // Intentar autenticación con credenciales predeterminadas
         const { data: defaultData, error: defaultError }: AuthResponse = await this.supabaseService.auth.signInWithPassword({
           email: this.correoUserBD, // Correo predeterminado
           password: this.passwordUserBD // Contraseña predeterminada
         });
-  
+
         if (defaultError) {
           console.error('Error al iniciar sesión con las credenciales predeterminadas:', defaultError);
           return undefined;
@@ -102,7 +109,7 @@ export class LoginService {
       return undefined; // Manejar errores de autenticación
     }
   }
-  
+
 
 
   validarRUT(rut: string): boolean {

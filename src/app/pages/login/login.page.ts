@@ -86,15 +86,12 @@ export class LoginPage implements OnInit {
     this.errorMessage = ''; // Reinicia los mensajes de error
     this.rutNoRegistrado = ''; // Reinicia el mensaje de RUT no registrado
 
-    const rut = this.username; // Usa el RUT como nombre de usuario
-    const password = this._loginService.encryptText(this.password); // Encripta la contraseña del formulario
-
     try {
       // Obtiene los usuarios activos directamente como un observable
       const usuariosActivos: Usuario[] = await firstValueFrom(this._usuarioService.obtenerUsuarios());
 
       // Usar el tipo de usuario aquí
-      const usuarioExistente = usuariosActivos.find((usuario: Usuario) => usuario.rut === rut);
+      const usuarioExistente = usuariosActivos.find((usuario: Usuario) => usuario.rut === this.username);
 
       if (!usuarioExistente) {
         // Si el usuario no existe, solicita el registro
@@ -103,7 +100,7 @@ export class LoginPage implements OnInit {
       }
 
       // Ahora intenta iniciar sesión
-      const user = await this._loginService.login(rut, password); // Llama al método de inicio de sesión
+      const user = await this._loginService.login(this.username, this.password); // Llama al método de inicio de sesión
 
       if (user) {
         // Guarda la información del usuario en Preferences

@@ -4,10 +4,7 @@ import { Preferences } from '@capacitor/preferences';
 import { Usuario } from './models/usuario';
 import { UsuarioService } from './services/usuarioService/usuario.service';
 import { MenuController } from '@ionic/angular'; // Importar MenuController
-import { register } from 'swiper/element/bundle'; 
 import { Subscription } from 'rxjs';
-
-register();
 
 @Component({
   selector: 'app-root',
