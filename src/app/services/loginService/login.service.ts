@@ -35,33 +35,31 @@ export class LoginService {
 
       // Verificar si el usuario existe y si el password coincide
       if (Array.isArray(usuarioResponse.body) && usuarioResponse.body.length > 0) {
-        const usuario = usuarioResponse.body[0]; // Asumimos que el primer usuario es el que buscamos
+        const usuario = usuarioResponse.body[0];
+        return usuario; // Asumimos que el primer usuario es el que buscamos
 
         // Validar el password
-        password = this.encryptText(password);
-        if (usuario.password === password) {
-          this.correo = usuario.correo; // Asignar el correo a la variable
-          console.log('Correo del usuario:', this.correo);
-
-          // Intentar autenticación en Supabase
-          const authenticatedUser = await this.authSupabase(this.correoUserBD, this.passwordUserBD);
-          if (authenticatedUser) {
-            console.log('Usuario autenticado con éxito:', authenticatedUser);
-            return usuario; // Retornar el usuario autenticado si todo va bien
-          } else {
-            console.error('Error al autenticar con Supabase.');
-            return undefined; // Manejar el error si no se puede autenticar en Supabase
-          }
-        } else {
-          console.error('Contraseña incorrecta.');
-          await Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Contraseña incorrecta.',
-            heightAuto: false
-          });
-          return undefined; // Contraseña incorrecta
-        }
+        // password = this.encryptText(password);
+        // if (usuario.password === password) {
+        //   // Intentar autenticación en Supabase
+        //   const authenticatedUser = await this.authSupabase(this.correoUserBD, this.passwordUserBD);
+        //   if (authenticatedUser) {
+        //     console.log('Usuario autenticado con éxito:', authenticatedUser);
+        //     return usuario; // Retornar el usuario autenticado si todo va bien
+        //   } else {
+        //     console.error('Error al autenticar con Supabase.');
+        //     return undefined; // Manejar el error si no se puede autenticar en Supabase
+        //   }
+        // } else {
+        //   console.error('Contraseña incorrecta.');
+        //   await Swal.fire({
+        //     icon: 'error',
+        //     title: 'Error',
+        //     text: 'Contraseña incorrecta.',
+        //     heightAuto: false
+        //   });
+        //   return undefined; // Contraseña incorrecta
+        // }
       } else {
         console.error('Usuario no encontrado.');
         await Swal.fire({
