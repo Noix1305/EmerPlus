@@ -31,7 +31,7 @@ export class SupabaseService {
       await Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: '' + error,
+        text: '' + error.message,
         heightAuto: false
       });
       return { url: null, error };
