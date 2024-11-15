@@ -2,17 +2,15 @@ import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
+import { AuthService } from '../auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseService {
-  private supabase: SupabaseClient;
-  bucket: string = 'images'
+  private supabase = createClient(environment.API_URL, environment.API_KEY_SUPABASE);
 
-  constructor() {
-    this.supabase = createClient(environment.API_URL, environment.API_KEY_SUPABASE);
-  }
+  constructor(private authService: AuthService) { }
 
   get client() {
     return this.supabase;
@@ -23,10 +21,16 @@ export class SupabaseService {
   }
 
   async uploadFile(bucket: string, path: string, file: File): Promise<{ url: string | null; error: any }> {
-    // Subir el archivo al bucket
+
+    const user = this.authService.getUser();
+
+    if (!user) {
+      // Si no está autenticado, redirigir al login o pedir credenciales
+      await this.redirectToLogin();
+      return { url: null, error: 'Usuario no autenticado' };
+    }
     const { data, error } = await this.supabase.storage.from(bucket).upload(path, file);
 
-    // Si hay un error, retornarlo
     if (error) {
       await Swal.fire({
         icon: 'error',
@@ -37,11 +41,20 @@ export class SupabaseService {
       return { url: null, error };
     }
 
-    // Si la carga fue exitosa, obtenemos la URL pública
     const { data: { publicUrl } } = this.supabase.storage.from(bucket).getPublicUrl(path);
-
-    // Retornamos la URL pública y el posible error
     return { url: publicUrl, error: null };
+
+  }
+
+
+  // Redirigir al usuario a la página de login si no está autenticado
+  private async redirectToLogin() {
+    const credentials = { email: environment.CORREO_USER_DB, password: environment.PASSWORD_DB };
+
+    // Si el usuario ha ingresado datos, intentar loguearlo
+    if (credentials) {
+      await this.authService.login(credentials.email, credentials.password);
+    }
   }
 
 }

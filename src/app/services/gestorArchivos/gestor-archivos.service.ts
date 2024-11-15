@@ -10,6 +10,7 @@ import { SupabaseService } from '../supabase_service/supabase.service';
 export class GestorArchivosService implements OnInit {
 
   usuario: Usuario | null = null;
+  bucket: string = 'images';
 
   constructor(
     private supabaseService: SupabaseService
@@ -21,7 +22,7 @@ export class GestorArchivosService implements OnInit {
 
   async uploadPhoto(file: File, ruta: string): Promise<string | null> {
     const path = ruta + '/' + `${this.usuario?.rut}_${file.name}`;
-    const uploadResult = await this.supabaseService.uploadFile('images', path, file);
+    const uploadResult = await this.supabaseService.uploadFile(this.bucket, path, file);
 
     // Asegúrate de que la estructura de `uploadResult` es correcta
     if (uploadResult.url) {

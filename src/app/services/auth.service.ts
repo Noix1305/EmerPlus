@@ -42,4 +42,9 @@ export class AuthService {
     const token = await localStorage.getItem('auth-token');
     return !!token;
   }
+
+  // Cambié de `user()` a `getUser()`
+  getUser() {
+    return this.supabase.auth.getUser();
+  }
 }
