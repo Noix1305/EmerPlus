@@ -31,7 +31,6 @@ export class DashboardPage implements OnInit {
   notificaciones: Notificacion[] = []
 
   constructor(
-    private alertController: AlertController,
     private emergenciaService: SolicitudDeEmergenciaService,
     private router: Router,
     private _notificacionService: NotificacionService,

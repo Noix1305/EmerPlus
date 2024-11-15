@@ -10,7 +10,6 @@ export class SupabaseService {
   bucket: string = 'images'
 
   constructor() {
-    console.log(environment.API_URL)
     this.supabase = createClient(environment.API_URL, environment.API_KEY_SUPABASE);
   }
 
