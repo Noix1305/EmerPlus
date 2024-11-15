@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
+import Swal from 'sweetalert2';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +28,12 @@ export class SupabaseService {
 
     // Si hay un error, retornarlo
     if (error) {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: '' + error,
+        heightAuto: false
+      });
       return { url: null, error };
     }
 
