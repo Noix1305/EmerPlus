@@ -34,31 +34,35 @@ export class GestorArchivosService implements OnInit {
 
   async tomarFotoDesdeCamara(): Promise<File | undefined> {
     let file: File | undefined;
-  
+
     try {
-      // Tomamos la foto desde la cámara
+      // Tomar foto desde la cámara
       const image = await Camera.getPhoto({
         resultType: CameraResultType.Uri,  // Queremos la URI de la imagen
         source: CameraSource.Camera,       // Usar la cámara para tomar la foto
         quality: 90,                       // Calidad de la imagen
       });
-  
-      // Verificamos si la imagen tiene una URI válida
+
+      // Verificar si la URI es válida
       if (image && image.webPath) {
-        // Hacemos una solicitud de la imagen usando la URI
+        // Intentar obtener la imagen desde la URI
         const response = await fetch(image.webPath);
-        const blob = await response.blob(); // Convertimos la respuesta en un blob
-  
-        // Creamos un objeto File a partir del blob
+        const blob = await response.blob();  // Convertir a blob
+
+        // Crear un objeto File a partir del blob
         file = new File([blob], `foto_${new Date().getTime()}.jpg`, { type: blob.type });
+        console.log('Foto tomada correctamente:', file);
+      } else {
+        console.error('No se obtuvo la URI de la foto');
       }
     } catch (error) {
       console.error('Error al tomar la foto:', error);
     }
-  
-    // Retornamos el archivo si fue creado, o undefined si hubo un error
+
+    // Retornar el archivo si se creó correctamente o undefined en caso de error
     return file;
   }
+
 
   async seleccionarFotoDesdeGaleria(): Promise<File | undefined> {
     let file: File | undefined;
