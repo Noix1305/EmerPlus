@@ -26,9 +26,12 @@ export class SupabaseService {
 
     if (!user) {
       // Si no está autenticado, redirigir al login o pedir credenciales
-      await this.redirectToLogin();
-      return { url: null, error: 'Usuario no autenticado' };
+      const authSuccess = await this.redirectToLogin();
+      if (!authSuccess) {
+        return { url: null, error: 'Usuario no autenticado' };
+      }
     }
+
     const { data, error } = await this.supabase.storage.from(bucket).upload(path, file);
 
     if (error) {
@@ -43,18 +46,26 @@ export class SupabaseService {
 
     const { data: { publicUrl } } = this.supabase.storage.from(bucket).getPublicUrl(path);
     return { url: publicUrl, error: null };
-
   }
 
-
   // Redirigir al usuario a la página de login si no está autenticado
-  private async redirectToLogin() {
+  private async redirectToLogin(): Promise<boolean> {
     const credentials = { email: environment.CORREO_USER_DB, password: environment.PASSWORD_DB };
 
     // Si el usuario ha ingresado datos, intentar loguearlo
     if (credentials) {
-      await this.authService.login(credentials.email, credentials.password);
+      const success = await this.authService.login(credentials.email, credentials.password);
+      return success; // Retorna true si el login fue exitoso, false si falló
+    } else {
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'No se pudo acceder a las credenciales',
+        heightAuto: false
+      });
     }
+
+    return false;
   }
 
 }
