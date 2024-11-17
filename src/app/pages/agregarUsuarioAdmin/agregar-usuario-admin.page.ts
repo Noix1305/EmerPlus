@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { LoadingController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { Usuario } from 'src/app/models/usuario';
+import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
@@ -27,6 +28,7 @@ export class AgregarUsuarioAdminPage implements OnInit {
   constructor(
     private loadingController: LoadingController,
     private _usuarioService: UsuarioService,
+    private _encriptadorService: EncriptadorService,
     private _loginService: LoginService) { }
 
   ngOnInit() {
@@ -58,7 +60,7 @@ export class AgregarUsuarioAdminPage implements OnInit {
       return;
     }
 
-    passwordFinal = this._loginService.encryptText(this.password);
+    passwordFinal = this._encriptadorService.encrypt(this.password);
 
     const newUser: Usuario = {
       rut: this.rut,

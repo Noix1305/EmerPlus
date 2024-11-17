@@ -2,9 +2,9 @@ import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { UsuarioService } from '../services/usuarioService/usuario.service';
 import { CrearUsuario } from '../models/crearUsuario';
-import { LoginService } from '../services/loginService/login.service';
+import { EncriptadorService } from '../services/encriptador/encriptador.service';
 
-export async function mostrarFormularioRegistro(usuarioService: UsuarioService, loginService: LoginService) {
+export async function mostrarFormularioRegistro(usuarioService: UsuarioService, encriptadorService: EncriptadorService) {
   const { value: formValues } = await Swal.fire({
     title: 'Registro de Usuario',
     html: `
@@ -50,7 +50,7 @@ export async function mostrarFormularioRegistro(usuarioService: UsuarioService, 
 
   if (formValues) {
     console.log('Datos del usuario:', formValues);
-    registrarUsuario(formValues, usuarioService, loginService);
+    registrarUsuario(formValues, usuarioService, encriptadorService);
     // Aquí puedes llamar a un servicio de registro o procesar los datos como necesites.
     // Por ejemplo:
     // await this.authService.registerUser(formValues.rut, formValues.correo, formValues.password);
@@ -60,8 +60,8 @@ export async function mostrarFormularioRegistro(usuarioService: UsuarioService, 
 async function registrarUsuario(
   formValues: { rut: string; correo: string; password: string },
   usuarioService: UsuarioService,
-  loginService: LoginService) {
-    
+  encriptadorService: EncriptadorService) {
+
   let errorMessage = ''; // Reiniciar el mensaje de error
   let successMessage = ''; // Reiniciar el mensaje de éxito
   const defaultRoleId = 2;
@@ -83,7 +83,7 @@ async function registrarUsuario(
 
     const nuevoUsuario: CrearUsuario = {
       rut: formValues.rut,
-      password: loginService.encryptText(formValues.password),
+      password: encriptadorService.encrypt(formValues.password),
       rol: [defaultRoleId],
       correo: formValues.correo,
       estado: 1

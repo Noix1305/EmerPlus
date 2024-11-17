@@ -4,37 +4,45 @@ import { Preferences } from '@capacitor/preferences';
 import { LoadingController } from '@ionic/angular';
 import { Usuario } from 'src/app/models/usuario';
 import { RolService } from 'src/app/services/rolService/rol.service';
+import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service'; // Importar el servicio de encriptación
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.page.html',
   styleUrls: ['./admin.page.scss'],
 })
-export class AdminPage {
+export class AdminPage implements OnInit {
 
   constructor(
     private router: Router,
     private _rolService: RolService,
-    private loadingController: LoadingController) { }
+    private loadingController: LoadingController,
+    private _encriptadorService: EncriptadorService // Inyectar el servicio de encriptación
+  ) { }
 
   rolUsuarioActivo: string = '';
   usuarioActivo: Usuario | null = null;
 
-
   async ngOnInit() {
     await this.presentLoading();
+    
+    // Obtener el valor encriptado desde Preferences
     const { value } = await Preferences.get({ key: 'userInfo' });
 
     if (value) {
-      this.usuarioActivo = JSON.parse(value) as Usuario;
+      // Desencriptar el valor obtenido
+      const decryptedValue = this._encriptadorService.decrypt(value);
+
+      // Parsear el valor desencriptado a un objeto Usuario
+      this.usuarioActivo = JSON.parse(decryptedValue) as Usuario;
+
       if (this.usuarioActivo) {
         // Si obtenerNombreRol devuelve undefined, se asigna 'Desconocido' como valor por defecto
         this.rolUsuarioActivo = await this._rolService.obtenerNombreRol(this.usuarioActivo.rol[0]) || 'Desconocido';
       }
     }
-    console.log(this.rolUsuarioActivo)
+    console.log(this.rolUsuarioActivo);
   }
-
 
   // Función para ver todas las solicitudes
   verSolicitudes() {
@@ -63,8 +71,6 @@ export class AdminPage {
   verSolicitudesAmbulancia() { }
 
   // Función para salir de la sesión
-
-
   async cerrarSesion() {
     console.log('Cerrando sesión...'); // Asegúrate de que esto se imprima en la consola
     try {
@@ -86,6 +92,4 @@ export class AdminPage {
     });
     await loading.present();
   }
-
-
 }

@@ -16,6 +16,7 @@ import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergenc
 import { Geolocation } from '@capacitor/geolocation';
 
 import Swal, { SweetAlertIcon } from 'sweetalert2';
+import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 
 
 @Component({
@@ -36,26 +37,48 @@ export class DashboardPage implements OnInit {
     private _notificacionService: NotificacionService,
     private _contactoService: ContactosemergenciaService,
     private popoverController: PopoverController,
-    private _gestorArchivos: GestorArchivosService
+    private _gestorArchivos: GestorArchivosService,
+    private _encriptadorService: EncriptadorService
   ) { }
 
   async ngOnInit() {
-
     // Intenta obtener el usuario desde la navegación anterior
     this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
+
     if (!this.usuario) {
       const { value } = await Preferences.get({ key: 'userInfo' });
 
       if (value) {
-        this.usuario = JSON.parse(value) as Usuario; // Convierte el JSON a Usuario
+        try {
+          // Desencriptar el valor usando el servicio de desencriptación
+          const decryptedData = this._encriptadorService.decrypt(value);
+
+          if (decryptedData) {
+            this.usuario = JSON.parse(decryptedData) as Usuario; // Convierte el JSON desencriptado a Usuario
+          } else {
+            console.error('Error al desencriptar los datos');
+            this.mostrarSwal('error', 'Error', 'Hubo un problema al cargar los datos del usuario.');
+          }
+        } catch (error) {
+          console.error('Error al parsear JSON o desencriptar:', error);
+          this.mostrarSwal('error', 'Error', 'Hubo un problema al cargar los datos del usuario.');
+        }
       } else {
         console.log('No se encontró el usuario en Preferences.');
       }
     } else {
       console.log('Usuario obtenido desde la navegación:', this.usuario);
     }
-    await this.someFunction();
-    console.log(this.notificaciones[0].fecha)
+
+    // Cargar las notificaciones
+    await this.cargarNotificacionesNuevas();
+
+    // Verificar que 'notificaciones' tiene al menos un elemento antes de acceder a su primer elemento
+    if (this.notificaciones.length > 0) {
+      console.log(this.notificaciones[0].fecha);
+    } else {
+      console.log('No hay notificaciones disponibles.');
+    }
   }
 
   limpiarNotificaciones(ev: MouseEvent) {
@@ -64,16 +87,22 @@ export class DashboardPage implements OnInit {
   }
 
   async mostrarNotificaciones(ev: MouseEvent): Promise<void> {
-    const popover = await this.popoverController.create({
-      component: NotificacionPopoverComponent,
-      event: ev, // Pasa el evento para la posición
-      componentProps: {
-        notificaciones: this.notificaciones // Pasa las notificaciones aquí
-      }
-
-    });
-
-    await popover.present();
+    // Verifica si hay notificaciones
+    if (this.notificaciones && this.notificaciones.length > 0) {
+      // Si hay notificaciones, muestra el popover
+      const popover = await this.popoverController.create({
+        component: NotificacionPopoverComponent,
+        event: ev, // Pasa el evento para la posición
+        componentProps: {
+          notificaciones: this.notificaciones // Pasa las notificaciones aquí
+        }
+      });
+  
+      await popover.present();
+    } else {
+      // Si no hay notificaciones, muestra el Swal
+      this.mostrarSwal('info', 'Sin notificaciones', 'No hay notificaciones nuevas.');
+    }
   }
 
 
@@ -332,28 +361,32 @@ export class DashboardPage implements OnInit {
       });
     });
   }
-  cargarNotificacionesNuevas() {
+  async cargarNotificacionesNuevas() {
     const rut = this.usuario?.rut; // Utiliza el operador de encadenamiento opcional
 
-    // Verifica que el rut no sea undefined
     if (!rut) {
       console.error('El RUT del usuario es indefinido.');
-      return Promise.reject('RUT indefinido'); // Devuelve una promesa rechazada si el RUT es indefinido
+      return Promise.reject('RUT indefinido');
     }
 
     return new Promise<void>((resolve, reject) => {
       this._notificacionService.obtenerNotificacionesUsuario(rut).subscribe({
         next: (response: HttpResponse<Notificacion[]>) => {
-          // Extrae las notificaciones del cuerpo de la respuesta
-          this.notificaciones = response.body || []; // Almacena las notificaciones obtenidas
+          // Verifica que las notificaciones sean válidas antes de asignarlas
+          if (Array.isArray(response.body)) {
+            this.notificaciones = response.body;
+          } else {
+            console.error('Respuesta de notificaciones inválida:', response.body);
+            reject('Notificaciones inválidas');
+          }
         },
         error: (error) => {
           console.error('Error al cargar las notificaciones:', error);
-          reject(error); // Rechaza la promesa si hay un error
+          reject(error);
         },
         complete: () => {
           console.log('Carga de notificaciones completa.');
-          resolve(); // Resuelve la promesa al completar
+          resolve();
         }
       });
     });

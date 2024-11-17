@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
-import { AuthService } from '../auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +9,7 @@ import { AuthService } from '../auth.service';
 export class SupabaseService {
   private supabase = createClient(environment.API_URL, environment.API_KEY_SUPABASE);
 
-  constructor(private authService: AuthService) { }
+  constructor() { }
 
   get client() {
     return this.supabase;

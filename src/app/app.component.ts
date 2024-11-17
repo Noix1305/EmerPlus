@@ -5,6 +5,7 @@ import { Usuario } from './models/usuario';
 import { UsuarioService } from './services/usuarioService/usuario.service';
 import { MenuController } from '@ionic/angular'; // Importar MenuController
 import { Subscription } from 'rxjs';
+import { EncriptadorService } from './services/encriptador/encriptador.service'; // Importar el servicio de encriptación
 
 @Component({
   selector: 'app-root',
@@ -20,10 +21,13 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private _usuarioService: UsuarioService,
-    private menu: MenuController // Inyectar MenuController
-  ) {}
+    private menu: MenuController, // Inyectar MenuController
+    private _encriptadorService: EncriptadorService // Inyectar el servicio de encriptación
+  ) { }
 
   ngOnInit() {
+    // Obtener y desencriptar el usuario al iniciar la aplicación
+    this._usuarioService.cargarUsuario();
     this.userSubscription = this._usuarioService.usuario$.subscribe((usuario) => {
       this.usuario = usuario;
       if (this.usuario) {
@@ -35,9 +39,6 @@ export class AppComponent implements OnInit, OnDestroy {
         this.isUser = false;
       }
     });
-
-    // Cargar el usuario al iniciar la aplicación
-    this._usuarioService.cargarUsuario();
   }
 
   ngOnDestroy() {
@@ -47,7 +48,7 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ionViewWillEnter() {
-    this.verificarRol(); 
+    this.verificarRol();
   }
 
   verificarRol() {
@@ -60,11 +61,31 @@ export class AppComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Método para cargar el usuario desde Preferences y desencriptarlo
+  async cargarUsuario() {
+    const { value } = await Preferences.get({ key: 'userInfo' });
+    console.log('Valor recuperado de Preferences:', value); // Agregar este log
+
+    if (value) {
+      // Desencriptar y parsear solo si el valor es válido
+      const decryptedValue = this._encriptadorService.decrypt(value);
+      console.log('Valor desencriptado:', decryptedValue); // Agregar este log
+
+      try {
+        this.usuario = JSON.parse(decryptedValue);
+        // Aquí continuar con la lógica de rol y demás
+      } catch (error) {
+        console.error('Error al parsear el JSON:', error);
+      }
+    }
+  }
+
   async cerrarSesion() {
     console.log('Cerrando sesión...');
     try {
-      await Preferences.remove({ key: 'userInfo' }); 
-      this.navigateAndCloseMenu('/home')
+      // Eliminar datos de Preferences
+      await Preferences.remove({ key: 'userInfo' });
+      this.navigateAndCloseMenu('/home');
       console.log('Sesión cerrada y datos eliminados de Preferences.');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);

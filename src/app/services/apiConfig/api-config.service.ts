@@ -52,18 +52,20 @@ export class ApiConfigService {
     );
   }
 
-  patch<T>(path: string, data: any, params?: HttpParams): Observable<HttpResponse<T>> {
-    return this.httpClient.patch<T>(`${this.urlBase}/rest/v1/${path}`, // Agregar '/rest/v1/' a la URL
+  patch<T>(path: string, data: any, options: { headers?: HttpHeaders, observe?: 'response', params?: HttpParams } = {}): Observable<HttpResponse<T>> {
+    return this.httpClient.patch<T>(
+      `${this.urlBase}/rest/v1/${path}`,
       data,
       {
-        headers: this.getHeaders(),
-        observe: 'response',
-        params
-      })
-      .pipe(
-        catchError(this.handleError)
-      );
+        ...options,
+        headers: options.headers || this.getHeaders(), // Usa el valor de `headers` pasado o el valor por defecto
+        observe: 'response',  // Define `observe: 'response'` aquí para asegurarte de que devuelva el HttpResponse completo
+      }
+    ).pipe(
+      catchError(this.handleError)
+    );
   }
+  
 
   patchParcial<T>(path: string, userModel: Partial<T>, params?: HttpParams): Observable<HttpResponse<T>> {
     return this.httpClient.patch<T>(`${this.urlBase}/rest/v1/${path}`, // Agregar '/rest/v1/' a la URL

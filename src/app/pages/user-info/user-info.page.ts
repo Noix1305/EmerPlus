@@ -3,7 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { AlertController, IonModal, ModalController, ToastController } from '@ionic/angular';
+import { IonModal, ModalController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { firstValueFrom } from 'rxjs';
 import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pass.component';
@@ -12,7 +12,7 @@ import { Contacto } from 'src/app/models/contacto';
 import { Region } from 'src/app/models/region';
 import { Usuario } from 'src/app/models/usuario';
 import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
-import { LoginService } from 'src/app/services/loginService/login.service';
+import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
@@ -85,10 +85,10 @@ export class UserInfoPage {
     private _rolService: RolService,
     private _usuarioService: UsuarioService,
     private _regionComunaService: RegionComunaService,
-    private toastController: ToastController,
     private fb: FormBuilder,
     private modalCtrl: ModalController,
-    private _contactoService: ContactosemergenciaService) {
+    private _contactoService: ContactosemergenciaService,
+    private _encriptadorService: EncriptadorService) {
 
     this.form = this.fb.group({
       nombre: ['', Validators.required],
@@ -105,67 +105,54 @@ export class UserInfoPage {
   async ngOnInit() {
     this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
 
-    this.cargarRegiones();
-    this.cargarComunas();
+  this.cargarRegiones();
+  this.cargarComunas();
 
-    if (!this.usuario) {
-      const { value } = await Preferences.get({ key: 'userInfo' });
+  if (!this.usuario) {
+    const { value } = await Preferences.get({ key: 'userInfo' });
 
-      if (value) {
-        this.usuario = JSON.parse(value) as Usuario; // Convierte el JSON a Usuario
-        console.log('Usuario obtenido de Preferences:', this.usuario);
-      } else {
-        console.log('No se encontró el usuario en Preferences.');
+    if (value) {
+      try {
+        // Desencripta el valor antes de parsearlo
+        const decryptedValue = this._encriptadorService.decrypt(value);
+        
+        // Verifica que la desencriptación haya sido exitosa
+        if (decryptedValue) {
+          // Intenta parsear el JSON solo si la desencriptación fue exitosa
+          this.usuario = JSON.parse(decryptedValue) as Usuario;
+          console.log('Usuario obtenido de Preferences:', this.usuario);
+        } else {
+          console.error('La desencriptación no fue exitosa');
+        }
+      } catch (error) {
+        console.error('Error al desencriptar o parsear JSON:', error);
       }
     } else {
-      console.log('Usuario obtenido desde la navegación:', this.usuario);
+      console.log('No se encontró el usuario en Preferences.');
     }
+  } else {
+    console.log('Usuario obtenido desde la navegación:', this.usuario);
+  }
 
     if (this.usuario) {
-      this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
-        next: (response) => {
-          console.log('Respuesta del servicio de contacto:', response); // Agregado para depuración
-          if (response.body && response.body.length > 0) {
-            this.contacto = response.body[0];
-            this.usuario.contactoEmergencia = this.contacto;
-            console.log('Contacto de emergencia obtenido:', this.usuario.contactoEmergencia); // Verificar el contacto
-          } else {
-            console.log('No se encontró ningún contacto de emergencia.'); // Manejo del caso sin contacto
-          }
-        },
-        error: (error) => {
-          console.error('Error al obtener contacto:', error);
-        },
-        complete: async () => {
-          console.log('Solicitud completada');
-          if (this.usuario.contactoEmergencia) {
-            await Preferences.set({
-              key: 'contacto',
-              value: JSON.stringify(this.usuario.contactoEmergencia) // Convierte el objeto de contacto a string
-            });
-            console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);
-          } else {
-            console.log('No hay contacto de emergencia para guardar');
-          }
-        }
-      });
 
-
-      if (this.usuario.comunaid) { // Reemplaza 'id' con la propiedad correspondiente que estés usando
+      this.getContacto();
+      console.log("Comuna ID: " + this.usuario.comunaid + "||" + "Región ID: " + this.usuario.regionid)
+      if (this.usuario.comunaid) {
         this.getNombreComunaPorId(this.usuario.comunaid);
       } else {
         console.error('El ID de comuna es undefined');
       }
-
-      if (this.usuario.regionid) { // Reemplaza 'id' con la propiedad correspondiente que estés usando
+  
+      if (this.usuario.regionid) {
         this.getNombreRegionPorId(this.usuario.regionid);
       } else {
         console.error('El ID de comuna es undefined');
       }
-
+  
       if (this.usuario.rol && this.usuario.rol.length > 0) {
         const rolId = this.usuario.rol[0];
-
+  
         const rolDesdeServicio = await this._rolService.obtenerRolPorId(rolId);
         this.rolUsuario = rolDesdeServicio ? rolDesdeServicio.nombre : undefined;
       } else {
@@ -174,26 +161,40 @@ export class UserInfoPage {
     }
   }
 
+
   async openChangePasswordModal() {
     if (this.usuario) {
       try {
         const modal = await this.modalCtrl.create({
           component: CambiarPassComponent,
           componentProps: {
-
-            rut: this.usuario.rut, // Enviar el RUT al modal
-            password: this.usuario.password, // Enviar la contraseña actual
+            rut: this.usuario.rut,
+            password: this.usuario.password
           }
+        });
+
+        // Presenta el modal
+        await modal.present();
+
+        // Escucha el evento de cierre para actualizar el usuario si se cambió la contraseña
+        const { data } = await modal.onDidDismiss();
+        if (data && data.success) {
+          console.log("Pass: " + data.nuevaContrasena)
+          // Actualiza la contraseña del usuario en `this.usuario`
+          this.usuario.password = data.nuevaContrasena;
+
+          // También puedes actualizar `Preferences` si es necesario
+          await Preferences.set({
+            key: 'userInfo',
+            value: JSON.stringify(this.usuario)
+          });
         }
-        );
-        return await modal.present();
       } catch (error) {
-        return error;
+        console.error('Error al abrir el modal:', error);
       }
-    } else {
-      return;
     }
   }
+
 
   getComunasPorRegion(idRegion: number) {
     this._regionComunaService.getComunaPorRegion(idRegion).subscribe({
@@ -479,6 +480,47 @@ export class UserInfoPage {
     }
   }
 
+  async getContacto() {
+    this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
+      next: (response) => {
+        console.log('Respuesta del servicio de contacto:', response);
+        if (response.body && response.body.length > 0) {
+          this.contacto = response.body[0];
+
+          // Verifica si el contacto de emergencia es necesario
+          if (this.contacto) {
+            this.usuario.contactoEmergencia = this.contacto;
+
+            // Si es necesario, puedes también desencriptar el contacto de emergencia aquí, si fue guardado previamente
+            if (this.usuario.contactoEmergencia) {
+              const decryptedContact = this._encriptadorService.decrypt(JSON.stringify(this.usuario.contactoEmergencia));
+              this.usuario.contactoEmergencia = JSON.parse(decryptedContact);
+            }
+
+            console.log('Contacto de emergencia obtenido:', this.usuario.contactoEmergencia);
+          }
+        } else {
+          console.log('No se encontró ningún contacto de emergencia.');
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener contacto:', error);
+      },
+      complete: async () => {
+        console.log('Solicitud completada');
+        if (this.usuario.contactoEmergencia) {
+          await Preferences.set({
+            key: 'contacto',
+            value: this._encriptadorService.encrypt(JSON.stringify(this.usuario.contactoEmergencia)) // Guarda el contacto de emergencia de forma encriptada
+          });
+          console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);
+        } else {
+          console.log('No hay contacto de emergencia para guardar');
+        }
+      }
+    });
+  }
+
   async activarSwal(titulo: string, mensaje: string, icono: SweetAlertIcon, textoBoton: string) {
     await Swal.fire({
       title: titulo,
@@ -519,8 +561,6 @@ export class UserInfoPage {
     this.closeModal(this.modalContacto);
 
   }
-
-
 
   get correoUsuario(): string {
     return this.usuario?.correo || '';

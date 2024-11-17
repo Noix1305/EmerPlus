@@ -6,6 +6,7 @@ import { SupabaseService } from '../supabase_service/supabase.service';
 import { AuthResponse } from '@supabase/supabase-js';
 import { environment } from 'src/environments/environment';
 import Swal from 'sweetalert2';
+import { EncriptadorService } from '../encriptador/encriptador.service';
 
 
 
@@ -23,7 +24,8 @@ export class LoginService {
 
   constructor(
     private _usuarioService: UsuarioService,
-    private supabaseService: SupabaseService) {
+    private supabaseService: SupabaseService,
+    private _encriptadorService: EncriptadorService) {
   }
 
   mostrarUsuarios() { }
@@ -36,32 +38,22 @@ export class LoginService {
       // Verificar si el usuario existe y si el password coincide
       if (Array.isArray(usuarioResponse.body) && usuarioResponse.body.length > 0) {
         const usuario = usuarioResponse.body[0];
-        // Asumimos que el primer usuario es el que buscamos
+        // Desencriptar la contraseña almacenada en la base de datos
+        const decryptedPassword = this._encriptadorService.decrypt(usuario.password);
 
-        // Validar el password
-        password = this.encryptText(password);
-        if (usuario.password === password) {
+        // Comparar la contraseña proporcionada con la desencriptada
+        if (decryptedPassword === password) {
           return usuario;
+        } else {
+          console.error('Contraseña incorrecta.');
+          await Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Contraseña incorrecta.',
+            heightAuto: false
+          });
+          return undefined; // Contraseña incorrecta
         }
-        //   // Intentar autenticación en Supabase
-        //   const authenticatedUser = await this.authSupabase(this.correoUserBD, this.passwordUserBD);
-        //   if (authenticatedUser) {
-        //     console.log('Usuario autenticado con éxito:', authenticatedUser);
-        //     return usuario; // Retornar el usuario autenticado si todo va bien
-        //   } else {
-        //     console.error('Error al autenticar con Supabase.');
-        //     return undefined; // Manejar el error si no se puede autenticar en Supabase
-        //   }
-        // } else {
-        //   console.error('Contraseña incorrecta.');
-        //   await Swal.fire({
-        //     icon: 'error',
-        //     title: 'Error',
-        //     text: 'Contraseña incorrecta.',
-        //     heightAuto: false
-        //   });
-        //   return undefined; // Contraseña incorrecta
-        // }
       } else {
         console.error('Usuario no encontrado.');
         await Swal.fire({
@@ -76,9 +68,8 @@ export class LoginService {
       console.error('Error al obtener el usuario o durante la autenticación:', error);
       return undefined; // Manejar errores y devolver undefined
     }
-
-    return undefined;
   }
+
 
   private async authSupabase(email: string, password: string): Promise<any> {
     try {
