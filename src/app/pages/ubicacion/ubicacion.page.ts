@@ -37,6 +37,8 @@ export class UbicacionPage implements OnInit {
       if (this.solicitud?.latitud && this.solicitud?.longitud) {
         // Asegúrate de que las coordenadas son cadenas antes de pasarlas a initMap
         this.initMap(this.solicitud.latitud.toString(), this.solicitud.longitud.toString());
+      } else {
+        this.initMap();
       }
     }).catch((error) => {
       console.error('Error al cargar la API de Google Maps: ', error);
@@ -45,42 +47,45 @@ export class UbicacionPage implements OnInit {
 
   }
 
-  initMap(latitud: string, longitud: string) {
+  initMap(latitud?: string, longitud?: string) {
     if (latitud && longitud) {
+      // Si hay parámetros de latitud y longitud, inicializa el mapa con esos valores.
       this.iniciarConParametros(latitud, longitud);
-      console.log('Hay Parametros')
+      console.log('Hay Parametros');
     } else {
-      // Si los parámetros están vacíos, usa la geolocalización
-      if (navigator.geolocation) {
-        this.iniciarSinParametros();
-        console.log('No Hay Parametros')
-      } else {
-        alert('La geolocalización no es compatible con este navegador.');
-      }
+      console.log('No Hay Parametros');
+      this.iniciarSinParametros();
     }
   }
 
-
   async iniciarSinParametros() {
+    console.log("Iniciando sin parametros...");
     try {
-      // Verifica si ya se tienen permisos para acceder a la ubicación
+      // Verifica si ya se tienen permisos para acceder a la ubicación.
+      console.log("Comprobando permisos de ubicación...");
       const permission = await Geolocation.checkPermissions();
+      console.log('Permiso actual: ', permission);
 
       if (permission.location !== 'granted') {
-        // Si no se tienen permisos, solicita permisos
+        // Si no se tienen permisos, solicita permisos.
+        console.log("Solicitando permisos...");
         const requestPermission = await Geolocation.requestPermissions();
+        console.log('Respuesta de solicitud de permisos: ', requestPermission);
 
         if (requestPermission.location !== 'granted') {
+          console.error('No se ha concedido permiso para acceder a la ubicación.');
           alert('No se ha concedido permiso para acceder a la ubicación.');
           return;
         }
       }
 
-      // Si se conceden los permisos, obtiene la ubicación
+      // Si se conceden los permisos, obtiene la ubicación.
+      console.log("Obteniendo la ubicación...");
       const position = await Geolocation.getCurrentPosition();
+      console.log('Ubicación obtenida:', position);
+
       const lat = position.coords.latitude;
       const lng = position.coords.longitude;
-
       const userLatLng = new google.maps.LatLng(lat, lng);
 
       const mapOptions: google.maps.MapOptions = {
@@ -88,17 +93,20 @@ export class UbicacionPage implements OnInit {
         zoom: 15,
       };
 
-      // Asegúrate de que el div con id="map" existe
+      // Asegúrate de que el div con id="map" existe y tiene tamaño.
       const mapElement = document.getElementById('map') as HTMLElement;
 
       if (mapElement) {
+        console.log("Cargando mapa...");
         this.map = new google.maps.Map(mapElement, mapOptions);
 
-        // Crear el marcador con la ubicación actual
+        // Crear el marcador con la ubicación actual.
         this.currentMarker = new google.maps.Marker({
           position: userLatLng,
           map: this.map,
         });
+
+        console.log("Mapa cargado correctamente.");
       } else {
         console.error('No se encontró el contenedor del mapa');
       }
@@ -107,6 +115,7 @@ export class UbicacionPage implements OnInit {
       alert('No se pudo obtener la ubicación.');
     }
   }
+
 
 
   iniciarConParametros(latitud: string, longitud: string) {
