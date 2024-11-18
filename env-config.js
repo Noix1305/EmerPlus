@@ -64,7 +64,5 @@ fs.writeFileSync(
 
 );
 
-
-
 console.log(`Archivo de entorno generado en ${environmentFile} para el entorno ${process.env.ENV || 'desarrollo'}`);
 

@@ -7,8 +7,8 @@ import { firstValueFrom } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
 import Swal from 'sweetalert2';
-import { environment } from 'src/environments/environment';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-login',
@@ -26,7 +26,6 @@ export class LoginPage implements OnInit {
   isPasswordRecovery: boolean = false;
 
   ngOnInit() {
-
   }
 
   constructor(
@@ -34,6 +33,7 @@ export class LoginPage implements OnInit {
     private _usuarioService: UsuarioService,
     private _encriptadorService: EncriptadorService,
     private router: Router,
+    private loadingController: LoadingController
   ) { }
 
   togglePasswordRecovery() {
@@ -54,6 +54,12 @@ export class LoginPage implements OnInit {
   }
 
   async onSubmitForgotPassword(event: Event): Promise<void> {
+
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+    });
+
+    await loading.present();
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
@@ -68,11 +74,13 @@ export class LoginPage implements OnInit {
         text: this.errorMessage,
         heightAuto: false
       });
+      loading.dismiss();
       return;
     }
 
     try {
       await this._usuarioService.enviarContraseñaPorRut(rut);
+      loading.dismiss();
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Error durante la recuperación de contraseña:', error.message);
@@ -85,39 +93,46 @@ export class LoginPage implements OnInit {
   }
 
   async handleLoginSubmit(event: Event) {
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+    });
+    await loading.present();
     event.preventDefault(); // Evita que el formulario se envíe por defecto
-  
+
     this.errorMessage = ''; // Reinicia los mensajes de error
     this.rutNoRegistrado = ''; // Reinicia el mensaje de RUT no registrado
-  
+
     try {
       // Obtiene los usuarios activos directamente como un observable
       const usuariosActivos: Usuario[] = await firstValueFrom(this._usuarioService.obtenerUsuarios());
-  
+
       // Usar el tipo de usuario aquí
       const usuarioExistente = usuariosActivos.find((usuario: Usuario) => usuario.rut === this.username);
-  
+
       if (!usuarioExistente) {
         // Si el usuario no existe, solicita el registro
         this.rutNoRegistrado = 'El RUT ingresado no se encuentra registrado. ';
-        return false; // Salir de la función temprano
+        loading.dismiss();
+        return; // Salir de la función temprano
       }
-  
+
       // Ahora intenta iniciar sesión
       const user = await this._loginService.login(usuarioExistente.rut, this.password); // Llama al método de inicio de sesión
-  
+
       if (user) {
         // Encriptar el usuario antes de guardarlo en Preferences
         const encryptedUser = this._encriptadorService.encrypt(JSON.stringify(user)); // Encriptar el objeto del usuario
-  
+
         // Guarda la información del usuario en Preferences de forma encriptada
         await Preferences.set({
           key: 'userInfo',
           value: encryptedUser // Guardamos el usuario encriptado
         });
-  
+
         this._usuarioService.actualizarUsuario(user);
-  
+
+        loading.dismiss();
+
         // Navegar según el rol del usuario
         if ([1, 3, 4, 5].includes(user.rol[0])) {
           this.router.navigate(['admin']);
@@ -126,10 +141,12 @@ export class LoginPage implements OnInit {
         } else {
           this.router.navigate(['home']);
         }
-  
+
+
       } else {
         // Si la contraseña es incorrecta
         this.errorMessage = 'Credenciales incorrectas'; // Maneja credenciales incorrectas
+        loading.dismiss();
         return false; // No permite el acceso
       }
     } catch (error) {
@@ -138,10 +155,10 @@ export class LoginPage implements OnInit {
       console.error('Error en el login:', error); // Registra el error
       return false; // No permite el acceso
     }
-  
+
     return false; // Valor por defecto al final de la función
   }
-  
+
 }
 
 

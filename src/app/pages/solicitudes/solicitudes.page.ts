@@ -38,7 +38,7 @@ export class SolicitudesPage implements OnInit {
 
   ngOnInit() {
     this.solicitudes = [];
-    this.solicitudesUsuario = []; 
+    this.solicitudesUsuario = [];
     this.solicitudesFiltradas = [];
 
     this.cargarSolicitudes();
@@ -145,6 +145,12 @@ export class SolicitudesPage implements OnInit {
       })
     );
   }
+
+  verEnMapa(solicitud: SolicitudDeEmergencia) {
+    // Navegar a la página de ubicación y pasar los parámetros latitud y longitud
+    this.router.navigate(['/ubicacion'], { state: { solicitud } });
+  }
+
 
   generarPDF() {
     const doc = new jsPDF();

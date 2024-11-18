@@ -28,6 +28,10 @@
             <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
             <p>Estado: {{ solicitud.estadoDescripcion }}</p>
           </ion-label>
+          <!-- Botón para ver la solicitud en el mapa -->
+          <ion-button color="primary" (click)="verEnMapa(solicitud)">
+            Ver en el mapa
+          </ion-button>
         </ion-item>
       </ion-list>
     </ion-card>
@@ -73,7 +77,6 @@
           <ion-button expand="full" color="warning" (click)="limpiarFiltro()">Limpiar Filtro</ion-button>
           <ion-button expand="full" color="primary" (click)="filtrar()">Filtrar</ion-button>
         </div>
-
       </form>
     </ion-card>
 
@@ -91,15 +94,18 @@
               <p>Estado: {{ solicitud.estadoDescripcion }}</p>
             </ion-label>
           </ion-item>
-    
+
+          <!-- Botón para ver la solicitud en el mapa -->
           <ion-item-options *ngIf="rolUsuario === 2" side="end">
+            <ion-item-option color="primary" (click)="verEnMapa(solicitud)">
+              Ver en el mapa
+            </ion-item-option>
             <ion-item-option color="secondary" >Cancelar</ion-item-option>
             <ion-item-option color="danger" >Eliminar</ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
     </ion-card>
-    
 
     <!-- Mensaje si no hay solicitudes filtradas -->
     <p *ngIf="solicitudesFiltradas.length === 0">No hay solicitudes filtradas.</p>

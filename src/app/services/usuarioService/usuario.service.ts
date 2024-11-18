@@ -252,19 +252,44 @@ export class UsuarioService {
     const result = await Preferences.get({ key: 'userInfo' });
     const value = result.value;
   
-    console.log('Valor recuperado de userInfo:', value); // Esto te ayudará a ver qué tienes almacenado
+    console.log('Valor recuperado de userInfo:', value); // Verifica el valor almacenado
   
     if (value) {
       try {
-        const usuario = JSON.parse(value) as Usuario;
-        this.usuarioSubject.next(usuario); // Emite el nuevo usuario
+        // Validar que el valor es un JSON antes de intentar parsearlo
+        if (this.esJsonValido(value)) {
+          const usuario = JSON.parse(value) as Usuario;
+          this.usuarioSubject.next(usuario); // Emite el nuevo usuario
+        } else {
+          console.error('El valor almacenado no es un JSON válido');
+          await Preferences.remove({ key: 'userInfo' }); // Eliminar el valor corrupto
+        }
       } catch (error) {
         console.error('Error al parsear el JSON:', error);
-        // Elimina el valor corrupto si el parseo falla
-        await Preferences.remove({ key: 'userInfo' });
+        await Preferences.remove({ key: 'userInfo' }); // Eliminar el valor corrupto si el parseo falla
       }
     } else {
       console.log('No hay información del usuario');
+    }
+  }
+  
+  // Función para verificar si una cadena es un JSON válido
+  esJsonValido(str: string): boolean {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+  
+
+  async guardarUsuario(usuario: Usuario) {
+    try {
+      const value = JSON.stringify(usuario);  // Convertir el objeto a JSON
+      await Preferences.set({ key: 'userInfo', value });
+    } catch (error) {
+      console.error('Error al guardar el usuario:', error);
     }
   }
   

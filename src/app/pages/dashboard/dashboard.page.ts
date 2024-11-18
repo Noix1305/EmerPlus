@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { AlertController, PopoverController } from '@ionic/angular';
+import { AlertController, LoadingController, PopoverController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { NotificacionPopoverComponent } from 'src/app/components/notificacionPopover/notificacion-popover/notificacion-popover.component';
 import { Contacto } from 'src/app/models/contacto';
@@ -38,11 +38,16 @@ export class DashboardPage implements OnInit {
     private _contactoService: ContactosemergenciaService,
     private popoverController: PopoverController,
     private _gestorArchivos: GestorArchivosService,
-    private _encriptadorService: EncriptadorService
+    private _encriptadorService: EncriptadorService,
+    private loadingController: LoadingController
   ) { }
 
   async ngOnInit() {
     // Intenta obtener el usuario desde la navegación anterior
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+    });
+    await loading.present();
     this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
 
     if (!this.usuario) {
@@ -79,6 +84,8 @@ export class DashboardPage implements OnInit {
     } else {
       console.log('No hay notificaciones disponibles.');
     }
+
+    loading.dismiss();
   }
 
   limpiarNotificaciones(ev: MouseEvent) {
@@ -97,7 +104,7 @@ export class DashboardPage implements OnInit {
           notificaciones: this.notificaciones // Pasa las notificaciones aquí
         }
       });
-  
+
       await popover.present();
     } else {
       // Si no hay notificaciones, muestra el Swal
@@ -283,9 +290,6 @@ export class DashboardPage implements OnInit {
       return null; // Maneja el error según sea necesario
     }
   }
-
-
-
 
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {
     if (this.usuario) {

@@ -105,34 +105,34 @@ export class UserInfoPage {
   async ngOnInit() {
     this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
 
-  this.cargarRegiones();
-  this.cargarComunas();
+    this.cargarRegiones();
+    this.cargarComunas();
 
-  if (!this.usuario) {
-    const { value } = await Preferences.get({ key: 'userInfo' });
+    if (!this.usuario) {
+      const { value } = await Preferences.get({ key: 'userInfo' });
 
-    if (value) {
-      try {
-        // Desencripta el valor antes de parsearlo
-        const decryptedValue = this._encriptadorService.decrypt(value);
-        
-        // Verifica que la desencriptación haya sido exitosa
-        if (decryptedValue) {
-          // Intenta parsear el JSON solo si la desencriptación fue exitosa
-          this.usuario = JSON.parse(decryptedValue) as Usuario;
-          console.log('Usuario obtenido de Preferences:', this.usuario);
-        } else {
-          console.error('La desencriptación no fue exitosa');
+      if (value) {
+        try {
+          // Desencripta el valor antes de parsearlo
+          const decryptedValue = this._encriptadorService.decrypt(value);
+
+          // Verifica que la desencriptación haya sido exitosa
+          if (decryptedValue) {
+            // Intenta parsear el JSON solo si la desencriptación fue exitosa
+            this.usuario = JSON.parse(decryptedValue) as Usuario;
+            console.log('Usuario obtenido de Preferences:', this.usuario);
+          } else {
+            console.error('La desencriptación no fue exitosa');
+          }
+        } catch (error) {
+          console.error('Error al desencriptar o parsear JSON:', error);
         }
-      } catch (error) {
-        console.error('Error al desencriptar o parsear JSON:', error);
+      } else {
+        console.log('No se encontró el usuario en Preferences.');
       }
     } else {
-      console.log('No se encontró el usuario en Preferences.');
+      console.log('Usuario obtenido desde la navegación:', this.usuario);
     }
-  } else {
-    console.log('Usuario obtenido desde la navegación:', this.usuario);
-  }
 
     if (this.usuario) {
 
@@ -143,16 +143,16 @@ export class UserInfoPage {
       } else {
         console.error('El ID de comuna es undefined');
       }
-  
+
       if (this.usuario.regionid) {
         this.getNombreRegionPorId(this.usuario.regionid);
       } else {
         console.error('El ID de comuna es undefined');
       }
-  
+
       if (this.usuario.rol && this.usuario.rol.length > 0) {
         const rolId = this.usuario.rol[0];
-  
+
         const rolDesdeServicio = await this._rolService.obtenerRolPorId(rolId);
         this.rolUsuario = rolDesdeServicio ? rolDesdeServicio.nombre : undefined;
       } else {
@@ -484,20 +484,29 @@ export class UserInfoPage {
     this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
       next: (response) => {
         console.log('Respuesta del servicio de contacto:', response);
+
+        // Verifica que la respuesta tenga datos
         if (response.body && response.body.length > 0) {
           this.contacto = response.body[0];
 
-          // Verifica si el contacto de emergencia es necesario
+          // Verifica si hay un contacto de emergencia
           if (this.contacto) {
-            this.usuario.contactoEmergencia = this.contacto;
-
-            // Si es necesario, puedes también desencriptar el contacto de emergencia aquí, si fue guardado previamente
+            // Verifica si el contacto de emergencia ya está presente
             if (this.usuario.contactoEmergencia) {
-              const decryptedContact = this._encriptadorService.decrypt(JSON.stringify(this.usuario.contactoEmergencia));
-              this.usuario.contactoEmergencia = JSON.parse(decryptedContact);
-            }
+              try {
+                const decryptedContact = this._encriptadorService.decrypt(JSON.stringify(this.usuario.contactoEmergencia));
 
-            console.log('Contacto de emergencia obtenido:', this.usuario.contactoEmergencia);
+                // Verifica si el JSON desencriptado es válido antes de parsear
+                if (this.esJsonValido(decryptedContact)) {
+                  this.usuario.contactoEmergencia = JSON.parse(decryptedContact);
+                  console.log('Contacto de emergencia desencriptado:', this.usuario.contactoEmergencia);
+                } else {
+                  console.error('El valor desencriptado no es un JSON válido');
+                }
+              } catch (error) {
+                console.error('Error al desencriptar el contacto de emergencia:', error);
+              }
+            }
           }
         } else {
           console.log('No se encontró ningún contacto de emergencia.');
@@ -508,18 +517,41 @@ export class UserInfoPage {
       },
       complete: async () => {
         console.log('Solicitud completada');
+
+        // Solo guarda el contacto si es válido
         if (this.usuario.contactoEmergencia) {
-          await Preferences.set({
-            key: 'contacto',
-            value: this._encriptadorService.encrypt(JSON.stringify(this.usuario.contactoEmergencia)) // Guarda el contacto de emergencia de forma encriptada
-          });
-          console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);
+          try {
+            // Verifica si el contacto de emergencia es un JSON válido
+            const contactoString = JSON.stringify(this.usuario.contactoEmergencia);
+            if (this.esJsonValido(contactoString)) {
+              await Preferences.set({
+                key: 'contacto',
+                value: this._encriptadorService.encrypt(contactoString) // Guarda el contacto de emergencia de forma encriptada
+              });
+              console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);
+            } else {
+              console.error('El contacto de emergencia no es un JSON válido para guardar.');
+            }
+          } catch (error) {
+            console.error('Error al guardar el contacto de emergencia:', error);
+          }
         } else {
           console.log('No hay contacto de emergencia para guardar');
         }
       }
     });
   }
+
+  // Función para verificar si una cadena es un JSON válido
+  esJsonValido(str: string): boolean {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
 
   async activarSwal(titulo: string, mensaje: string, icono: SweetAlertIcon, textoBoton: string) {
     await Swal.fire({

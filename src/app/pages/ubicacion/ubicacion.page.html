@@ -1,15 +1,15 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
     <ion-title>
       Ubicación
     </ion-title>
   </ion-toolbar>
 </ion-header>
+<!-- Mapa -->
 
 <ion-content>
-  <!-- Mapa -->
   <div id="map" style="height: 100%;"></div>
-
-  <!-- Botón para actualizar ubicación -->
-  <ion-button (click)="actualizarUbicacion()">Actualizar Ubicación</ion-button>
 </ion-content>
