@@ -19,8 +19,9 @@ import { HOY, AYER, SEMANA, MES, RUTA_ADMIN, RUTA_DASHBOARD, RUTA_MAPA, RUTA_GES
 export class SolicitudesPage implements OnInit {
   solicitudes: SolicitudDeEmergencia[] = [];
   solicitudPatch: SolicitudPatch | undefined;
-  solicitudesUsuario: SolicitudDeEmergencia[] = [];
   solicitudesFiltradas: SolicitudDeEmergencia[] = [];
+  solicitudesAsignadas: SolicitudDeEmergencia[] = [];
+
   esAdmin = false;
   usuario: Usuario | null = null;
   esUsuario = false;
@@ -47,7 +48,6 @@ export class SolicitudesPage implements OnInit {
 
   private async inicializarDatos() {
     this.solicitudes = [];
-    this.solicitudesUsuario = [];
     this.solicitudesFiltradas = [];
     await this.cargarSolicitudes();
   }
@@ -75,50 +75,79 @@ export class SolicitudesPage implements OnInit {
   }
 
   async cargarSolicitudes() {
+    let solicitudes: SolicitudDeEmergencia[]; // Define solicitudes con el tipo esperado.
+
     try {
-      let solicitudes = await this._solicitudService.obtenerSolicitudesPorRol(this.rolUsuario);
+      if (!this.esUsuario) {
+        solicitudes = await this._solicitudService.obtenerSolicitudesPorRol(this.rolUsuario);
+        console.log('Solicitudes obtenidas desde el servicio:', solicitudes);
+      } else {
+        // Usa await para obtener el array de solicitudes.
+        solicitudes = await this._solicitudService.obtenerSolicitudes();
+      }
+
       solicitudes = await this.procesarSolicitudes(solicitudes);
-      console.log('Todas las solicitudes: ' + solicitudes.length)
-      solicitudes.forEach(s => console.log('Entidad: ' + s.entidad));
-      this.filtrarSolicitudesPorRol(solicitudes);
+      console.log('Solicitudes procesadas:', solicitudes);
+
+      solicitudes.forEach(s => console.log('Entidad:', s.entidad));
+
+      // Filtra las solicitudes según el rol del usuario
+      this.solicitudes = this.filtrarSolicitudesPorRol(solicitudes);
+
       if (!this.solicitudes.length) console.warn('No se encontraron solicitudes.');
+
     } catch (error) {
       console.error('Error al cargar las solicitudes:', error);
     }
   }
 
-  private async filtrarSolicitudesPorRol(solicitudes: SolicitudDeEmergencia[]) {
-    if (this.esAdmin) {
-      this.solicitudes = solicitudes;
-      this.solicitudesUsuario = await this.procesarSolicitudes(solicitudes);
-    } else if (this.esUsuario) {
-      const rutUsuario = this.usuario?.rut;
-      const solicitudesFiltradas = solicitudes.filter((s) => s.usuario_id === rutUsuario);
-      this.solicitudes = solicitudesFiltradas;
-      this.solicitudesUsuario = await this.procesarSolicitudes(solicitudesFiltradas);
-    } else {
-      const solicitudesFiltradas = solicitudes.filter(s => s.entidad === this.rolUsuario);
-      this.solicitudes = solicitudesFiltradas;
-      this.solicitudesUsuario = await this.procesarSolicitudes(solicitudesFiltradas);
+  private filtrarSolicitudesPorRol(solicitudes: SolicitudDeEmergencia[]): SolicitudDeEmergencia[] {
+    switch (this.rolUsuario) {
+      case 2: // Usuario puede ver todas sus solicitudes
+        return solicitudes.filter(solicitud => solicitud.usuario_id === this.usuario?.rut);
+      case 3: // Bomberos
+        return solicitudes.filter(solicitud => solicitud.entidad === 3);
+      case 4: // Policía
+        return solicitudes.filter(solicitud => solicitud.entidad === 4);
+      case 5: // Ambulancia
+        return solicitudes.filter(solicitud => solicitud.entidad === 5);
+      default: // Si el rol no coincide, devolver un array vacío o manejar de otra forma
+        return [];
     }
   }
 
+  private async filtrarSolicitudesAsignadas() {
+    return this.solicitudes.filter(s => s.asignada === this.usuario?.rut);
+  }
+
+  private async verSolicitudesAsignadas() {
+    this.solicitudesAsignadas = await this.filtrarSolicitudesAsignadas();
+  }
+
   async filtrarSolicitudes() {
+    console.log("Solicitudes antes de filtrar:", this.solicitudes);
+    console.log("Fecha desde:", this.fechaDesde, "Fecha hasta:", this.fechaHasta);
+    console.log("Estado filtro:", this.estadoFiltro);
+
     const solicitudesFiltradas = this.solicitudes.filter((solicitud) => {
       const fechaSolicitud = new Date(solicitud.fecha);
       return (
         this.filtrarPorFecha(fechaSolicitud) &&
-        this.filtrarPorEstado(solicitud.estado) &&
-        this.filtrarSolicitudesPorRol(this.solicitudes)
+        this.filtrarPorEstado(solicitud.estado)
       );
     });
+
     this.solicitudesFiltradas = await this.procesarSolicitudes(solicitudesFiltradas);
-    console.log("Cantidad de solicitudes: " + solicitudesFiltradas.length)
+    console.log("Solicitudes después de filtrar:", solicitudesFiltradas);
   }
 
   private filtrarPorFecha(fechaSolicitud: Date): boolean {
     const fechaDesdeDate = this.obtenerFechaFiltro(this.fechaDesde);
     const fechaHastaDate = this.obtenerFechaFiltro(this.fechaHasta);
+
+    console.log("Fecha de la solicitud:", fechaSolicitud);
+    console.log("Fecha desde filtro:", fechaDesdeDate, "Fecha hasta filtro:", fechaHastaDate);
+
     const fechaValida = fechaDesdeDate ? fechaSolicitud >= fechaDesdeDate : true;
     const hastaValida = fechaHastaDate ? fechaSolicitud <= fechaHastaDate : true;
     return fechaValida && hastaValida;
@@ -136,6 +165,7 @@ export class SolicitudesPage implements OnInit {
   }
 
   private filtrarPorEstado(estado: number): boolean {
+    console.log("Estado de la solicitud:", estado, "Estado filtro:", this.estadoFiltro);
     return this.estadoFiltro === '0' || estado === Number(this.estadoFiltro);
   }
 
@@ -187,23 +217,23 @@ export class SolicitudesPage implements OnInit {
     this.router.navigate([RUTA_MAPA], { state: { solicitud } });
   }
 
-  generarPDF() {
-    const doc = new jsPDF();
-    const title = 'Reporte de Solicitudes de Emergencia';
-    doc.setFontSize(16);
-    doc.text(title, 10, 10);
+  // generarPDF() {
+  //   const doc = new jsPDF();
+  //   const title = 'Reporte de Solicitudes de Emergencia';
+  //   doc.setFontSize(16);
+  //   doc.text(title, 10, 10);
 
-    const head = [['ID', 'Tipo', 'Fecha', 'Ubicación']];
-    const data = this.solicitudesUsuario.map(solicitud => [
-      solicitud.id,
-      solicitud.tipo,
-      solicitud.fecha,
-      `${solicitud.latitud}, ${solicitud.longitud}`
-    ]);
+  //   const head = [['ID', 'Tipo', 'Fecha', 'Ubicación']];
+  //   const data = this.solicitudesUsuario.map(solicitud => [
+  //     solicitud.id,
+  //     solicitud.tipo,
+  //     solicitud.fecha,
+  //     `${solicitud.latitud}, ${solicitud.longitud}`
+  //   ]);
 
-    (doc as any).autoTable({ head, body: data, startY: 20 });
-    doc.save('solicitudes_emergencia.pdf');
-  }
+  //   (doc as any).autoTable({ head, body: data, startY: 20 });
+  //   doc.save('solicitudes_emergencia.pdf');
+  // }
 
   navegar() {
     this.router.navigate([this.esAdmin ? RUTA_ADMIN : RUTA_DASHBOARD]);

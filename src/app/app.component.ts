@@ -15,6 +15,7 @@ import { EncriptadorService } from './services/encriptador/encriptador.service';
 export class AppComponent implements OnInit, OnDestroy {
   isAdmin = false;
   isUser = false;
+  isStaff = false;
   usuario: Usuario | null = null;
   private userSubscription: Subscription | undefined;
 
@@ -33,7 +34,9 @@ export class AppComponent implements OnInit, OnDestroy {
       if (this.usuario) {
         const rol = this.usuario.rol[0];
         this.isAdmin = rol === 1;
-        this.isUser = rol !== 1;
+        this.isUser = rol === 2;
+        this.isStaff = rol !== 2 && rol !== 1;
+
       } else {
         this.isAdmin = false;
         this.isUser = false;

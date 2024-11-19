@@ -99,18 +99,24 @@ export class SolicitudDeEmergenciaService {
 
   // Función auxiliar para filtrar solicitudes según el rol
   private filtrarSolicitudesPorRol(solicitudes: SolicitudDeEmergencia[], rolUsuario: number): SolicitudDeEmergencia[] {
-    if (rolUsuario === 1) {
-      return solicitudes; // Administrador puede ver todas las solicitudes
-    } else if (rolUsuario === 3) {
-      return solicitudes.filter(solicitud => solicitud.entidad === 3); // Filtrar por tipo 'Fuego' para Bomberos
-    } else if (rolUsuario === 4) {
-      return solicitudes.filter(solicitud => solicitud.entidad === 4); // Filtrar por tipo 'Seguridad' para Policía
-    } else if (rolUsuario === 5) {
-      return solicitudes.filter(solicitud => solicitud.entidad === 5); // Filtrar por tipo 'Medico' para Ambulancia
-    } else {
-      return []; // Si el rol no coincide, devolver un array vacío o manejar de otra forma
+    switch (rolUsuario) {
+      case 1: // Rol de Administrador
+        return solicitudes; // Administrador puede ver todas las solicitudes
+
+      case 3: // Rol de Bomberos
+        return solicitudes.filter(solicitud => solicitud.entidad === 3); // Filtrar por entidad 'Fuego' para Bomberos
+
+      case 4: // Rol de Policía
+        return solicitudes.filter(solicitud => solicitud.entidad === 4); // Filtrar por entidad 'Seguridad' para Policía
+
+      case 5: // Rol de Ambulancia
+        return solicitudes.filter(solicitud => solicitud.entidad === 5); // Filtrar por entidad 'Medico' para Ambulancia
+
+      default:
+        return []; // Si el rol no coincide, devolver un array vacío o manejar de otra forma
     }
   }
+
 
   // Método para actualizar una solicitud de emergencia (PATCH)
   actualizarSolicitud(id: number, solicitud: Partial<SolicitudDeEmergencia>): Observable<HttpResponse<SolicitudDeEmergencia>> {

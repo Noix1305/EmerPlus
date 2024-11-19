@@ -55,8 +55,7 @@ const routes: Routes = [
   },
   {
     path: 'soporte',
-    loadChildren: () => import('./pages/soporte/soporte/soporte.module').then(m => m.SoportePageModule),
-    canActivate: [isTecnicoGuard]
+    loadChildren: () => import('./pages/soporte/soporte/soporte.module').then(m => m.SoportePageModule)
   },
   {
     path: 'gestionar-solicitud',
