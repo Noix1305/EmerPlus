@@ -23,11 +23,6 @@
       Agregar usuario
     </ion-item>
 
-    <ion-item *ngIf="rolUsuarioActivo === 'Administrador'" button (click)="verEstadisticas()">
-      <ion-icon name="bar-chart-outline" slot="start"></ion-icon>
-      Ver estadísticas* (Próximamente)
-    </ion-item>
-
     <ion-item *ngIf="rolUsuarioActivo === 'Administrador'" button (click)="gestionarRoles()">
       <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
       Gestionar roles de usuario

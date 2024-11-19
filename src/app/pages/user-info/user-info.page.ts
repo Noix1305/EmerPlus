@@ -16,6 +16,7 @@ import { EncriptadorService } from 'src/app/services/encriptador/encriptador.ser
 import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import { COLOR_ERROR, COLOR_EXITO, KEY_USER_INFO, NAV_CONTACTO, NAV_USUARIO, RUTA_LOGIN, SWAL_ERROR, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
@@ -47,8 +48,8 @@ export class UserInfoPage {
   };
 
 
-  colorVerde: string = 'success'
-  colorRojo: string = 'danger'
+  colorVerde: string = COLOR_EXITO
+  colorRojo: string = COLOR_ERROR
 
   contacto: Contacto = {
     rut_usuario: '',
@@ -103,13 +104,13 @@ export class UserInfoPage {
   }
 
   async ngOnInit() {
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
+    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
 
     this.cargarRegiones();
     this.cargarComunas();
 
     if (!this.usuario) {
-      const { value } = await Preferences.get({ key: 'userInfo' });
+      const { value } = await Preferences.get({ key: KEY_USER_INFO });
 
       if (value) {
         try {
@@ -185,7 +186,7 @@ export class UserInfoPage {
 
           // También puedes actualizar `Preferences` si es necesario
           await Preferences.set({
-            key: 'userInfo',
+            key: KEY_USER_INFO,
             value: JSON.stringify(this.usuario)
           });
         }
@@ -276,15 +277,15 @@ export class UserInfoPage {
     try {
       await firstValueFrom(this._usuarioService.editarUsuario(updatedUser.rut, updatedUser));
       this.successMessage = 'Usuario editado con éxito';
-      this.activarSwal('Exito', this.successMessage, 'success', 'OK');
+      this.activarSwal('Exito', this.successMessage, SWAL_SUCCESS, 'OK');
       this.usuario = updatedUser;
-
+      const encryptedUser = this._encriptadorService.encrypt(JSON.stringify(this.usuario));
       await Preferences.set({
-        key: 'userInfo',
-        value: JSON.stringify(this.usuario) // Convierte el objeto de usuario a string
+        key: KEY_USER_INFO,
+        value: encryptedUser // Convierte el objeto de usuario a string
       });
+
       this.closeEditUserModal();
-      location.reload()
       this.usuario = updatedUser;
 
       // // Actualiza los datos del usuario en la página
@@ -318,7 +319,7 @@ export class UserInfoPage {
     const result = await Swal.fire({
       title: 'Eliminar Cuenta',
       text: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
-      icon: 'warning',
+      icon: SWAL_WARN,
       showCancelButton: true,
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
@@ -333,14 +334,14 @@ export class UserInfoPage {
           await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
           this.successMessage = 'Cuenta eliminada exitosamente.';
 
-          this.activarSwal('Éxito', this.successMessage, 'success', 'OK');
+          this.activarSwal('Éxito', this.successMessage, SWAL_SUCCESS, 'OK');
 
-          this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
+          this.router.navigate([RUTA_LOGIN]); // Redirige al usuario a la página de login después de eliminar la cuenta
         } catch (error) {
           console.error('Error al eliminar la cuenta:', error);
           this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
 
-          this.activarSwal('Error', this.errorMessage, 'error', 'OK')
+          this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK')
         }
       }
     } else if (result.dismiss === Swal.DismissReason.cancel) {
@@ -353,7 +354,7 @@ export class UserInfoPage {
       await this.modalContacto.present();
     } else {
       this.errorMessage = 'No se ha registrado información de contacto de emergencia.'
-      this.activarSwal('Sin Contacto de Emergencia', this.errorMessage, 'error', 'OK');
+      this.activarSwal('Sin Contacto de Emergencia', this.errorMessage, SWAL_ERROR, 'OK');
     }
   }
 
@@ -452,28 +453,28 @@ export class UserInfoPage {
           } catch (error: unknown) {
             if (error instanceof Error) {
               this.errorMessage = 'Error durante el envío de la notificación.';
-              this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+              this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK');
 
             } else {
               console.error('Error desconocido:', error);
               this.errorMessage = 'Error durante el envío de la notificación.';
 
-              this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+              this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK');
             }
           }
         } else {
           this.errorMessage = 'Ocurrió un error al crear o editar el contacto.';
           console.error(this.errorMessage);
-          this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+          this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK');
         }
 
-        this.activarSwal('Éxito', this.successMessage, 'success', 'OK');
+        this.activarSwal('Éxito', this.successMessage, SWAL_SUCCESS, 'OK');
 
         this.closeEditContactModal();
 
       } catch (error) {
         this.errorMessage = 'Ocurrió un error al crear o editar el contacto. Inténtalo de nuevo.';
-        this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+        this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK');
 
         console.error('Error al crear o editar contacto:', error);
       }
@@ -525,7 +526,7 @@ export class UserInfoPage {
             const contactoString = JSON.stringify(this.usuario.contactoEmergencia);
             if (this.esJsonValido(contactoString)) {
               await Preferences.set({
-                key: 'contacto',
+                key: NAV_CONTACTO,
                 value: this._encriptadorService.encrypt(contactoString) // Guarda el contacto de emergencia de forma encriptada
               });
               console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);

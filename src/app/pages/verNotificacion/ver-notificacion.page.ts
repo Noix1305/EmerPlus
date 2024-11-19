@@ -4,6 +4,7 @@ import { lastValueFrom } from 'rxjs';
 import { Notificacion } from 'src/app/models/notificacion';
 import { NotificacionPatch } from 'src/app/models/notificacionPatch';
 import { NotificacionService } from 'src/app/services/notificacionService/notificacion.service';
+import { ESTADO_LEIDA, NAV_NOTIFICACION, RUTA_DASHBOARD } from 'src/constantes';
 
 @Component({
   selector: 'app-ver-notificacion',
@@ -14,7 +15,7 @@ export class VerNotificacionPage implements OnInit {
 
   notificacion: Notificacion | undefined;
   notificacionPatch: NotificacionPatch | undefined;
-  estadoLeida: string = 'Leída';
+  estadoLeida: string = ESTADO_LEIDA;
 
   constructor(
     private router: Router,
@@ -25,17 +26,17 @@ export class VerNotificacionPage implements OnInit {
     const navigation = this.router.getCurrentNavigation();
 
     if (navigation && navigation.extras.state) {
-      this.notificacion = navigation.extras.state['notificacion'];
+      this.notificacion = navigation.extras.state[NAV_NOTIFICACION];
 
     } else {
       console.error('No se encontró la notificación.');
       // Puedes redirigir al usuario a otra página si la notificación no se encuentra
-      this.router.navigate(['/dashboard']); // Ajusta la ruta según sea necesario
+      this.router.navigate([RUTA_DASHBOARD]); // Ajusta la ruta según sea necesario
     }
   }
 
   async volver() {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate([RUTA_DASHBOARD]);
   }
   realizarAccion() {
     this.crearNotificacionLeida();

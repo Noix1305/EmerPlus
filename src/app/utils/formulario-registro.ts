@@ -3,6 +3,7 @@ import Swal from 'sweetalert2';
 import { UsuarioService } from '../services/usuarioService/usuario.service';
 import { CrearUsuario } from '../models/crearUsuario';
 import { EncriptadorService } from '../services/encriptador/encriptador.service';
+import { SWAL_ERROR, SWAL_SUCCESS } from 'src/constantes';
 
 export async function mostrarFormularioRegistro(usuarioService: UsuarioService, encriptadorService: EncriptadorService) {
   const { value: formValues } = await Swal.fire({
@@ -72,7 +73,7 @@ async function registrarUsuario(
     if (usuarioExistenteBD.body && Array.isArray(usuarioExistenteBD.body) && usuarioExistenteBD.body.length > 0) {
       errorMessage = 'El RUT ya está registrado en la base de datos.';
       await Swal.fire({
-        icon: 'error',
+        icon: SWAL_ERROR,
         title: 'Error',
         text: errorMessage,
         heightAuto: false
@@ -94,7 +95,7 @@ async function registrarUsuario(
 
     successMessage = 'Usuario creado exitosamente.';
     await Swal.fire({
-      icon: 'success',
+      icon: SWAL_SUCCESS,
       title: 'Exito',
       text: successMessage,
       heightAuto: false
@@ -102,7 +103,7 @@ async function registrarUsuario(
   } catch (error) {
     errorMessage = 'Ocurrió un error al crear el usuario. Inténtalo de nuevo.';
     await Swal.fire({
-      icon: 'error',
+      icon: SWAL_ERROR,
       title: 'Error',
       text: errorMessage,
       heightAuto: false

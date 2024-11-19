@@ -4,6 +4,7 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
 import { environment } from 'src/environments/environment';
 import { Geolocation } from '@capacitor/geolocation';
+import { NAV_SOLICITUD } from 'src/constantes';
 
 @Component({
   selector: 'app-ubicacion',
@@ -24,7 +25,7 @@ export class UbicacionPage implements OnInit {
 
     // Verifica si hay una navegación y si tiene parámetros
     if (navigation?.extras?.state) {
-      this.solicitud = navigation.extras.state['solicitud'];
+      this.solicitud = navigation.extras.state[NAV_SOLICITUD];
       console.log(`Ubicación recibida: Latitud = ${this.solicitud?.latitud}, Longitud = ${this.solicitud?.longitud}`);
     }
 

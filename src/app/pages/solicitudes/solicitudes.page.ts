@@ -2,11 +2,14 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { lastValueFrom } from 'rxjs';
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
+import { SolicitudPatch } from 'src/app/models/solicitudPatch';
 import { Usuario } from 'src/app/models/usuario';
 import { EstadoSolicitudService } from 'src/app/services/estadoSolicitud/estado-solicitud.service';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import { HOY, AYER, SEMANA, MES, RUTA_ADMIN, RUTA_DASHBOARD, RUTA_MAPA, RUTA_GESTION_SOLICITUD } from 'src/constantes';
 
 @Component({
   selector: 'app-solicitudes',
@@ -14,117 +17,126 @@ import { UsuarioService } from 'src/app/services/usuarioService/usuario.service'
   styleUrls: ['./solicitudes.page.scss'],
 })
 export class SolicitudesPage implements OnInit {
-
   solicitudes: SolicitudDeEmergencia[] = [];
-  solicitudesUsuario: SolicitudDeEmergencia[] = []; // Para almacenar las solicitudes del usuario normal
+  solicitudPatch: SolicitudPatch | undefined;
+  solicitudesUsuario: SolicitudDeEmergencia[] = [];
   solicitudesFiltradas: SolicitudDeEmergencia[] = [];
-  esAdmin: boolean = false;
+  esAdmin = false;
   usuario: Usuario | null = null;
-  esUsuario: boolean = false;
-  esPolicia: boolean = false;
-  esBombero: boolean = false;
-  esAmbulancia: boolean = false;
+  esUsuario = false;
+  esPolicia = false;
+  esBombero = false;
+  esAmbulancia = false;
 
-  fechaDesde: string = '';
-  fechaHasta: string = '';
-  estadoFiltro: string = '';
-  rolUsuario: number = 0;
+  fechaDesde = '';
+  fechaHasta = '';
+  estadoFiltro = '';
+  rolUsuario = 0;
 
   constructor(
     private _solicitudService: SolicitudDeEmergenciaService,
     private _usuarioService: UsuarioService,
     private _estadoSolicitudService: EstadoSolicitudService,
-    private router: Router) { }
+    private router: Router
+  ) { }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.suscribirUsuario();
+    await this.inicializarDatos();
+  }
+
+  private async inicializarDatos() {
     this.solicitudes = [];
     this.solicitudesUsuario = [];
     this.solicitudesFiltradas = [];
+    await this.cargarSolicitudes();
+  }
 
-    this.cargarSolicitudes();
-
+  private async suscribirUsuario() {
     this._usuarioService.usuario$.subscribe((usuario) => {
       this.usuario = usuario;
-      if (this.usuario && this.usuario.rol.length > 0) {
-        this.rolUsuario = this.usuario.rol[0];
-        this.esAdmin = this.rolUsuario === 1;
-        this.esUsuario = this.rolUsuario === 2;
-        this.esBombero = this.rolUsuario === 3;
-        this.esPolicia = this.rolUsuario === 4;
-        this.esAmbulancia = this.rolUsuario === 5;
-      }
+      this.setRolesUsuario();
     });
   }
 
+  private setRolesUsuario() {
+    if (this.usuario && this.usuario.rol.length > 0) {
+      this.rolUsuario = this.usuario.rol[0];
+      this.esUsuario = this.rolUsuario === 2;
+      this.esBombero = this.rolUsuario === 3;
+      this.esPolicia = this.rolUsuario === 4;
+      this.esAmbulancia = this.rolUsuario === 5;
+    }
+  }
+
   async filtrar() {
-    await this.cargarSolicitudes(); // Cargar las solicitudes primero
-    await this.filtrarSolicitudes(); // Luego filtrar las solicitudes
+    await this.cargarSolicitudes();
+    await this.filtrarSolicitudes();
   }
 
   async cargarSolicitudes() {
     try {
-      const solicitudes = await this._solicitudService.obtenerSolicitudes();
-
-      // Filtrar solicitudes según rol
-      if (this.esAdmin) {
-        // Si es admin, obtiene todas las solicitudes
-        this.solicitudes = solicitudes;
-        this.solicitudesUsuario = await this.procesarSolicitudes(solicitudes); // Procesar todas las solicitudes para el admin
-      } else if (this.esUsuario) {
-        // Si es un usuario normal (rol 2), filtra por RUT
-        const rutUsuario = this.usuario?.rut; // Asumiendo que el RUT del usuario está en this.usuario
-        const solicitudesFiltradas = solicitudes.filter((solicitud) => {
-          return solicitud.usuario_id === rutUsuario; // Filtrar por RUT
-        });
-
-        this.solicitudes = solicitudesFiltradas; // Solo solicitudes del usuario por RUT
-        this.solicitudesUsuario = await this.procesarSolicitudes(solicitudesFiltradas); // Procesar las solicitudes filtradas
-      } else {
-        // Para otros roles, filtra por entidad
-        const solicitudesFiltradas = solicitudes.filter((solicitud) => {
-          return solicitud.entidad === this.rolUsuario; // Filtrar por rol
-        });
-
-        this.solicitudes = solicitudesFiltradas; // Solo solicitudes del rol del usuario
-        this.solicitudesUsuario = await this.procesarSolicitudes(solicitudesFiltradas); // Procesar las solicitudes filtradas
-      }
-
-      // Verifica si hay solicitudes cargadas
-      if (!this.solicitudes.length) {
-        console.warn('No se encontraron solicitudes.');
-      }
+      let solicitudes = await this._solicitudService.obtenerSolicitudesPorRol(this.rolUsuario);
+      solicitudes = await this.procesarSolicitudes(solicitudes);
+      console.log('Todas las solicitudes: ' + solicitudes.length)
+      solicitudes.forEach(s => console.log('Entidad: ' + s.entidad));
+      this.filtrarSolicitudesPorRol(solicitudes);
+      if (!this.solicitudes.length) console.warn('No se encontraron solicitudes.');
     } catch (error) {
       console.error('Error al cargar las solicitudes:', error);
+    }
+  }
+
+  private async filtrarSolicitudesPorRol(solicitudes: SolicitudDeEmergencia[]) {
+    if (this.esAdmin) {
+      this.solicitudes = solicitudes;
+      this.solicitudesUsuario = await this.procesarSolicitudes(solicitudes);
+    } else if (this.esUsuario) {
+      const rutUsuario = this.usuario?.rut;
+      const solicitudesFiltradas = solicitudes.filter((s) => s.usuario_id === rutUsuario);
+      this.solicitudes = solicitudesFiltradas;
+      this.solicitudesUsuario = await this.procesarSolicitudes(solicitudesFiltradas);
+    } else {
+      const solicitudesFiltradas = solicitudes.filter(s => s.entidad === this.rolUsuario);
+      this.solicitudes = solicitudesFiltradas;
+      this.solicitudesUsuario = await this.procesarSolicitudes(solicitudesFiltradas);
     }
   }
 
   async filtrarSolicitudes() {
     const solicitudesFiltradas = this.solicitudes.filter((solicitud) => {
       const fechaSolicitud = new Date(solicitud.fecha);
-      const fechaDesdeDate = this.fechaDesde === 'hoy' ? new Date() :
-        this.fechaDesde === 'ayer' ? new Date(Date.now() - 864e5) :
-          this.fechaDesde === 'semana' ? new Date(Date.now() - 6048e5) :
-            this.fechaDesde === 'mes' ? new Date(Date.now() - 2592e6) :
-              null;
-
-      const fechaHastaDate = this.fechaHasta === 'hoy' ? new Date() :
-        this.fechaHasta === 'ayer' ? new Date(Date.now() - 864e5) :
-          this.fechaHasta === 'semana' ? new Date(Date.now() - 6048e5) :
-            this.fechaHasta === 'mes' ? new Date(Date.now() - 2592e6) :
-              null;
-
-      // Filtrar por fecha
-      const fechaValida = fechaDesdeDate ? fechaSolicitud >= fechaDesdeDate : true;
-      const hastaValida = fechaHastaDate ? fechaSolicitud <= fechaHastaDate : true;
-
-      // Filtrar por estado usando valores numéricos
-      const estadoValido = this.estadoFiltro === '0' || solicitud.estado === Number(this.estadoFiltro); // Comparar como números
-
-      return fechaValida && hastaValida && estadoValido;
+      return (
+        this.filtrarPorFecha(fechaSolicitud) &&
+        this.filtrarPorEstado(solicitud.estado) &&
+        this.filtrarSolicitudesPorRol(this.solicitudes)
+      );
     });
-
-    // Procesar las solicitudes filtradas para obtener el estado
     this.solicitudesFiltradas = await this.procesarSolicitudes(solicitudesFiltradas);
+    console.log("Cantidad de solicitudes: " + solicitudesFiltradas.length)
+  }
+
+  private filtrarPorFecha(fechaSolicitud: Date): boolean {
+    const fechaDesdeDate = this.obtenerFechaFiltro(this.fechaDesde);
+    const fechaHastaDate = this.obtenerFechaFiltro(this.fechaHasta);
+    const fechaValida = fechaDesdeDate ? fechaSolicitud >= fechaDesdeDate : true;
+    const hastaValida = fechaHastaDate ? fechaSolicitud <= fechaHastaDate : true;
+    return fechaValida && hastaValida;
+  }
+
+  private obtenerFechaFiltro(fecha: string): Date | null {
+    const ahora = Date.now();
+    switch (fecha) {
+      case HOY: return new Date();
+      case AYER: return new Date(ahora - 864e5);
+      case SEMANA: return new Date(ahora - 6048e5);
+      case MES: return new Date(ahora - 2592e6);
+      default: return null;
+    }
+  }
+
+  private filtrarPorEstado(estado: number): boolean {
+    return this.estadoFiltro === '0' || estado === Number(this.estadoFiltro);
   }
 
   limpiarFiltro() {
@@ -137,33 +149,51 @@ export class SolicitudesPage implements OnInit {
   async procesarSolicitudes(solicitudes: SolicitudDeEmergencia[]) {
     return Promise.all(
       solicitudes.map(async (solicitud) => {
-        const estadoDescripcion = await this._estadoSolicitudService.obtenerNombreRol(solicitud.estado); // Obtener la descripción del estado
-        return {
-          ...solicitud,
-          estadoDescripcion: estadoDescripcion || 'Desconocido', // Asigna la descripción del estado
-        };
+        const estadoDescripcion = await this._estadoSolicitudService.obtenerNombreRol(solicitud.estado);
+        console.log(`Solicitud ID: ${solicitud.id}, Estado: ${solicitud.estado}, Descripción: ${estadoDescripcion}`);
+        return { ...solicitud, estadoDescripcion: estadoDescripcion || 'Desconocido' };
       })
     );
   }
 
-  verEnMapa(solicitud: SolicitudDeEmergencia) {
-    // Navegar a la página de ubicación y pasar los parámetros latitud y longitud
-    this.router.navigate(['/ubicacion'], { state: { solicitud } });
+
+  gestionarsolicitud(solicitud: SolicitudDeEmergencia) {
+    this.crearSolicitudRecibida(solicitud);
+    this.router.navigate([RUTA_GESTION_SOLICITUD], { state: { solicitud } });
+  }
+
+  async crearSolicitudRecibida(solicitud: SolicitudDeEmergencia) {
+    this.solicitudPatch = {
+      id: solicitud?.id,
+      estado: 3
+    } as SolicitudPatch;
+
+    try {
+      // Convierte el Observable en una Promise
+      const response = await lastValueFrom(this._solicitudService.modificarSolicitud(this.solicitudPatch.id, this.solicitudPatch));
+
+      const statusCode = response.status;
+      console.log('Código de respuesta:', statusCode);
+      console.log('Solicitud modificada con éxito:', response.body);
+
+      // Redirige al dashboard después de la actualización exitosa
+    } catch (error) {
+      console.error('Error al modificar la Solicitud:', error);
+    }
   }
 
 
+  verEnMapa(solicitud: SolicitudDeEmergencia) {
+    this.router.navigate([RUTA_MAPA], { state: { solicitud } });
+  }
+
   generarPDF() {
     const doc = new jsPDF();
-
-    // Título del PDF
     const title = 'Reporte de Solicitudes de Emergencia';
     doc.setFontSize(16);
-    doc.text(title, 10, 10); // (texto, x, y) - Ajusta las coordenadas según sea necesario
+    doc.text(title, 10, 10);
 
-    // Encabezado de la tabla
     const head = [['ID', 'Tipo', 'Fecha', 'Ubicación']];
-
-    // Datos de las solicitudes
     const data = this.solicitudesUsuario.map(solicitud => [
       solicitud.id,
       solicitud.tipo,
@@ -171,19 +201,11 @@ export class SolicitudesPage implements OnInit {
       `${solicitud.latitud}, ${solicitud.longitud}`
     ]);
 
-    (doc as any).autoTable({
-      head: head,
-      body: data,
-      startY: 20, // Para comenzar la tabla debajo del título (ajusta según sea necesario)
-    });
+    (doc as any).autoTable({ head, body: data, startY: 20 });
     doc.save('solicitudes_emergencia.pdf');
   }
 
   navegar() {
-    if (this.esAdmin) {
-      this.router.navigate(['/admin']);
-    } else {
-      this.router.navigate(['/dashboard']);
-    }
+    this.router.navigate([this.esAdmin ? RUTA_ADMIN : RUTA_DASHBOARD]);
   }
 }

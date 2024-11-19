@@ -59,10 +59,16 @@ const routes: Routes = [
     canActivate: [isTecnicoGuard]
   },
   {
+    path: 'gestionar-solicitud',
+    loadChildren: () => import('./pages/gestionSolicitud/gestionar-solicitud/gestionar-solicitud.module').then(m => m.GestionarSolicitudPageModule)
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
   },
+
+
 
 
 

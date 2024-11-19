@@ -1,0 +1,70 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Gestionar Solicitud</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Detalles de la Solicitud</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <ion-card *ngIf="solicitud">
+    <ion-card-header>
+      <ion-card-title>Solicitud ID: {{ solicitud.id }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Tipo:</strong> {{ solicitud.tipo }}</p>
+      <p><strong>Fecha:</strong> {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+      <p><strong>Ubicación:</strong> {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
+      <p><strong>Estado:</strong> {{ solicitud.estadoDescripcion }}</p>
+      <p><strong>Entidad:</strong> {{ solicitud.entidad }}</p>
+    </ion-card-content>
+
+    <!-- Botón para ver la solicitud en el mapa -->
+    <ion-button expand="full" color="primary" (click)="verEnMapa(solicitud)">
+      Ver en el mapa
+    </ion-button>
+
+    <!-- Botón para mostrar opciones con usuarios -->
+    <ion-button expand="full" color="primary" (click)="mostrarUsuarios()">
+      Mostrar opciones de usuarios
+    </ion-button>
+  </ion-card>
+
+  <!-- Modal de usuarios -->
+  <ion-modal [isOpen]="modalAbierto">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title *ngIf="solicitud?.entidad == 3">Compañias</ion-title>
+          <ion-title *ngIf="solicitud?.entidad == 4">Comisarias</ion-title>
+          <ion-title *ngIf="solicitud?.entidad == 5">Ambulancias</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="cerrarModal()">Cerrar</ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list>
+          <ion-item *ngFor="let usuario of usuarios" 
+                    [class.selected]="usuario === usuarioSeleccionado" 
+                    (click)="usuarioSeleccionado = usuario">
+            {{ usuario.nombre }} {{ usuario.papellido }} {{ usuario.sapellido }}
+          </ion-item>
+        </ion-list>
+  
+        <!-- Botón para asignar la solicitud al usuario seleccionado -->
+        <ion-button *ngIf="usuarioSeleccionado" expand="full" color="success" (click)="asignarSolicitud()">
+          Asignar
+        </ion-button>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+  
+</ion-content>

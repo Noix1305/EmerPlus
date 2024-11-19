@@ -5,6 +5,7 @@ import { LoadingController } from '@ionic/angular';
 import { Usuario } from 'src/app/models/usuario';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service'; // Importar el servicio de encriptación
+import { RUTA_AGREGAR_USER_ADMIN, RUTA_GESTOR_ROLES, RUTA_SOLICITUDES, RUTA_SOPORTE, KEY_USER_INFO, RUTA_HOME } from 'src/constantes';
 
 @Component({
   selector: 'app-admin',
@@ -27,7 +28,7 @@ export class AdminPage implements OnInit {
     await this.presentLoading();
 
     // Obtener el valor encriptado desde Preferences
-    const { value } = await Preferences.get({ key: 'userInfo' });
+    const { value } = await Preferences.get({ key: KEY_USER_INFO });
 
     if (value) {
       // Desencriptar el valor obtenido
@@ -46,26 +47,21 @@ export class AdminPage implements OnInit {
 
   // Función para ver todas las solicitudes
   verSolicitudes() {
-    this.router.navigate(['/solicitudes']); // Redirigir a una página de solicitudes
+    this.router.navigate([RUTA_SOLICITUDES]); // Redirigir a una página de solicitudes
   }
 
   // Función para agregar un nuevo usuario
   agregarUsuario() {
-    this.router.navigate(['/agregar-usuario-admin']); // Redirigir a una página para agregar usuarios
-  }
-
-  // Función para ver estadísticas
-  verEstadisticas() {
-    this.router.navigate(['/estadisticas']); // Redirigir a la página de estadísticas
+    this.router.navigate([RUTA_AGREGAR_USER_ADMIN]); // Redirigir a una página para agregar usuarios
   }
 
   // Función para gestionar roles de usuarios
   gestionarRoles() {
-    this.router.navigate(['/gestor-roles']); // Redirigir a la página para gestionar roles
+    this.router.navigate([RUTA_GESTOR_ROLES]); // Redirigir a la página para gestionar roles
   }
 
   solicitudesTecnicas() {
-    this.router.navigate(['/soporte']);
+    this.router.navigate([RUTA_SOPORTE]);
   }
 
   verSolicitudesBomberos() { }
@@ -82,7 +78,7 @@ export class AdminPage implements OnInit {
       await Preferences.clear(); // Elimina solo el campo userInfo
 
       // Redirigir al usuario a la página de inicio
-      this.router.navigate(['/home']);
+      this.router.navigate([RUTA_HOME]);
       console.log('Sesión cerrada y datos eliminados de Preferences.');
     } catch (error) {
       console.error('Error al cerrar sesión:', error);

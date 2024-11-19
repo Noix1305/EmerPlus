@@ -3,6 +3,7 @@ import { ApiConfigService } from '../apiConfig/api-config.service';
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
 import { catchError, firstValueFrom, map, Observable, of, tap, throwError } from 'rxjs';
 import { HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
+import { SolicitudPatch } from 'src/app/models/solicitudPatch';
 
 @Injectable({
   providedIn: 'root'
@@ -56,6 +57,20 @@ export class SolicitudDeEmergenciaService {
       console.error('Error al obtener regiones:', error);
       return []; // Devuelve un array vacío en caso de error
     }
+  }
+
+  modificarSolicitud(id: number, notificacion: SolicitudPatch): Observable<HttpResponse<SolicitudPatch>> {
+    const path = `${this.path}?id=eq.${id}`;
+    return this._apiConfig.patch<SolicitudPatch>(path, notificacion).pipe(
+      map(response => {
+        return new HttpResponse<SolicitudPatch>({
+          body: response.body || null,
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+      })
+    );
   }
 
   async obtenerSolicitudesPorRol(rolUsuario: number): Promise<SolicitudDeEmergencia[]> {

@@ -14,31 +14,10 @@
   <div class="text-center">
     <h2>Lista de Solicitudes de Emergencia</h2>
 
-    <!-- Solicitudes para Admin -->
-    <ion-card *ngIf="esAdmin">
-      <ion-list>
-        <ion-item *ngFor="let solicitud of solicitudes">
-          <ion-icon name="warning" slot="start"></ion-icon>
-          <ion-label>
-            <h3>{{ solicitud.tipo }}</h3>
-            <p>ID: {{ solicitud.id }}</p>
-            <p>Usuario: {{ solicitud.usuario_id }}</p>
-            <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
-            <p>Hora: {{ solicitud.hora }}</p>
-            <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
-            <p>Estado: {{ solicitud.estadoDescripcion }}</p>
-          </ion-label>
-          <!-- Botón para ver la solicitud en el mapa -->
-          <ion-button color="primary" (click)="verEnMapa(solicitud)">
-            Ver en el mapa
-          </ion-button>
-        </ion-item>
-      </ion-list>
-    </ion-card>
-
     <!-- Filtros para Usuarios -->
     <ion-card *ngIf="!esAdmin" class="filters-container">
-      <form (ngSubmit)="filtrarSolicitudes()">
+      <form (ngSubmit)="filtrar()">
+        <!-- Select de Fecha Desde -->
         <ion-item>
           <ion-label>Fecha Desde</ion-label>
           <ion-select [(ngModel)]="fechaDesde" name="fechaDesde">
@@ -50,6 +29,7 @@
           </ion-select>
         </ion-item>
 
+        <!-- Select de Fecha Hasta -->
         <ion-item>
           <ion-label>Fecha Hasta</ion-label>
           <ion-select [(ngModel)]="fechaHasta" name="fechaHasta">
@@ -61,6 +41,7 @@
           </ion-select>
         </ion-item>
 
+        <!-- Select de Estado -->
         <ion-item>
           <ion-label>Estado</ion-label>
           <ion-select [(ngModel)]="estadoFiltro" name="estadoFiltro">
@@ -73,21 +54,22 @@
           </ion-select>
         </ion-item>
 
+        <!-- Botones para Filtrar y Limpiar -->
         <div class="button-group">
           <ion-button expand="full" color="warning" (click)="limpiarFiltro()">Limpiar Filtro</ion-button>
-          <ion-button expand="full" color="primary" (click)="filtrar()">Filtrar</ion-button>
+          <ion-button expand="full" color="primary" type="submit">Filtrar</ion-button>
         </div>
       </form>
     </ion-card>
 
     <!-- Mostrar solicitudes filtradas -->
-    <ion-card *ngIf="solicitudesFiltradas.length > 0">
+    <ion-card *ngIf="solicitudesFiltradas.length > 0; else todasSolicitudes">
       <ion-list>
         <ion-item-sliding *ngFor="let solicitud of solicitudesFiltradas">
           <ion-item>
             <ion-icon name="checkmark-circle" slot="start"></ion-icon>
             <ion-label>
-              <h2>{{ solicitud.tipo }}</h2>
+              <h4>{{ solicitud.tipo }}</h4>
               <p>ID: {{ solicitud.id }}</p>
               <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
               <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
@@ -100,12 +82,46 @@
             <ion-item-option color="primary" (click)="verEnMapa(solicitud)">
               Ver en el mapa
             </ion-item-option>
-            <ion-item-option color="secondary" >Cancelar</ion-item-option>
-            <ion-item-option color="danger" >Eliminar</ion-item-option>
+            <ion-item-option *ngIf="esUsuario" color="secondary">Cancelar</ion-item-option>
+            <ion-item-option *ngIf="esUsuario" color="danger">Eliminar</ion-item-option>
+            <ion-item-option *ngIf="!esUsuario" color="success"
+              (click)="gestionarsolicitud(solicitud)">Gestionar</ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
     </ion-card>
+
+    <!-- Plantilla para mostrar todas las solicitudes si no hay filtradas -->
+    <ng-template #todasSolicitudes>
+      <ion-card>
+        <ion-list>
+          <ion-item-sliding *ngFor="let solicitud of solicitudes">
+            <ion-item>
+              <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+              <ion-label>
+                <h4>{{ solicitud.tipo }}</h4>
+                <p>ID: {{ solicitud.id }}</p>
+                <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+                <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
+                <p>Estado: {{ solicitud.estadoDescripcion }}</p>
+              </ion-label>
+            </ion-item>
+
+            <!-- Botón para ver la solicitud en el mapa -->
+            <ion-item-options side="end">
+              <ion-item-option color="primary" (click)="verEnMapa(solicitud)">
+                Ver en el mapa
+              </ion-item-option>
+              <ion-item-option *ngIf="esUsuario" color="secondary">Cancelar</ion-item-option>
+              <ion-item-option *ngIf="esUsuario" color="danger">Eliminar</ion-item-option>
+              <ion-item-option *ngIf="!esUsuario" color="success"
+                (click)="gestionarsolicitud(solicitud)">Gestionar</ion-item-option>
+            </ion-item-options>
+          </ion-item-sliding>
+        </ion-list>
+      </ion-card>
+    </ng-template>
+
 
     <!-- Mensaje si no hay solicitudes filtradas -->
     <p *ngIf="solicitudesFiltradas.length === 0">No hay solicitudes filtradas.</p>

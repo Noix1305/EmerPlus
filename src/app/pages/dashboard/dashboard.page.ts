@@ -17,6 +17,7 @@ import { Geolocation } from '@capacitor/geolocation';
 
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
+import { ACCIDENTE, ESTADO_ENVIADA, INCENDIO, KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, ROBO, SWAL_ERROR, SWAL_INFO, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
 
 
 @Component({
@@ -45,13 +46,13 @@ export class DashboardPage implements OnInit {
   async ngOnInit() {
     // Intenta obtener el usuario desde la navegación anterior
     const loading = await this.loadingController.create({
-      message: 'Cargando...',
+      message: MENSAJE_CARGANDO,
     });
     await loading.present();
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
+    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
 
     if (!this.usuario) {
-      const { value } = await Preferences.get({ key: 'userInfo' });
+      const { value } = await Preferences.get({ key: KEY_USER_INFO });
 
       if (value) {
         try {
@@ -62,11 +63,11 @@ export class DashboardPage implements OnInit {
             this.usuario = JSON.parse(decryptedData) as Usuario; // Convierte el JSON desencriptado a Usuario
           } else {
             console.error('Error al desencriptar los datos');
-            this.mostrarSwal('error', 'Error', 'Hubo un problema al cargar los datos del usuario.');
+            this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
           }
         } catch (error) {
           console.error('Error al parsear JSON o desencriptar:', error);
-          this.mostrarSwal('error', 'Error', 'Hubo un problema al cargar los datos del usuario.');
+          this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
         }
       } else {
         console.log('No se encontró el usuario en Preferences.');
@@ -108,24 +109,24 @@ export class DashboardPage implements OnInit {
       await popover.present();
     } else {
       // Si no hay notificaciones, muestra el Swal
-      this.mostrarSwal('info', 'Sin notificaciones', 'No hay notificaciones nuevas.');
+      this.mostrarSwal(SWAL_INFO, 'Sin notificaciones', 'No hay notificaciones nuevas.');
     }
   }
 
 
   carabineros(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('robo', entidad, 4)
+    this.enviarSolicitudDeEmergencia(ROBO, entidad, 4)
   }
 
   bomberos(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('incendio', entidad, 3)
+    this.enviarSolicitudDeEmergencia(INCENDIO, entidad, 3)
   }
 
   ambulancia(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('accidente', entidad, 5)
+    this.enviarSolicitudDeEmergencia(ACCIDENTE, entidad, 5)
 
   }
 
@@ -181,7 +182,7 @@ export class DashboardPage implements OnInit {
       }
     } catch (error) {
       console.error('Error al mostrar la alerta:', error);
-      this.mostrarSwal('error', 'Error', 'No se pudo mostrar la alerta.');
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'No se pudo mostrar la alerta.');
     }
   }
 
@@ -214,12 +215,12 @@ export class DashboardPage implements OnInit {
 
       if (!this.usuario) {
 
-        return this.mostrarSwal('warning', 'Error', 'No hay usuario autenticado para procesar la solicitud.');
+        return this.mostrarSwal(SWAL_WARN, 'Error', 'No hay usuario autenticado para procesar la solicitud.');
       }
 
       if (!ubicacion) {
 
-        return this.mostrarSwal('warning', 'Error', 'No se pudo obtener la ubicación. Verifica los permisos.');
+        return this.mostrarSwal(SWAL_WARN, 'Error', 'No se pudo obtener la ubicación. Verifica los permisos.');
       }
 
       // Cambiar urlImg a string | undefined
@@ -247,7 +248,7 @@ export class DashboardPage implements OnInit {
       // Enviar la solicitud de emergencia
       const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
       console.log('Solicitud enviada con éxito:', response);
-      this.mostrarSwal('success', 'Éxito', 'Solicitud enviada con éxito.')
+      this.mostrarSwal(SWAL_SUCCESS, 'Éxito', 'Solicitud enviada con éxito.')
 
       // Obtener la última solicitud y enviar notificación
       const ultimaSolicitud = await this.emergenciaService.obtenerUltimaSolicitud();
@@ -260,19 +261,19 @@ export class DashboardPage implements OnInit {
           this.enviarNotificacion(tipoEmergencia, idSolicitud);
         }
       } else {
-        this.mostrarSwal('warning', 'Error', 'No se pudo encontrar la última solicitud. Inténtalo nuevamente más tarde.')
+        this.mostrarSwal(SWAL_WARN, 'Error', 'No se pudo encontrar la última solicitud. Inténtalo nuevamente más tarde.')
       }
     } catch (error) {
       console.error('Error al procesar la solicitud:', error);
-      this.mostrarSwal('error', 'Error', 'Error al procesar la solicitud.')
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al procesar la solicitud.')
 
       if (error instanceof HttpErrorResponse) {
         console.error('Error del servidor:', error.message);
-        this.mostrarSwal('error', 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
+        this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
         console.error('Detalles del error:', error.error); // Esto puede dar más información sobre el problema
       }
 
-      this.mostrarSwal('error', 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
 
     }
   }
@@ -285,7 +286,7 @@ export class DashboardPage implements OnInit {
         longitud: position.coords.longitude
       };
     } catch (error) {
-      this.mostrarSwal('warning', 'Error', 'Error al obtener la ubicación.');
+      this.mostrarSwal(SWAL_WARN, 'Error', 'Error al obtener la ubicación.');
       console.error('Error al obtener la ubicación:', error);
       return null; // Maneja el error según sea necesario
     }
@@ -300,7 +301,7 @@ export class DashboardPage implements OnInit {
         hora: new Date().toTimeString().split(' ')[0],
         tipo: tipo,
         id_solicitud: nuevoIdSolicitud,
-        estado: 'Enviada'
+        estado: ESTADO_ENVIADA
       };
 
       // Enviar la notificación a la base de datos
@@ -327,24 +328,24 @@ export class DashboardPage implements OnInit {
                   }
                 } else {
                   console.warn('No se encontraron contactos o el formato es incorrecto.');
-                  this.mostrarSwal('warning', 'Error', 'No se encontraron contactos.')
+                  this.mostrarSwal(SWAL_WARN, 'Error', 'No se encontraron contactos.')
 
                 }
               },
               error: (error) => {
                 console.error('Error al obtener contactos:', error);
-                this.mostrarSwal('error', 'Error', 'Error al obtener contactos.')
+                this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al obtener contactos.')
               }
             });
           }
         },
         error: (error) => {
           console.error('Error al enviar la notificación:', error);
-          this.mostrarSwal('error', 'Error', 'Error al enviar la notificación.')
+          this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al enviar la notificación.')
         }
       });
     } else {
-      this.mostrarSwal('error', 'Error', 'No se encontró el usuario para enviar la notificación.')
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'No se encontró el usuario para enviar la notificación.')
     }
   }
 

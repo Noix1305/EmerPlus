@@ -6,9 +6,10 @@ import { Usuario } from 'src/app/models/usuario';
 import { firstValueFrom } from 'rxjs';
 import { Preferences } from '@capacitor/preferences';
 import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
-import Swal from 'sweetalert2';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { LoadingController } from '@ionic/angular';
+import { KEY_USER_INFO, MENSAJE_CARGANDO, RUTA_ADMIN, RUTA_DASHBOARD, RUTA_HOME, SWAL_ERROR } from 'src/constantes';
 
 @Component({
   selector: 'app-login',
@@ -56,7 +57,7 @@ export class LoginPage implements OnInit {
   async onSubmitForgotPassword(event: Event): Promise<void> {
 
     const loading = await this.loadingController.create({
-      message: 'Cargando...',
+      message: MENSAJE_CARGANDO,
     });
 
     await loading.present();
@@ -68,12 +69,9 @@ export class LoginPage implements OnInit {
     if (!rut) {
       this.errorMessage = 'RUT es requerido';
       console.error('RUT es requerido');
-      await Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: this.errorMessage,
-        heightAuto: false
-      });
+
+      this.mostrarSwal(SWAL_ERROR, 'Error', this.errorMessage)
+
       loading.dismiss();
       return;
     }
@@ -83,18 +81,17 @@ export class LoginPage implements OnInit {
       loading.dismiss();
     } catch (error: unknown) {
       if (error instanceof Error) {
-        console.error('Error durante la recuperación de contraseña:', error.message);
-        alert(error.message || 'Ocurrió un error inesperado.');
+        this.mostrarSwal(SWAL_ERROR, 'Ocurrió un error inesperado.', 'Error: ' + error.message)
       } else {
-        console.error('Error desconocido:', error);
-        alert('Ocurrió un error inesperado.');
+        console.error();
+        this.mostrarSwal(SWAL_ERROR, 'Ocurrió un error inesperado.', 'Error desconocido:' + error)
       }
     }
   }
 
   async handleLoginSubmit(event: Event) {
     const loading = await this.loadingController.create({
-      message: 'Cargando...',
+      message: MENSAJE_CARGANDO,
     });
     await loading.present();
     event.preventDefault(); // Evita que el formulario se envíe por defecto
@@ -125,7 +122,7 @@ export class LoginPage implements OnInit {
 
         // Guarda la información del usuario en Preferences de forma encriptada
         await Preferences.set({
-          key: 'userInfo',
+          key: KEY_USER_INFO,
           value: encryptedUser // Guardamos el usuario encriptado
         });
 
@@ -135,11 +132,11 @@ export class LoginPage implements OnInit {
 
         // Navegar según el rol del usuario
         if ([1, 3, 4, 5, 6].includes(user.rol[0])) {
-          this.router.navigate(['admin']);
+          this.router.navigate([RUTA_ADMIN]);
         } else if (user.rol[0] === 2) {
-          this.router.navigate(['dashboard']);
+          this.router.navigate([RUTA_DASHBOARD]);
         } else {
-          this.router.navigate(['home']);
+          this.router.navigate([RUTA_HOME]);
         }
 
 
@@ -157,6 +154,15 @@ export class LoginPage implements OnInit {
     }
 
     return false; // Valor por defecto al final de la función
+  }
+
+  async mostrarSwal(icon: SweetAlertIcon, tittle: string, text: string) {
+    await Swal.fire({
+      icon: icon,
+      title: tittle,
+      text: text,
+      heightAuto: false
+    });
   }
 
 }

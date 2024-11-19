@@ -6,7 +6,8 @@ import { Rol } from 'src/app/models/rol';
 import { Usuario } from 'src/app/models/usuario';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
-import Swal from 'sweetalert2';
+import { MENSAJE_CARGANDO, SWAL_ERROR, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
+import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
   selector: 'app-gestor-roles',
@@ -34,14 +35,14 @@ export class GestorRolesPage implements OnInit {
 
   async ngOnInit() {
     const loading = await this.loadingController.create({
-      message: 'Cargando...',
+      message: MENSAJE_CARGANDO,
     });
     await loading.present();
     try {
       this.roles = await this._rolesService.obtenerRoles(); // Obtener todos los roles disponibles
       console.log(this.roles); // Ver cuántos roles se están cargando
     } catch (error) {
-      console.error('Error al cargar roles:', error);
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al cargar los roles.')
     } finally {
       // Cierra el loading después de procesar la solicitud
       loading.dismiss();
@@ -91,7 +92,7 @@ export class GestorRolesPage implements OnInit {
         });
       },
       error: (error) => {
-        console.error('Error al cargar usuarios:', error);
+        this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al cargar usuarios: ' + error)
       },
     });
   }
@@ -121,7 +122,7 @@ export class GestorRolesPage implements OnInit {
 
     this._usuarioService.actualizarRol(this.usuarioSeleccionado.rut, data).subscribe({
       next: (response) => {
-        console.log('Rol actualizado con éxito:', response);
+        this.mostrarSwal(SWAL_SUCCESS, 'Éxito', 'Rol Actualizado con éxito.')
         this.cerrarModal();
       },
       error: (error) => {
@@ -147,7 +148,7 @@ export class GestorRolesPage implements OnInit {
           <div class="role-options">${roleOptions}</div>
         </div>
       `,
-      heightAuto:false,
+      heightAuto: false,
       showCancelButton: true,
       confirmButtonText: 'Guardar Rol',
       focusConfirm: false,
@@ -173,9 +174,10 @@ export class GestorRolesPage implements OnInit {
       const selectedButton = document.querySelector('.role-button[style*="background-color: rgb(40, 167, 69)"]') as HTMLElement;
       if (selectedButton) {
         const selectedRoleId = selectedButton.getAttribute('data-role-id');
-        Swal.fire(`Rol guardado con ID: ${selectedRoleId}`, '', 'success');
+        this.mostrarSwal(SWAL_SUCCESS, 'Guardado exitoso.', `Rol guardado con ID: ${selectedRoleId}`)
+
       } else {
-        Swal.fire('No se seleccionó ningún rol', '', 'warning');
+        this.mostrarSwal(SWAL_WARN, 'No hay rol seleccionado.', 'No se seleccionó ningún rol')
       }
     }
   }
@@ -184,14 +186,14 @@ export class GestorRolesPage implements OnInit {
   async modificarRol(usuario: Usuario) {
     // Obtener los roles disponibles
     const roles = await this._rolesService.obtenerRoles();
-  
+
     // Crear un HTML dinámico para mostrar los detalles del usuario y los roles
-    const roleOptions = roles.map(rol => 
+    const roleOptions = roles.map(rol =>
       `<button class="role-button" data-role-id="${rol.id}" style="margin: 5px; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
         ${rol.nombre}
       </button>`
     ).join('');
-  
+
     // Mostrar la alerta con SweetAlert
     const { isConfirmed } = await Swal.fire({
       title: 'Modificar Rol',
@@ -210,7 +212,7 @@ export class GestorRolesPage implements OnInit {
       didOpen: () => {
         // Seleccionar todos los botones de rol después de abrir la alerta
         const buttons = document.querySelectorAll('.role-button') as NodeListOf<HTMLElement>;
-  
+
         // Añadir eventos de clic a los botones
         buttons.forEach(button => {
           button.addEventListener('click', () => {
@@ -219,7 +221,7 @@ export class GestorRolesPage implements OnInit {
               (btn as HTMLButtonElement).classList.remove('selected');
               (btn as HTMLButtonElement).style.backgroundColor = '#007bff'; // Color original
             });
-  
+
             // Marcar el botón seleccionado
             (button as HTMLButtonElement).classList.add('selected');
             (button as HTMLButtonElement).style.backgroundColor = '#28a745'; // Cambiar a color verde cuando se selecciona
@@ -228,54 +230,36 @@ export class GestorRolesPage implements OnInit {
         });
       }
     });
-  
+
     // Manejar la confirmación de la selección
     if (isConfirmed) {
       // Obtener el botón seleccionado
       const selectedButton = document.querySelector('.role-button.selected') as HTMLElement;
-      
+
       if (selectedButton) {
         const selectedRoleId = selectedButton.getAttribute('data-role-id'); // Obtener el ID del rol seleccionado
         const data: ActualizarRol = {
           rol: [parseInt(selectedRoleId!)] // Asegúrate de enviar el rol como número
         };
-  
+
         // Actualizar el rol en el servicio
         this._usuarioService.actualizarRol(usuario.rut, data).subscribe({
           next: (response) => {
             console.log('Rol actualizado con éxito:', response);
-            Swal.fire({
-              title: 'Éxito',
-              text: 'Rol guardado.',
-              icon: 'success',
-              heightAuto: false
-            });
+            this.mostrarSwal(SWAL_SUCCESS, 'Éxito', 'Rol guardado.')
+
             this.cargarUsuarios(); // Recargar la lista de usuarios
           },
           error: (error) => {
             console.error('Error al actualizar el rol:', error);
-            Swal.fire({
-              title: 'Error',
-              text: 'No se pudo actualizar el rol',
-              icon: 'error',
-              heightAuto: false
-            });
+            this.mostrarSwal(SWAL_ERROR, 'Error', 'No se pudo actualizar el rol');
           }
         });
       } else {
-        Swal.fire({
-          title: 'Error',
-          text: 'No se seleccionó ningún rol',
-          icon: 'warning',
-          heightAuto: false
-        });
+        this.mostrarSwal(SWAL_WARN, 'Error', 'No se seleccionó ningún rol');
       }
     }
   }
-  
-
-  
-
 
   // Cerrar modal
   cerrarModal() {
@@ -290,5 +274,14 @@ export class GestorRolesPage implements OnInit {
     } else {
       this.usuariosFiltrados = this.usuarios; // Si no hay filtro, mostrar todos los usuarios
     }
+  }
+
+  async mostrarSwal(icon: SweetAlertIcon, tittle: string, text: string) {
+    await Swal.fire({
+      icon: icon,
+      title: tittle,
+      text: text,
+      heightAuto: false
+    });
   }
 }

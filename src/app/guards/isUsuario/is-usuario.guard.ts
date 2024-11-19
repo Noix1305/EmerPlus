@@ -20,7 +20,7 @@ export const isUsuarioGuard: CanActivateFn = async (route, state) => {
         const infoUser = JSON.parse(decryptedData);  // Ahora que está desencriptado, lo parseamos como JSON
 
         // Verifica si el usuario tiene el rol de 'usuario' (en este caso rol[0] === 2)
-        if (infoUser.rol && infoUser.rol[0] === 2) {
+        if (infoUser.rol && infoUser.rol[0] != 1) {
           return true; // Permite el acceso si el rol es correcto
         } else {
           console.log('Acceso denegado: usuario no tiene rol de usuario');

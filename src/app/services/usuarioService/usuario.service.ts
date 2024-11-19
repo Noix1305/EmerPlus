@@ -32,6 +32,19 @@ export class UsuarioService {
     );
   }
 
+  getUsuarioPorRol(rol: number): Observable<HttpResponse<Usuario[]>> {
+    // Usamos "cs" para verificar si el array "rol" contiene el número dado
+    const params = new HttpParams().set('rol', `cs.{${rol}}`);
+    console.log('Rol de consulta: ' + rol);
+
+    return this.apiConfig.get<Usuario[]>(this.path, params).pipe(
+      catchError((error) => {
+        console.error('Error al obtener usuarios por rol:', error);
+        return throwError(() => new Error('Error al obtener usuarios por rol.'));
+      })
+    );
+  }
+
   async enviarContraseñaPorRut(rut?: string, email?: string): Promise<void> {
     if (rut) {
       const usuarioResponse = await firstValueFrom(this.getUsuarioPorRut(rut));
@@ -251,9 +264,9 @@ export class UsuarioService {
   async cargarUsuario() {
     const result = await Preferences.get({ key: 'userInfo' });
     const value = result.value;
-  
+
     console.log('Valor recuperado de userInfo:', value); // Verifica el valor almacenado
-  
+
     if (value) {
       try {
         // Validar que el valor es un JSON antes de intentar parsearlo
@@ -272,7 +285,7 @@ export class UsuarioService {
       console.log('No hay información del usuario');
     }
   }
-  
+
   // Función para verificar si una cadena es un JSON válido
   esJsonValido(str: string): boolean {
     try {
@@ -282,7 +295,7 @@ export class UsuarioService {
       return false;
     }
   }
-  
+
 
   async guardarUsuario(usuario: Usuario) {
     try {
@@ -292,7 +305,7 @@ export class UsuarioService {
       console.error('Error al guardar el usuario:', error);
     }
   }
-  
+
 
 
   actualizarUsuario(usuario: Usuario) {

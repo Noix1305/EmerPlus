@@ -5,6 +5,7 @@ import { LoginService } from 'src/app/services/loginService/login.service';
 import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
 import { LoadingController } from '@ionic/angular';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
+import { MENSAJE_CARGANDO } from 'src/constantes';
 
 
 @Component({
@@ -32,8 +33,8 @@ export class HomePage {
 
   async presentLoading() {
     const loading = await this.loadingController.create({
-      message: 'Cargando...',
-      duration: 1000,
+      message: MENSAJE_CARGANDO,
+      duration: 500,
     });
     await loading.present();
   }
