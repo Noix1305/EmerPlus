@@ -33,6 +33,11 @@
       Gestionar roles de usuario
     </ion-item>
 
+    <ion-item *ngIf="rolUsuarioActivo === 'Staff Técnico'" button (click)="solicitudesTecnicas()">
+      <ion-icon name="shield-checkmark-outline" slot="start"></ion-icon>
+      Solicitudes de servicio 
+    </ion-item>
+
     <!-- Para Bombero -->
     <ion-item *ngIf="rolUsuarioActivo === 'Bombero'" button (click)="verSolicitudes()">
       <ion-icon name="flame-outline" slot="start"></ion-icon>

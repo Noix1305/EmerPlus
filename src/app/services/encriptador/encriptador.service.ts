@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import * as CryptoJS from 'crypto-js';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class EncriptadorService {
-  
 
-  private secretKey: string = 'emerplus2024';  // Cambia esta clave por una clave más segura
+
+  private secretKey: string = environment.ENCRYPT_KEY;  // Cambia esta clave por una clave más segura
 
   constructor() { }
 

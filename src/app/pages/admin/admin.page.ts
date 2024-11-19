@@ -25,7 +25,7 @@ export class AdminPage implements OnInit {
 
   async ngOnInit() {
     await this.presentLoading();
-    
+
     // Obtener el valor encriptado desde Preferences
     const { value } = await Preferences.get({ key: 'userInfo' });
 
@@ -62,6 +62,10 @@ export class AdminPage implements OnInit {
   // Función para gestionar roles de usuarios
   gestionarRoles() {
     this.router.navigate(['/gestor-roles']); // Redirigir a la página para gestionar roles
+  }
+
+  solicitudesTecnicas() {
+    this.router.navigate(['/soporte']);
   }
 
   verSolicitudesBomberos() { }

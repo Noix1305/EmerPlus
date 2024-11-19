@@ -4,6 +4,7 @@ import { isUsuarioGuard } from './guards/isUsuario/is-usuario.guard';
 import { isAdminGuard } from './guards/isAdmin/is-admin.guard';
 import { isAdminOrUserGuard } from './guards/isAdminOrUser/is-admin-or-user.guard';
 import { isStaffGuard } from './guards/isStaff/is-staff.guard';
+import { isTecnicoGuard } from './guards/isTecnico/is-tecnico.guard';
 
 const routes: Routes = [
   {
@@ -53,10 +54,17 @@ const routes: Routes = [
     loadChildren: () => import('./pages/ubicacion/ubicacion.module').then(m => m.UbicacionPageModule)
   },
   {
+    path: 'soporte',
+    loadChildren: () => import('./pages/soporte/soporte/soporte.module').then(m => m.SoportePageModule),
+    canActivate: [isTecnicoGuard]
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
   },
+
+
 
 ];
 

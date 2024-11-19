@@ -22,7 +22,7 @@ export const isStaffGuard: CanActivateFn = async (route, state) => {
     console.log('Información del usuario:', infoUser); // Log para depuración
 
     // Verificar si el usuario tiene los permisos necesarios
-    if ([1, 3, 4, 5].includes(infoUser.rol[0])) {
+    if ([1, 3, 4, 5, 6].includes(infoUser.rol[0])) {
       return true;
     } else {
       // Redirigir si el usuario no tiene los permisos adecuados

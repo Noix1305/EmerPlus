@@ -54,11 +54,11 @@ export class AgregarUsuarioAdminPage implements OnInit {
       return;
     }
 
-    if (!this._loginService.validarRUT(this.rut)) {
-      this.errorMessage = 'El RUT ingresado no es válido.';
-      this.mostrarSwal('error', 'Error', this.errorMessage);
-      return;
-    }
+    // if (!this._loginService.validarRUT(this.rut)) {
+    //   this.errorMessage = 'El RUT ingresado no es válido.';
+    //   this.mostrarSwal('error', 'Error', this.errorMessage);
+    //   return;
+    // }
 
     passwordFinal = this._encriptadorService.encrypt(this.password);
 
