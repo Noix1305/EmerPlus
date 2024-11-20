@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { AlertController, LoadingController, PopoverController } from '@ionic/angular';
+import { LoadingController, PopoverController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { NotificacionPopoverComponent } from 'src/app/components/notificacionPopover/notificacion-popover/notificacion-popover.component';
 import { Contacto } from 'src/app/models/contacto';
@@ -17,7 +17,7 @@ import { Geolocation } from '@capacitor/geolocation';
 
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
-import { ACCIDENTE, ESTADO_ENVIADA, INCENDIO, KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, ROBO, SWAL_ERROR, SWAL_INFO, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
+import { ACCIDENTE, AMBULANCIA, BOMBERO, ESTADO_ENVIADA, INCENDIO, KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, POLICIA, ROBO, SWAL_ERROR, SWAL_INFO, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
 
 
 @Component({
@@ -116,17 +116,17 @@ export class DashboardPage implements OnInit {
 
   carabineros(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia(ROBO, entidad, 4)
+    this.enviarSolicitudDeEmergencia(ROBO, entidad, POLICIA)
   }
 
   bomberos(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia(INCENDIO, entidad, 3)
+    this.enviarSolicitudDeEmergencia(INCENDIO, entidad, BOMBERO)
   }
 
   ambulancia(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia(ACCIDENTE, entidad, 5)
+    this.enviarSolicitudDeEmergencia(ACCIDENTE, entidad, AMBULANCIA)
 
   }
 

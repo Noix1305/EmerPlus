@@ -29,5 +29,11 @@ export const NAV_CONTACTO = 'contacto'
 export const NAV_NOTIFICACION = 'notificacion'
 export const ESTADO_ENVIADA = 'Enviada'
 export const ESTADO_LEIDA = 'Leída'
+export const ADMIN = 1;
+export const USUARIO = 2;
+export const BOMBERO = 3;
+export const POLICIA = 4;
+export const AMBULANCIA = 5;
+export const STAFF_TECNICO = 6;
 
 
