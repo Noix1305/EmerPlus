@@ -2,9 +2,10 @@ import { firstValueFrom } from 'rxjs';
 import Swal from 'sweetalert2';
 import { UsuarioService } from '../services/usuarioService/usuario.service';
 import { CrearUsuario } from '../models/crearUsuario';
-import { LoginService } from '../services/loginService/login.service';
+import { EncriptadorService } from '../services/encriptador/encriptador.service';
+import { SWAL_ERROR, SWAL_SUCCESS } from 'src/constantes';
 
-export async function mostrarFormularioRegistro(usuarioService: UsuarioService, loginService: LoginService) {
+export async function mostrarFormularioRegistro(usuarioService: UsuarioService, encriptadorService: EncriptadorService) {
   const { value: formValues } = await Swal.fire({
     title: 'Registro de Usuario',
     html: `
@@ -50,7 +51,7 @@ export async function mostrarFormularioRegistro(usuarioService: UsuarioService, 
 
   if (formValues) {
     console.log('Datos del usuario:', formValues);
-    registrarUsuario(formValues, usuarioService, loginService);
+    registrarUsuario(formValues, usuarioService, encriptadorService);
     // Aquí puedes llamar a un servicio de registro o procesar los datos como necesites.
     // Por ejemplo:
     // await this.authService.registerUser(formValues.rut, formValues.correo, formValues.password);
@@ -60,8 +61,8 @@ export async function mostrarFormularioRegistro(usuarioService: UsuarioService, 
 async function registrarUsuario(
   formValues: { rut: string; correo: string; password: string },
   usuarioService: UsuarioService,
-  loginService: LoginService) {
-    
+  encriptadorService: EncriptadorService) {
+
   let errorMessage = ''; // Reiniciar el mensaje de error
   let successMessage = ''; // Reiniciar el mensaje de éxito
   const defaultRoleId = 2;
@@ -72,7 +73,7 @@ async function registrarUsuario(
     if (usuarioExistenteBD.body && Array.isArray(usuarioExistenteBD.body) && usuarioExistenteBD.body.length > 0) {
       errorMessage = 'El RUT ya está registrado en la base de datos.';
       await Swal.fire({
-        icon: 'error',
+        icon: SWAL_ERROR,
         title: 'Error',
         text: errorMessage,
         heightAuto: false
@@ -83,7 +84,7 @@ async function registrarUsuario(
 
     const nuevoUsuario: CrearUsuario = {
       rut: formValues.rut,
-      password: loginService.encryptText(formValues.password),
+      password: encriptadorService.encrypt(formValues.password),
       rol: [defaultRoleId],
       correo: formValues.correo,
       estado: 1
@@ -94,7 +95,7 @@ async function registrarUsuario(
 
     successMessage = 'Usuario creado exitosamente.';
     await Swal.fire({
-      icon: 'success',
+      icon: SWAL_SUCCESS,
       title: 'Exito',
       text: successMessage,
       heightAuto: false
@@ -102,7 +103,7 @@ async function registrarUsuario(
   } catch (error) {
     errorMessage = 'Ocurrió un error al crear el usuario. Inténtalo de nuevo.';
     await Swal.fire({
-      icon: 'error',
+      icon: SWAL_ERROR,
       title: 'Error',
       text: errorMessage,
       heightAuto: false

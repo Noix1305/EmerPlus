@@ -10,4 +10,5 @@ export interface SolicitudDeEmergencia {
     estadoDescripcion?: string;
     imageUrl?: string | null;
     entidad: number;
+    asignada?:string
 }

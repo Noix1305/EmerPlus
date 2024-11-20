@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { AlertController, PopoverController } from '@ionic/angular';
+import { AlertController, LoadingController, PopoverController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { NotificacionPopoverComponent } from 'src/app/components/notificacionPopover/notificacion-popover/notificacion-popover.component';
 import { Contacto } from 'src/app/models/contacto';
@@ -16,6 +16,8 @@ import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergenc
 import { Geolocation } from '@capacitor/geolocation';
 
 import Swal, { SweetAlertIcon } from 'sweetalert2';
+import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
+import { ACCIDENTE, ESTADO_ENVIADA, INCENDIO, KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, ROBO, SWAL_ERROR, SWAL_INFO, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
 
 
 @Component({
@@ -36,26 +38,55 @@ export class DashboardPage implements OnInit {
     private _notificacionService: NotificacionService,
     private _contactoService: ContactosemergenciaService,
     private popoverController: PopoverController,
-    private _gestorArchivos: GestorArchivosService
+    private _gestorArchivos: GestorArchivosService,
+    private _encriptadorService: EncriptadorService,
+    private loadingController: LoadingController
   ) { }
 
   async ngOnInit() {
-
     // Intenta obtener el usuario desde la navegación anterior
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
+    const loading = await this.loadingController.create({
+      message: MENSAJE_CARGANDO,
+    });
+    await loading.present();
+    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
+
     if (!this.usuario) {
-      const { value } = await Preferences.get({ key: 'userInfo' });
+      const { value } = await Preferences.get({ key: KEY_USER_INFO });
 
       if (value) {
-        this.usuario = JSON.parse(value) as Usuario; // Convierte el JSON a Usuario
+        try {
+          // Desencriptar el valor usando el servicio de desencriptación
+          const decryptedData = this._encriptadorService.decrypt(value);
+
+          if (decryptedData) {
+            this.usuario = JSON.parse(decryptedData) as Usuario; // Convierte el JSON desencriptado a Usuario
+          } else {
+            console.error('Error al desencriptar los datos');
+            this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
+          }
+        } catch (error) {
+          console.error('Error al parsear JSON o desencriptar:', error);
+          this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
+        }
       } else {
         console.log('No se encontró el usuario en Preferences.');
       }
     } else {
       console.log('Usuario obtenido desde la navegación:', this.usuario);
     }
-    await this.someFunction();
-    console.log(this.notificaciones[0].fecha)
+
+    // Cargar las notificaciones
+    await this.cargarNotificacionesNuevas();
+
+    // Verificar que 'notificaciones' tiene al menos un elemento antes de acceder a su primer elemento
+    if (this.notificaciones.length > 0) {
+      console.log(this.notificaciones[0].fecha);
+    } else {
+      console.log('No hay notificaciones disponibles.');
+    }
+
+    loading.dismiss();
   }
 
   limpiarNotificaciones(ev: MouseEvent) {
@@ -64,32 +95,38 @@ export class DashboardPage implements OnInit {
   }
 
   async mostrarNotificaciones(ev: MouseEvent): Promise<void> {
-    const popover = await this.popoverController.create({
-      component: NotificacionPopoverComponent,
-      event: ev, // Pasa el evento para la posición
-      componentProps: {
-        notificaciones: this.notificaciones // Pasa las notificaciones aquí
-      }
+    // Verifica si hay notificaciones
+    if (this.notificaciones && this.notificaciones.length > 0) {
+      // Si hay notificaciones, muestra el popover
+      const popover = await this.popoverController.create({
+        component: NotificacionPopoverComponent,
+        event: ev, // Pasa el evento para la posición
+        componentProps: {
+          notificaciones: this.notificaciones // Pasa las notificaciones aquí
+        }
+      });
 
-    });
-
-    await popover.present();
+      await popover.present();
+    } else {
+      // Si no hay notificaciones, muestra el Swal
+      this.mostrarSwal(SWAL_INFO, 'Sin notificaciones', 'No hay notificaciones nuevas.');
+    }
   }
 
 
   carabineros(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('robo', entidad, 4)
+    this.enviarSolicitudDeEmergencia(ROBO, entidad, 4)
   }
 
   bomberos(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('incendio', entidad, 3)
+    this.enviarSolicitudDeEmergencia(INCENDIO, entidad, 3)
   }
 
   ambulancia(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia('accidente', entidad, 5)
+    this.enviarSolicitudDeEmergencia(ACCIDENTE, entidad, 5)
 
   }
 
@@ -145,7 +182,7 @@ export class DashboardPage implements OnInit {
       }
     } catch (error) {
       console.error('Error al mostrar la alerta:', error);
-      this.mostrarSwal('error', 'Error', 'No se pudo mostrar la alerta.');
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'No se pudo mostrar la alerta.');
     }
   }
 
@@ -178,12 +215,12 @@ export class DashboardPage implements OnInit {
 
       if (!this.usuario) {
 
-        return this.mostrarSwal('warning', 'Error', 'No hay usuario autenticado para procesar la solicitud.');
+        return this.mostrarSwal(SWAL_WARN, 'Error', 'No hay usuario autenticado para procesar la solicitud.');
       }
 
       if (!ubicacion) {
 
-        return this.mostrarSwal('warning', 'Error', 'No se pudo obtener la ubicación. Verifica los permisos.');
+        return this.mostrarSwal(SWAL_WARN, 'Error', 'No se pudo obtener la ubicación. Verifica los permisos.');
       }
 
       // Cambiar urlImg a string | undefined
@@ -211,7 +248,7 @@ export class DashboardPage implements OnInit {
       // Enviar la solicitud de emergencia
       const response = await firstValueFrom(this.emergenciaService.enviarSolicitud(nuevaSolicitud));
       console.log('Solicitud enviada con éxito:', response);
-      this.mostrarSwal('success', 'Éxito', 'Solicitud enviada con éxito.')
+      this.mostrarSwal(SWAL_SUCCESS, 'Éxito', 'Solicitud enviada con éxito.')
 
       // Obtener la última solicitud y enviar notificación
       const ultimaSolicitud = await this.emergenciaService.obtenerUltimaSolicitud();
@@ -224,19 +261,19 @@ export class DashboardPage implements OnInit {
           this.enviarNotificacion(tipoEmergencia, idSolicitud);
         }
       } else {
-        this.mostrarSwal('warning', 'Error', 'No se pudo encontrar la última solicitud. Inténtalo nuevamente más tarde.')
+        this.mostrarSwal(SWAL_WARN, 'Error', 'No se pudo encontrar la última solicitud. Inténtalo nuevamente más tarde.')
       }
     } catch (error) {
       console.error('Error al procesar la solicitud:', error);
-      this.mostrarSwal('error', 'Error', 'Error al procesar la solicitud.')
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al procesar la solicitud.')
 
       if (error instanceof HttpErrorResponse) {
         console.error('Error del servidor:', error.message);
-        this.mostrarSwal('error', 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
+        this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
         console.error('Detalles del error:', error.error); // Esto puede dar más información sobre el problema
       }
 
-      this.mostrarSwal('error', 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un error al enviar la solicitud. Inténtalo nuevamente.')
 
     }
   }
@@ -249,14 +286,11 @@ export class DashboardPage implements OnInit {
         longitud: position.coords.longitude
       };
     } catch (error) {
-      this.mostrarSwal('warning', 'Error', 'Error al obtener la ubicación.');
+      this.mostrarSwal(SWAL_WARN, 'Error', 'Error al obtener la ubicación.');
       console.error('Error al obtener la ubicación:', error);
       return null; // Maneja el error según sea necesario
     }
   }
-
-
-
 
   enviarNotificacion(tipo: string, nuevoIdSolicitud: number) {
     if (this.usuario) {
@@ -267,7 +301,7 @@ export class DashboardPage implements OnInit {
         hora: new Date().toTimeString().split(' ')[0],
         tipo: tipo,
         id_solicitud: nuevoIdSolicitud,
-        estado: 'Enviada'
+        estado: ESTADO_ENVIADA
       };
 
       // Enviar la notificación a la base de datos
@@ -294,24 +328,24 @@ export class DashboardPage implements OnInit {
                   }
                 } else {
                   console.warn('No se encontraron contactos o el formato es incorrecto.');
-                  this.mostrarSwal('warning', 'Error', 'No se encontraron contactos.')
+                  this.mostrarSwal(SWAL_WARN, 'Error', 'No se encontraron contactos.')
 
                 }
               },
               error: (error) => {
                 console.error('Error al obtener contactos:', error);
-                this.mostrarSwal('error', 'Error', 'Error al obtener contactos.')
+                this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al obtener contactos.')
               }
             });
           }
         },
         error: (error) => {
           console.error('Error al enviar la notificación:', error);
-          this.mostrarSwal('error', 'Error', 'Error al enviar la notificación.')
+          this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al enviar la notificación.')
         }
       });
     } else {
-      this.mostrarSwal('error', 'Error', 'No se encontró el usuario para enviar la notificación.')
+      this.mostrarSwal(SWAL_ERROR, 'Error', 'No se encontró el usuario para enviar la notificación.')
     }
   }
 
@@ -332,28 +366,32 @@ export class DashboardPage implements OnInit {
       });
     });
   }
-  cargarNotificacionesNuevas() {
+  async cargarNotificacionesNuevas() {
     const rut = this.usuario?.rut; // Utiliza el operador de encadenamiento opcional
 
-    // Verifica que el rut no sea undefined
     if (!rut) {
       console.error('El RUT del usuario es indefinido.');
-      return Promise.reject('RUT indefinido'); // Devuelve una promesa rechazada si el RUT es indefinido
+      return Promise.reject('RUT indefinido');
     }
 
     return new Promise<void>((resolve, reject) => {
       this._notificacionService.obtenerNotificacionesUsuario(rut).subscribe({
         next: (response: HttpResponse<Notificacion[]>) => {
-          // Extrae las notificaciones del cuerpo de la respuesta
-          this.notificaciones = response.body || []; // Almacena las notificaciones obtenidas
+          // Verifica que las notificaciones sean válidas antes de asignarlas
+          if (Array.isArray(response.body)) {
+            this.notificaciones = response.body;
+          } else {
+            console.error('Respuesta de notificaciones inválida:', response.body);
+            reject('Notificaciones inválidas');
+          }
         },
         error: (error) => {
           console.error('Error al cargar las notificaciones:', error);
-          reject(error); // Rechaza la promesa si hay un error
+          reject(error);
         },
         complete: () => {
           console.log('Carga de notificaciones completa.');
-          resolve(); // Resuelve la promesa al completar
+          resolve();
         }
       });
     });

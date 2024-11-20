@@ -1,12 +1,10 @@
 <ion-content>
   <ion-card>
     <ion-card-header class="cardHeader">
-      <ion-item lines="none" class="ionItems">
-        <ion-icon slot="start" name="log-in" color="secondary"></ion-icon>
-        <ion-card-title class="center-title">
-          <p style="text-align: center;">Member Login</p>
-        </ion-card-title>
-      </ion-item>
+      <ion-icon slot="start" name="log-in" color="secondary"></ion-icon>
+      <ion-card-title class="center-title" >
+        <p>Inicio de Sesión</p>
+      </ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
@@ -29,7 +27,8 @@
           <ion-button expand="block" type="submit">Iniciar Sesión</ion-button>
 
           <div *ngIf="rutNoRegistrado">
-            <p>{{ rutNoRegistrado }} <em><a style="font-weight: bold;" (click)="mostrarFormularioRegistro()">Registrate</a></em>
+            <p>{{ rutNoRegistrado }} <em><a style="font-weight: bold;"
+                  (click)="mostrarFormularioRegistro()">Registrate</a></em>
               para ingresar.</p>
           </div>
         </form>
@@ -40,10 +39,9 @@
       </div>
 
       <div *ngIf="isPasswordRecovery">
-        <form (submit)="onSubmitForgotPassword($event)" class="forgot-password-form"
-          style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <form (submit)="onSubmitForgotPassword($event)" class="forgot-password-form">
           <ion-input type="text" name="rut" required placeholder="Ingrese su RUT" style="max-width: 300px;"></ion-input>
-          <ion-button expand="full" type="submit" class="submit-button" style="max-width: 300px;">Enviar</ion-button>
+          <ion-button expand="block" type="submit" class="submit-button" style="max-width: 300px; margin-top: 10%;">Enviar</ion-button>
         </form>
       </div>
     </ion-card-content>
@@ -55,15 +53,12 @@
       <ion-item class="ionItems2" expand="full" href="home" lines="none">
         <ion-icon name="home" class="iconosInferior"></ion-icon>
       </ion-item>
-      <ion-item class="ionItems2" expand="full" href="dashboard" lines="none">
-        <ion-icon name="person-circle" class="iconosInferior"></ion-icon>
-      </ion-item>
-      <ion-item class="ionItems2" expand="full" lines="none">
-        <ion-icon name="settings" class="iconosInferior"></ion-icon>
+      <ion-item class="ionItems2" expand="full" href="soporte" lines="none">
+        <ion-icon name="chatbubbles" class="iconosInferior"></ion-icon>
       </ion-item>
     </div>
   </ion-card>
 
-  
+
 
 </ion-content>

@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Rol } from 'src/app/models/rol';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { environment } from 'src/environments/environment';
 import { ApiConfigService } from '../apiConfig/api-config.service';
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import {  HttpParams } from '@angular/common/http';
 import { firstValueFrom, map, Observable } from 'rxjs';
 
 @Injectable({

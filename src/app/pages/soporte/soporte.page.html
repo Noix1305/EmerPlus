@@ -1,0 +1,35 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Soporte Técnico</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <div class="container">
+    <h5 style="font-weight: bold; text-size-adjust: inherit;">Opciones de Soporte</h5>
+
+    <!-- Sección visible para todos los usuarios -->
+    <ion-button expand="full" color="primary">Enviar Ticket de Soporte</ion-button>
+
+    <!-- Sección visible solo para usuarios avanzados -->
+    <div>
+      <ion-button expand="full" color="secondary">Acceder a la Base de Conocimientos</ion-button>
+      <ion-button expand="full" color="secondary">Gestionar Mis Tickets</ion-button>
+    </div>
+
+    <!-- Sección visible solo para administradores -->
+    <div>
+      <ion-button expand="full" color="danger">Gestionar Usuarios</ion-button>
+      <ion-button expand="full" color="danger">Ver Todos los Tickets</ion-button>
+    </div>
+  </div>
+</ion-content>
+
+

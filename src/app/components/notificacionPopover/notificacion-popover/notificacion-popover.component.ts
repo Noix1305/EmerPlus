@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { PopoverController } from '@ionic/angular';
 import { Notificacion } from 'src/app/models/notificacion';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-notificacion-popover',
@@ -22,9 +23,12 @@ export class NotificacionPopoverComponent {
   }
 
   verNotificacion(notificacion: Notificacion) {
-    // Redirige a la página de ver notificación pasando la notificación completa
-    this.router.navigate(['/ver-notificacion'], { state: { notificacion } });
-    this.closePopover()
+    // Verifica si hay notificaciones disponibles
+    if (this.notificaciones && this.notificaciones.length > 0) {
+      // Si hay notificaciones, redirige a la página de ver notificación pasando la notificación completa
+      this.router.navigate(['/ver-notificacion'], { state: { notificacion } });
+      this.closePopover();
+    } 
   }
 
 }

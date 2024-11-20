@@ -40,7 +40,9 @@ if (!isAppflow && envFilePath) {
 
         PASSWORD_DB: process.env.PASSWORD_DB || '',
 
-        GOOGLE_MAP_TOKEN: process.env.GOOGLE_MAP_TOKEN || ''
+        GOOGLE_MAP_TOKEN: process.env.GOOGLE_MAP_TOKEN || '',
+        
+        ENCRYPT_KEY: process.env.ENCRYPT_KEY || ''
 
     };
 
@@ -63,8 +65,6 @@ fs.writeFileSync(
     'export const environment = ' + JSON.stringify(envConfig) + ';'
 
 );
-
-
 
 console.log(`Archivo de entorno generado en ${environmentFile} para el entorno ${process.env.ENV || 'desarrollo'}`);
 

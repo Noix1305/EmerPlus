@@ -4,6 +4,8 @@ import { UsuarioService } from 'src/app/services/usuarioService/usuario.service'
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
 import { LoadingController } from '@ionic/angular';
+import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
+import { MENSAJE_CARGANDO } from 'src/constantes';
 
 
 @Component({
@@ -15,9 +17,9 @@ export class HomePage {
 
   constructor(
     private _usuarioService: UsuarioService,
-    private _loginService: LoginService,
-    private loadingController: LoadingController
-    
+    private loadingController: LoadingController,
+    private _encriptadorService: EncriptadorService
+
   ) { }
 
   async ngOnInit() {
@@ -26,13 +28,13 @@ export class HomePage {
   }
 
   async mostrarFormularioRegistro() {
-    mostrarFormularioRegistro(this._usuarioService, this._loginService);
+    mostrarFormularioRegistro(this._usuarioService, this._encriptadorService);
   }
 
   async presentLoading() {
     const loading = await this.loadingController.create({
-      message: 'Cargando...',
-      duration: 1000,
+      message: MENSAJE_CARGANDO,
+      duration: 500,
     });
     await loading.present();
   }

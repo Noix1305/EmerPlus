@@ -3,9 +3,9 @@ import { Usuario } from 'src/app/models/usuario';
 import { MailSenderService } from '../mailService/mail-sender.service';
 import { Notificacion } from 'src/app/models/notificacion';
 import { catchError, map, Observable, of, throwError } from 'rxjs';
-import { Contacto } from 'src/app/models/contacto';
 import { HttpParams, HttpResponse } from '@angular/common/http';
 import { ApiConfigService } from '../apiConfig/api-config.service';
+import { NotificacionPatch } from 'src/app/models/notificacionPatch';
 
 @Injectable({
   providedIn: 'root'
@@ -59,8 +59,6 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
   }
 
 
-
-
   crearNotificacion(notificacion: Notificacion): Observable<HttpResponse<Notificacion>> {
     return this._apiConfig.post(this.path, notificacion);
   }
@@ -88,6 +86,20 @@ El equipo de Emerplus. Conectándote con la ayuda que necesitas, cuando la neces
     return this._apiConfig.get<Notificacion[]>(this.path, params);
   }
 
+
+  modificarNotificacion(id: number, notificacion: NotificacionPatch): Observable<HttpResponse<NotificacionPatch>> {
+    const path = `${this.path}?id=eq.${id}`;
+    return this._apiConfig.patch<NotificacionPatch>(path, notificacion).pipe(
+      map(response => {
+        return new HttpResponse<NotificacionPatch>({
+          body: response.body || null,
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+      })
+    );
+  }
 
 
 

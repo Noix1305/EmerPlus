@@ -3,7 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { AlertController, IonModal, ModalController, ToastController } from '@ionic/angular';
+import { IonModal, ModalController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { firstValueFrom } from 'rxjs';
 import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pass.component';
@@ -12,10 +12,11 @@ import { Contacto } from 'src/app/models/contacto';
 import { Region } from 'src/app/models/region';
 import { Usuario } from 'src/app/models/usuario';
 import { ContactosemergenciaService } from 'src/app/services/contactos/contactosemergencia.service';
-import { LoginService } from 'src/app/services/loginService/login.service';
+import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import { COLOR_ERROR, COLOR_EXITO, KEY_USER_INFO, NAV_CONTACTO, NAV_USUARIO, RUTA_LOGIN, SWAL_ERROR, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
@@ -47,8 +48,8 @@ export class UserInfoPage {
   };
 
 
-  colorVerde: string = 'success'
-  colorRojo: string = 'danger'
+  colorVerde: string = COLOR_EXITO
+  colorRojo: string = COLOR_ERROR
 
   contacto: Contacto = {
     rut_usuario: '',
@@ -85,10 +86,10 @@ export class UserInfoPage {
     private _rolService: RolService,
     private _usuarioService: UsuarioService,
     private _regionComunaService: RegionComunaService,
-    private toastController: ToastController,
     private fb: FormBuilder,
     private modalCtrl: ModalController,
-    private _contactoService: ContactosemergenciaService) {
+    private _contactoService: ContactosemergenciaService,
+    private _encriptadorService: EncriptadorService) {
 
     this.form = this.fb.group({
       nombre: ['', Validators.required],
@@ -103,17 +104,30 @@ export class UserInfoPage {
   }
 
   async ngOnInit() {
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.['usuario'];
+    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
 
     this.cargarRegiones();
     this.cargarComunas();
 
     if (!this.usuario) {
-      const { value } = await Preferences.get({ key: 'userInfo' });
+      const { value } = await Preferences.get({ key: KEY_USER_INFO });
 
       if (value) {
-        this.usuario = JSON.parse(value) as Usuario; // Convierte el JSON a Usuario
-        console.log('Usuario obtenido de Preferences:', this.usuario);
+        try {
+          // Desencripta el valor antes de parsearlo
+          const decryptedValue = this._encriptadorService.decrypt(value);
+
+          // Verifica que la desencriptación haya sido exitosa
+          if (decryptedValue) {
+            // Intenta parsear el JSON solo si la desencriptación fue exitosa
+            this.usuario = JSON.parse(decryptedValue) as Usuario;
+            console.log('Usuario obtenido de Preferences:', this.usuario);
+          } else {
+            console.error('La desencriptación no fue exitosa');
+          }
+        } catch (error) {
+          console.error('Error al desencriptar o parsear JSON:', error);
+        }
       } else {
         console.log('No se encontró el usuario en Preferences.');
       }
@@ -122,42 +136,16 @@ export class UserInfoPage {
     }
 
     if (this.usuario) {
-      this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
-        next: (response) => {
-          console.log('Respuesta del servicio de contacto:', response); // Agregado para depuración
-          if (response.body && response.body.length > 0) {
-            this.contacto = response.body[0];
-            this.usuario.contactoEmergencia = this.contacto;
-            console.log('Contacto de emergencia obtenido:', this.usuario.contactoEmergencia); // Verificar el contacto
-          } else {
-            console.log('No se encontró ningún contacto de emergencia.'); // Manejo del caso sin contacto
-          }
-        },
-        error: (error) => {
-          console.error('Error al obtener contacto:', error);
-        },
-        complete: async () => {
-          console.log('Solicitud completada');
-          if (this.usuario.contactoEmergencia) {
-            await Preferences.set({
-              key: 'contacto',
-              value: JSON.stringify(this.usuario.contactoEmergencia) // Convierte el objeto de contacto a string
-            });
-            console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);
-          } else {
-            console.log('No hay contacto de emergencia para guardar');
-          }
-        }
-      });
 
-
-      if (this.usuario.comunaid) { // Reemplaza 'id' con la propiedad correspondiente que estés usando
+      this.getContacto();
+      console.log("Comuna ID: " + this.usuario.comunaid + "||" + "Región ID: " + this.usuario.regionid)
+      if (this.usuario.comunaid) {
         this.getNombreComunaPorId(this.usuario.comunaid);
       } else {
         console.error('El ID de comuna es undefined');
       }
 
-      if (this.usuario.regionid) { // Reemplaza 'id' con la propiedad correspondiente que estés usando
+      if (this.usuario.regionid) {
         this.getNombreRegionPorId(this.usuario.regionid);
       } else {
         console.error('El ID de comuna es undefined');
@@ -174,26 +162,40 @@ export class UserInfoPage {
     }
   }
 
+
   async openChangePasswordModal() {
     if (this.usuario) {
       try {
         const modal = await this.modalCtrl.create({
           component: CambiarPassComponent,
           componentProps: {
-
-            rut: this.usuario.rut, // Enviar el RUT al modal
-            password: this.usuario.password, // Enviar la contraseña actual
+            rut: this.usuario.rut,
+            password: this.usuario.password
           }
+        });
+
+        // Presenta el modal
+        await modal.present();
+
+        // Escucha el evento de cierre para actualizar el usuario si se cambió la contraseña
+        const { data } = await modal.onDidDismiss();
+        if (data && data.success) {
+          console.log("Pass: " + data.nuevaContrasena)
+          // Actualiza la contraseña del usuario en `this.usuario`
+          this.usuario.password = data.nuevaContrasena;
+
+          // También puedes actualizar `Preferences` si es necesario
+          await Preferences.set({
+            key: KEY_USER_INFO,
+            value: JSON.stringify(this.usuario)
+          });
         }
-        );
-        return await modal.present();
       } catch (error) {
-        return error;
+        console.error('Error al abrir el modal:', error);
       }
-    } else {
-      return;
     }
   }
+
 
   getComunasPorRegion(idRegion: number) {
     this._regionComunaService.getComunaPorRegion(idRegion).subscribe({
@@ -275,15 +277,15 @@ export class UserInfoPage {
     try {
       await firstValueFrom(this._usuarioService.editarUsuario(updatedUser.rut, updatedUser));
       this.successMessage = 'Usuario editado con éxito';
-      this.activarSwal('Exito', this.successMessage, 'success', 'OK');
+      this.activarSwal('Exito', this.successMessage, SWAL_SUCCESS, 'OK');
       this.usuario = updatedUser;
-
+      const encryptedUser = this._encriptadorService.encrypt(JSON.stringify(this.usuario));
       await Preferences.set({
-        key: 'userInfo',
-        value: JSON.stringify(this.usuario) // Convierte el objeto de usuario a string
+        key: KEY_USER_INFO,
+        value: encryptedUser // Convierte el objeto de usuario a string
       });
+
       this.closeEditUserModal();
-      location.reload()
       this.usuario = updatedUser;
 
       // // Actualiza los datos del usuario en la página
@@ -317,7 +319,7 @@ export class UserInfoPage {
     const result = await Swal.fire({
       title: 'Eliminar Cuenta',
       text: '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
-      icon: 'warning',
+      icon: SWAL_WARN,
       showCancelButton: true,
       confirmButtonText: 'Eliminar',
       cancelButtonText: 'Cancelar',
@@ -332,14 +334,14 @@ export class UserInfoPage {
           await firstValueFrom(this._usuarioService.eliminarCuenta(this.usuario.rut)); // Asegúrate de que esta función exista en tu servicio
           this.successMessage = 'Cuenta eliminada exitosamente.';
 
-          this.activarSwal('Éxito', this.successMessage, 'success', 'OK');
+          this.activarSwal('Éxito', this.successMessage, SWAL_SUCCESS, 'OK');
 
-          this.router.navigate(['/login']); // Redirige al usuario a la página de login después de eliminar la cuenta
+          this.router.navigate([RUTA_LOGIN]); // Redirige al usuario a la página de login después de eliminar la cuenta
         } catch (error) {
           console.error('Error al eliminar la cuenta:', error);
           this.errorMessage = 'Ocurrió un error al eliminar la cuenta. Inténtalo de nuevo.';
 
-          this.activarSwal('Error', this.errorMessage, 'error', 'OK')
+          this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK')
         }
       }
     } else if (result.dismiss === Swal.DismissReason.cancel) {
@@ -352,7 +354,7 @@ export class UserInfoPage {
       await this.modalContacto.present();
     } else {
       this.errorMessage = 'No se ha registrado información de contacto de emergencia.'
-      this.activarSwal('Sin Contacto de Emergencia', this.errorMessage, 'error', 'OK');
+      this.activarSwal('Sin Contacto de Emergencia', this.errorMessage, SWAL_ERROR, 'OK');
     }
   }
 
@@ -451,33 +453,106 @@ export class UserInfoPage {
           } catch (error: unknown) {
             if (error instanceof Error) {
               this.errorMessage = 'Error durante el envío de la notificación.';
-              this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+              this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK');
 
             } else {
               console.error('Error desconocido:', error);
               this.errorMessage = 'Error durante el envío de la notificación.';
 
-              this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+              this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK');
             }
           }
         } else {
           this.errorMessage = 'Ocurrió un error al crear o editar el contacto.';
           console.error(this.errorMessage);
-          this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+          this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK');
         }
 
-        this.activarSwal('Éxito', this.successMessage, 'success', 'OK');
+        this.activarSwal('Éxito', this.successMessage, SWAL_SUCCESS, 'OK');
 
         this.closeEditContactModal();
 
       } catch (error) {
         this.errorMessage = 'Ocurrió un error al crear o editar el contacto. Inténtalo de nuevo.';
-        this.activarSwal('Error', this.errorMessage, 'error', 'OK');
+        this.activarSwal('Error', this.errorMessage, SWAL_ERROR, 'OK');
 
         console.error('Error al crear o editar contacto:', error);
       }
     }
   }
+
+  async getContacto() {
+    this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
+      next: (response) => {
+        console.log('Respuesta del servicio de contacto:', response);
+
+        // Verifica que la respuesta tenga datos
+        if (response.body && response.body.length > 0) {
+          this.contacto = response.body[0];
+
+          // Verifica si hay un contacto de emergencia
+          if (this.contacto) {
+            // Verifica si el contacto de emergencia ya está presente
+            if (this.usuario.contactoEmergencia) {
+              try {
+                const decryptedContact = this._encriptadorService.decrypt(JSON.stringify(this.usuario.contactoEmergencia));
+
+                // Verifica si el JSON desencriptado es válido antes de parsear
+                if (this.esJsonValido(decryptedContact)) {
+                  this.usuario.contactoEmergencia = JSON.parse(decryptedContact);
+                  console.log('Contacto de emergencia desencriptado:', this.usuario.contactoEmergencia);
+                } else {
+                  console.error('El valor desencriptado no es un JSON válido');
+                }
+              } catch (error) {
+                console.error('Error al desencriptar el contacto de emergencia:', error);
+              }
+            }
+          }
+        } else {
+          console.log('No se encontró ningún contacto de emergencia.');
+        }
+      },
+      error: (error) => {
+        console.error('Error al obtener contacto:', error);
+      },
+      complete: async () => {
+        console.log('Solicitud completada');
+
+        // Solo guarda el contacto si es válido
+        if (this.usuario.contactoEmergencia) {
+          try {
+            // Verifica si el contacto de emergencia es un JSON válido
+            const contactoString = JSON.stringify(this.usuario.contactoEmergencia);
+            if (this.esJsonValido(contactoString)) {
+              await Preferences.set({
+                key: NAV_CONTACTO,
+                value: this._encriptadorService.encrypt(contactoString) // Guarda el contacto de emergencia de forma encriptada
+              });
+              console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);
+            } else {
+              console.error('El contacto de emergencia no es un JSON válido para guardar.');
+            }
+          } catch (error) {
+            console.error('Error al guardar el contacto de emergencia:', error);
+          }
+        } else {
+          console.log('No hay contacto de emergencia para guardar');
+        }
+      }
+    });
+  }
+
+  // Función para verificar si una cadena es un JSON válido
+  esJsonValido(str: string): boolean {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
 
   async activarSwal(titulo: string, mensaje: string, icono: SweetAlertIcon, textoBoton: string) {
     await Swal.fire({
@@ -519,8 +594,6 @@ export class UserInfoPage {
     this.closeModal(this.modalContacto);
 
   }
-
-
 
   get correoUsuario(): string {
     return this.usuario?.correo || '';

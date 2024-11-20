@@ -1,18 +1,3 @@
-:root {
-    --ion-color-primary: #4CAF50;
-    /* Verde vibrante */
-    --ion-color-secondary: #FF5722;
-    /* Naranja vibrante */
-    --ion-color-warning: #FFC107;
-    /* Amarillo para alertas */
-    --ion-color-danger: #f44336;
-    /* Rojo para botones de peligro */
-    --ion-color-light: #f1f1f1;
-    /* Fondo claro */
-    --ion-color-dark: #212121;
-    /* Texto oscuro */
-}
-
 ion-content {
     --background: linear-gradient(135deg, rgba(240, 240, 240, 0.8), rgba(255, 255, 255, 0.9));
     padding: 10px;
@@ -23,6 +8,8 @@ ion-card {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     background-color: var(--ion-color-light);
     margin-bottom: 20px;
+    align-items: center;
+    text-align: center;
 }
 
 ion-card-content {
@@ -43,11 +30,15 @@ ion-card-content {
     --background: transparent;
 }
 
-ion-card-title p {
+ion-card-title {
+    margin: auto;
+    height: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     color: white;
     font-size: 1.5rem;
     font-weight: bold;
-    margin: 0;
 }
 
 /* Imagen de usuario (icono de persona) */
@@ -120,7 +111,7 @@ a:hover {
     justify-content: space-around;
     align-items: center;
     flex-direction: row;
-    margin-left:40px;
+    margin-left: 40px;
     padding: auto;
 
 }
@@ -128,16 +119,14 @@ a:hover {
 .iconosInferior {
     font-size: 2rem;
     color: var(--ion-color-secondary);
-    margin-left: 10px;
+    margin: auto;
     align-self: auto;
-    /* Naranja vibrante */
 }
 
 /* Estilo de los ítems de la barra inferior */
 .ionItems2 {
     --background: transparent;
     justify-content: center;
-    padding: 10px;
 }
 
 .center-title {

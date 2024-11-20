@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ModalController, NavParams, ToastController } from '@ionic/angular';
+import { ModalController, NavParams } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
+import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { LoginService } from 'src/app/services/loginService/login.service';
-import { SupabaseService } from 'src/app/services/supabase_service/supabase.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cambiar-pass',
@@ -24,9 +25,8 @@ export class CambiarPassComponent implements OnInit {
     private modalCtrl: ModalController,
     private _loginService: LoginService,
     private _usuarioService: UsuarioService,
-    private toastController: ToastController,
+    private _encriptadorService:EncriptadorService,
     private navParams: NavParams,
-    private supabaseService: SupabaseService
   ) {
 
     this.rut = this.navParams.get('rut');
@@ -48,63 +48,76 @@ export class CambiarPassComponent implements OnInit {
   }
 
   async cambiarContrasena() {
-    // Si el formulario es inválido, no se procederá
+
+
     if (this.form.invalid) {
       console.error('Formulario inválido');
       return;
     }
 
-    // Extraer valores del formulario
+    var cambioExitoso = false;
+
     let { contrasenaActual, nuevaContrasena } = this.form.value;
+    const contrasenaDesencriptada = this._encriptadorService.decrypt(this.password);
 
-    // Desencriptar la contraseña actual almacenada para comparar
-    const contrasenaDesencriptada = this._loginService.decryptText(this.password);
-    console.log('Contraseña Actual desencriptada: ' + contrasenaDesencriptada);
-
-    // Verificar si la contraseña actual proporcionada coincide con la desencriptada
     if (contrasenaActual !== contrasenaDesencriptada) {
       this.errorMsg = 'La contraseña actual no es correcta';
       return;
     }
 
-    // Encriptar la nueva contraseña antes de enviarla al servidor
+    const nuevaContrasenaEncriptada = this._encriptadorService.encrypt(nuevaContrasena);
+
     try {
-      const nuevaContrasenaEncriptada = this._loginService.encryptText(nuevaContrasena);
 
-      // Actualizar la contraseña en tu sistema
-      await firstValueFrom(this._usuarioService.cambiarContrasena(this.rut, nuevaContrasenaEncriptada));
+      const response = await firstValueFrom(this._usuarioService.cambiarContrasena(this.rut, nuevaContrasenaEncriptada));
+      console.log("response: " + response.status)
+      // Verificar el código de estado de la respuesta
+      if (response.status === 204) {
+        this.successMessage = 'Contraseña cambiada con éxito.';
 
-      // Actualizar la contraseña en Supabase Auth
-      const { error } = await this.supabaseService.auth.updateUser({ password: nuevaContrasena });
+        await Swal.fire({
+          icon: 'success',
+          title: 'Éxito',
+          text: this.successMessage,
+          timer: 2000,
+          heightAuto: false
+        });
 
-      if (error) {
-        console.error('Error al cambiar la contraseña en Supabase:', error);
-        this.errorMsg = 'Ocurrió un error al cambiar la contraseña en Supabase.';
-        return;
+        cambioExitoso = true;
+      } else {
+        // Mostrar mensaje de error si el código de estado no es 200
+        await Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un problema al cambiar la contraseña.',
+          timer: 2000,
+          heightAuto: false
+        });
       }
 
-      this.successMessage = 'Contraseña cambiada con éxito.';
-      this.presentToast(this.successMessage, 'success');
-    } catch (error) {
-      console.error('Error al cambiar la contraseña:', error);
+    } catch (error: any) {  // Manejo de error
+      await Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error.message || 'Error inesperado.',
+        timer: 2000,
+        heightAuto: false
+      });
     }
 
-    // Cerrar el modal
-    this.closeModal();
+    if (cambioExitoso) {
+      await this.modalCtrl.dismiss({
+        success: true,
+        nuevaContrasena: nuevaContrasenaEncriptada // Envía la nueva contraseña encriptada
+      });
+    } else {
+      await this.modalCtrl.dismiss({ success: false });
+    }
+
   }
 
   closeModal() {
     this.modalCtrl.dismiss();
-  }
-
-  async presentToast(successMessage: string, color: string) {
-    const toast = await this.toastController.create({
-      message: successMessage,
-      duration: 2000, // Duración en milisegundos
-      position: 'top', // Posición del Toast
-      color: color, // Color del Toast, puedes cambiarlo según tus necesidades
-    });
-    toast.present();
   }
 
 }

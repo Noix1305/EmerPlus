@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+      <ion-back-button (onClick)="volver()"></ion-back-button>
     </ion-buttons>
     <ion-title>Detalles de la Notificación</ion-title>
     <ion-buttons slot="end">
@@ -25,5 +25,5 @@
     </ion-card-content>
   </ion-card>
 
-  <ion-button expand="full" (click)="realizarAccion()">Realizar Acción</ion-button>
+  <ion-button expand="full" (click)="realizarAccion()">Marcar como Leída</ion-button>
 </ion-content>

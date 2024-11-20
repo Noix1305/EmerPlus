@@ -3,6 +3,7 @@ import { ApiConfigService } from '../apiConfig/api-config.service';
 import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
 import { catchError, firstValueFrom, map, Observable, of, tap, throwError } from 'rxjs';
 import { HttpErrorResponse, HttpParams, HttpResponse } from '@angular/common/http';
+import { SolicitudPatch } from 'src/app/models/solicitudPatch';
 
 @Injectable({
   providedIn: 'root'
@@ -58,6 +59,20 @@ export class SolicitudDeEmergenciaService {
     }
   }
 
+  modificarSolicitud(id: number, notificacion: SolicitudPatch): Observable<HttpResponse<SolicitudPatch>> {
+    const path = `${this.path}?id=eq.${id}`;
+    return this._apiConfig.patch<SolicitudPatch>(path, notificacion).pipe(
+      map(response => {
+        return new HttpResponse<SolicitudPatch>({
+          body: response.body || null,
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers
+        });
+      })
+    );
+  }
+
   async obtenerSolicitudesPorRol(rolUsuario: number): Promise<SolicitudDeEmergencia[]> {
     const params = new HttpParams().set('select', '*');
 
@@ -84,18 +99,24 @@ export class SolicitudDeEmergenciaService {
 
   // Función auxiliar para filtrar solicitudes según el rol
   private filtrarSolicitudesPorRol(solicitudes: SolicitudDeEmergencia[], rolUsuario: number): SolicitudDeEmergencia[] {
-    if (rolUsuario === 1) {
-      return solicitudes; // Administrador puede ver todas las solicitudes
-    } else if (rolUsuario === 3) {
-      return solicitudes.filter(solicitud => solicitud.entidad === 3); // Filtrar por tipo 'Fuego' para Bomberos
-    } else if (rolUsuario === 4) {
-      return solicitudes.filter(solicitud => solicitud.entidad === 4); // Filtrar por tipo 'Seguridad' para Policía
-    } else if (rolUsuario === 5) {
-      return solicitudes.filter(solicitud => solicitud.entidad === 5); // Filtrar por tipo 'Medico' para Ambulancia
-    } else {
-      return []; // Si el rol no coincide, devolver un array vacío o manejar de otra forma
+    switch (rolUsuario) {
+      case 1: // Rol de Administrador
+        return solicitudes; // Administrador puede ver todas las solicitudes
+
+      case 3: // Rol de Bomberos
+        return solicitudes.filter(solicitud => solicitud.entidad === 3); // Filtrar por entidad 'Fuego' para Bomberos
+
+      case 4: // Rol de Policía
+        return solicitudes.filter(solicitud => solicitud.entidad === 4); // Filtrar por entidad 'Seguridad' para Policía
+
+      case 5: // Rol de Ambulancia
+        return solicitudes.filter(solicitud => solicitud.entidad === 5); // Filtrar por entidad 'Medico' para Ambulancia
+
+      default:
+        return []; // Si el rol no coincide, devolver un array vacío o manejar de otra forma
     }
   }
+
 
   // Método para actualizar una solicitud de emergencia (PATCH)
   actualizarSolicitud(id: number, solicitud: Partial<SolicitudDeEmergencia>): Observable<HttpResponse<SolicitudDeEmergencia>> {

@@ -18,7 +18,7 @@ export class UsuarioService {
   private usuarioSubject = new BehaviorSubject<Usuario | null>(null);
   public usuario$ = this.usuarioSubject.asObservable();
 
-  constructor(private apiConfig: ApiConfigService, private mailSenderService: MailSenderService) { 
+  constructor(private apiConfig: ApiConfigService, private mailSenderService: MailSenderService) {
     this.cargarUsuario();
   }
 
@@ -28,6 +28,19 @@ export class UsuarioService {
       catchError((error) => {
         console.error('Error al obtener usuario por RUT:', error);
         return throwError(() => new Error('Error al obtener usuario por RUT.'));
+      })
+    );
+  }
+
+  getUsuarioPorRol(rol: number): Observable<HttpResponse<Usuario[]>> {
+    // Usamos "cs" para verificar si el array "rol" contiene el número dado
+    const params = new HttpParams().set('rol', `cs.{${rol}}`);
+    console.log('Rol de consulta: ' + rol);
+
+    return this.apiConfig.get<Usuario[]>(this.path, params).pipe(
+      catchError((error) => {
+        console.error('Error al obtener usuarios por rol:', error);
+        return throwError(() => new Error('Error al obtener usuarios por rol.'));
       })
     );
   }
@@ -53,7 +66,7 @@ export class UsuarioService {
             heightAuto: false
           });
           throw new Error('El correo electrónico no está disponible para el usuario.');
-          
+
         }
       } else {
         await Swal.fire({
@@ -201,19 +214,11 @@ export class UsuarioService {
 
   cambiarContrasena(rut: string, nuevaContrasena: string): Observable<HttpResponse<Usuario>> {
     const path = `${this.path}?rut=eq.${rut}`;
-    const body = { password: nuevaContrasena }; // Asumiendo que el campo de la contraseña es 'password'
+    const body = { password: nuevaContrasena }; // Asegúrate de que el nombre del campo sea el correcto
 
-    return this.apiConfig.patch<Usuario>(path, body).pipe(
-      map(response => {
-        return new HttpResponse<Usuario>({
-          body: response.body || null,
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers
-        });
-      })
-    );
+    return this.apiConfig.patch<Usuario>(path, body, { observe: 'response' });
   }
+
 
   eliminarCuenta(rut: string): Observable<HttpResponse<void>> {
     const path = `${this.path}?rut=eq.${rut}`;
@@ -259,11 +264,49 @@ export class UsuarioService {
   async cargarUsuario() {
     const result = await Preferences.get({ key: 'userInfo' });
     const value = result.value;
+
+    console.log('Valor recuperado de userInfo:', value); // Verifica el valor almacenado
+
     if (value) {
-      const usuario = JSON.parse(value) as Usuario;
-      this.usuarioSubject.next(usuario); // Emite el nuevo usuario
+      try {
+        // Validar que el valor es un JSON antes de intentar parsearlo
+        if (this.esJsonValido(value)) {
+          const usuario = JSON.parse(value) as Usuario;
+          this.usuarioSubject.next(usuario); // Emite el nuevo usuario
+        } else {
+          console.error('El valor almacenado no es un JSON válido');
+          await Preferences.remove({ key: 'userInfo' }); // Eliminar el valor corrupto
+        }
+      } catch (error) {
+        console.error('Error al parsear el JSON:', error);
+        await Preferences.remove({ key: 'userInfo' }); // Eliminar el valor corrupto si el parseo falla
+      }
+    } else {
+      console.log('No hay información del usuario');
     }
   }
+
+  // Función para verificar si una cadena es un JSON válido
+  esJsonValido(str: string): boolean {
+    try {
+      JSON.parse(str);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+
+  async guardarUsuario(usuario: Usuario) {
+    try {
+      const value = JSON.stringify(usuario);  // Convertir el objeto a JSON
+      await Preferences.set({ key: 'userInfo', value });
+    } catch (error) {
+      console.error('Error al guardar el usuario:', error);
+    }
+  }
+
+
 
   actualizarUsuario(usuario: Usuario) {
     this.usuarioSubject.next(usuario); // Actualiza el estado del usuario
