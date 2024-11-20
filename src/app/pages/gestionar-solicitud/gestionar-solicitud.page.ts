@@ -6,7 +6,6 @@ import { UsuarioService } from 'src/app/services/usuarioService/usuario.service'
 import { NAV_SOLICITUD, RUTA_MAPA, KEY_USER_INFO } from 'src/constantes';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { firstValueFrom } from 'rxjs';  // Importa firstValueFrom
-import { NotificacionPatch } from 'src/app/models/notificacionPatch';
 import { SolicitudPatch } from 'src/app/models/solicitudPatch';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
 

@@ -55,11 +55,11 @@ const routes: Routes = [
   },
   {
     path: 'soporte',
-    loadChildren: () => import('./pages/soporte/soporte/soporte.module').then(m => m.SoportePageModule)
+    loadChildren: () => import('./pages/soporte/soporte.module').then(m => m.SoportePageModule)
   },
   {
     path: 'gestionar-solicitud',
-    loadChildren: () => import('./pages/gestionSolicitud/gestionar-solicitud/gestionar-solicitud.module').then(m => m.GestionarSolicitudPageModule)
+    loadChildren: () => import('./pages/gestionar-solicitud/gestionar-solicitud.module').then(m => m.GestionarSolicitudPageModule)
   },
   {
     path: '',

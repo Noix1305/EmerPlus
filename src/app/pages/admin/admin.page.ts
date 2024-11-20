@@ -23,6 +23,7 @@ export class AdminPage implements OnInit {
 
   rolUsuarioActivo: string = '';
   usuarioActivo: Usuario | null = null;
+  rolUsuario: number = 0;
 
   async ngOnInit() {
     await this.presentLoading();
@@ -42,7 +43,15 @@ export class AdminPage implements OnInit {
         this.rolUsuarioActivo = await this._rolService.obtenerNombreRol(this.usuarioActivo.rol[0]) || 'Desconocido';
       }
     }
+
+    this.cargarRolUsuario();
     console.log(this.rolUsuarioActivo);
+  }
+
+  private cargarRolUsuario() {
+    if (this.usuarioActivo) {
+      this.rolUsuario = this.usuarioActivo.rol[0];
+    }
   }
 
   // Función para ver todas las solicitudes

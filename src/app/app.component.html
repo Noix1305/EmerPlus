@@ -15,8 +15,6 @@
             <ion-label>Inicio</ion-label>
           </ion-item>
 
-
-
           <ion-item (click)="navigateAndCloseMenu('/user-info')" *ngIf="isUser || isStaff">
             <ion-icon slot="start" name="person" color="secondary"></ion-icon>
             <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
@@ -60,11 +58,6 @@
             <ion-label>Gestionar Roles de Usuarios</ion-label>
           </ion-item>
 
-          <ion-item (click)="navigateAndCloseMenu('/solicitudes')" *ngIf="isAdmin">
-            <ion-icon slot="start" name="list-circle" color="danger"></ion-icon>
-            <ion-icon slot="end" name="chevron-forward" color="secondary"></ion-icon>
-            <ion-label>Ver Solicitudes</ion-label>
-          </ion-item>
           <!-- Cierre sesión general -->
           <ion-item (click)="cerrarSesion()">
             <ion-icon slot="start" name="log-out" color="danger"></ion-icon>

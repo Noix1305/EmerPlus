@@ -4,26 +4,26 @@
 // src/theme/variables.scss
 
 :root {
-    --ion-color-primary: #d32f2f;   /* Rojo oscuro, asociado a emergencias */
+    --ion-color-primary: #4885ee;   /* Rojo oscuro, asociado a emergencias */
     --ion-color-primary-rgb: 211, 47, 47;
     --ion-color-primary-contrast: #ffffff; /* Contraste en blanco para buena legibilidad */
     --ion-color-primary-contrast-rgb: 255, 255, 255;
     --ion-color-primary-shade: #c62828;   /* Sombra para dar profundidad al color principal */
     --ion-color-primary-tint: #e57373;    /* Tono más claro para variantes de elementos */
   
-    --ion-color-secondary: #ffa726;  /* Naranja para dar energía y resaltar */
+    --ion-color-secondary: #073e66;  /* Naranja para dar energía y resaltar */
     --ion-color-secondary-rgb: 255, 167, 38;
     --ion-color-secondary-contrast: #ffffff;
     --ion-color-secondary-contrast-rgb: 255, 255, 255;
-    --ion-color-secondary-shade: #fb8c00;
-    --ion-color-secondary-tint: #ffb74d;
+    --ion-color-secondary-shade: #015796;
+    --ion-color-secondary-tint: #1a73b3;
   
-    --ion-color-tertiary: #ffffff; /* Blanco para dar claridad y espacios limpios */
+    --ion-color-tertiary: #6030ff; /* Blanco para dar claridad y espacios limpios */
     --ion-color-tertiary-rgb: 255, 255, 255;
     --ion-color-tertiary-contrast: #000000;
     --ion-color-tertiary-contrast-rgb: 0, 0, 0;
-    --ion-color-tertiary-shade: #f2f2f2;
-    --ion-color-tertiary-tint: #ffffff;
+    --ion-color-tertiary-shade: #542ae0;
+    --ion-color-tertiary-tint: #7045ff;
   
     /* Puedes personalizar más colores aquí */
   }

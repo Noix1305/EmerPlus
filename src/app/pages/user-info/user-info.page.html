@@ -48,10 +48,12 @@
       <mat-list-item>
         <span><strong>Contacto Emergencia:</strong></span>
         <ng-container *ngIf="usuario?.contactoEmergencia; else agregarContacto">
-          <button mat-raised-button (click)="mostrarContacto()" class="rounded-button mostrarContacto">Mostrar Contacto</button>
+          <button mat-raised-button (click)="mostrarContacto()" class="rounded-button mostrarContacto">Mostrar
+            Contacto</button>
         </ng-container>
         <ng-template #agregarContacto>
-          <button mat-raised-button (click)="openEditContactModal()" class="rounded-button">Agregar Contacto Emergencia</button>
+          <button mat-raised-button (click)="openEditContactModal()" class="rounded-button">Agregar Contacto
+            Emergencia</button>
         </ng-template>
       </mat-list-item>
     </mat-list>
@@ -66,7 +68,7 @@
         Contraseña</button>
     </div>
   </mat-card-content>
-  <ion-button color="danger" (click)="eliminarCuenta()" class="rounded-button">
+  <ion-button *ngIf="roleId === 2" color="danger" (click)="eliminarCuenta()" class="rounded-button">
     Eliminar Cuenta
   </ion-button>
 </mat-card>
