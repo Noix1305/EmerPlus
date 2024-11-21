@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { LoadingController } from '@ionic/angular';
+import { IonModal, LoadingController, ModalController, PickerController } from '@ionic/angular';
+import { ModalInfoComponent } from 'src/app/components/modal-info/modal-info.component';
+import { TipoTicket } from 'src/app/models/tituloTicket';
 import { Usuario } from 'src/app/models/usuario';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
+import { TipoTicketService } from 'src/app/services/tipoTicket/tipo-ticket-service.service';
 import { KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, SWAL_ERROR } from 'src/constantes';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
@@ -13,15 +16,18 @@ import Swal, { SweetAlertIcon } from 'sweetalert2';
   styleUrls: ['./soporte.page.scss'],
 })
 export class SoportePage implements OnInit {
+  @ViewChild('modalTemplate', { static: false }) modalTemplate!: TemplateRef<any>;
 
   usuario: Usuario | undefined;
   rolUsuario: number = 0;
-  mostrarModal: boolean = false;
 
   constructor(
     private _encriptadorService: EncriptadorService,
+    private _tipoTicketService: TipoTicketService,
     private loadingController: LoadingController,
-    private router: Router
+    private router: Router,
+    private modalController: ModalController,
+    private pickerController: PickerController
   ) { }
 
   async ngOnInit() {
@@ -31,7 +37,6 @@ export class SoportePage implements OnInit {
     });
 
     await loading.present();
-
     this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
 
     if (!this.usuario) {
@@ -63,14 +68,16 @@ export class SoportePage implements OnInit {
     loading.dismiss();
   }
 
-  // Método para abrir el modal
-  abrirInformacionTicket() {
-    this.mostrarModal = true;
+  async abrirInformacionTicket() {
+    const modal = await this.modalController.create({
+      component: ModalInfoComponent,  // Asegúrate de pasar el componente aquí, no la plantilla
+    });
+    return await modal.present();
   }
 
-  // Método para cerrar el modal
-  cerrarModal() {
-    this.mostrarModal = false;
+
+  async cerrarModalInformacion() {
+    await this.modalController.dismiss();
   }
 
   async mostrarSwal(icon: SweetAlertIcon, tittle: string, text: string) {

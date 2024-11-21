@@ -5,7 +5,7 @@ import { LoginService } from 'src/app/services/loginService/login.service';
 import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
 import { LoadingController } from '@ionic/angular';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
-import { MENSAJE_CARGANDO } from 'src/constantes';
+import { KEY_USER_INFO, MENSAJE_CARGANDO } from 'src/constantes';
 
 
 @Component({
@@ -14,6 +14,7 @@ import { MENSAJE_CARGANDO } from 'src/constantes';
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
+  user: any = {};
 
   constructor(
     private _usuarioService: UsuarioService,
@@ -24,6 +25,24 @@ export class HomePage {
 
   async ngOnInit() {
     await Preferences.clear();
+
+    const rol = [0];
+
+    // Asignar el array de roles al objeto user
+    this.user.rol = rol;
+
+    // Encriptar y guardar el objeto en Preferences
+    const userString = JSON.stringify(this.user);
+
+    // Encriptar el string usando el servicio EncriptadorService
+    const encryptedUser = this._encriptadorService.encrypt(userString);
+
+    // Guardar el objeto encriptado en Preferences
+    await Preferences.set({
+      key: KEY_USER_INFO,
+      value: encryptedUser // Guardamos el valor encriptado
+    });
+
     await this.presentLoading();
   }
 

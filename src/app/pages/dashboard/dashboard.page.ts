@@ -31,6 +31,8 @@ export class DashboardPage implements OnInit {
   notificacion: number = 0;
   defaultEstado: number = 4;
   notificaciones: Notificacion[] = []
+  private intervalId: any;
+
 
   constructor(
     private emergenciaService: SolicitudDeEmergenciaService,
@@ -77,7 +79,14 @@ export class DashboardPage implements OnInit {
     }
 
     // Cargar las notificaciones
+    // Cargar las notificaciones
     await this.cargarNotificacionesNuevas();
+
+    // Iniciar el intervalo para cargar notificaciones cada 10 segundos (10,000 ms)
+    this.intervalId = setInterval(() => {
+      console.log('Cargando Notificaciones')
+      this.cargarNotificacionesNuevas();
+    }, 10000);
 
     // Verificar que 'notificaciones' tiene al menos un elemento antes de acceder a su primer elemento
     if (this.notificaciones.length > 0) {
@@ -380,6 +389,7 @@ export class DashboardPage implements OnInit {
           // Verifica que las notificaciones sean válidas antes de asignarlas
           if (Array.isArray(response.body)) {
             this.notificaciones = response.body;
+            this.notificacion = this.notificaciones.length
           } else {
             console.error('Respuesta de notificaciones inválida:', response.body);
             reject('Notificaciones inválidas');

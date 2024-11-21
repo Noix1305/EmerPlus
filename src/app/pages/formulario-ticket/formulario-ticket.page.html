@@ -1,0 +1,75 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Ticket de Soporte</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div style="padding: 20px;">
+    <div *ngIf="ticketForm">
+      <form [formGroup]="ticketForm" (ngSubmit)="enviarTicket()">
+
+        <!-- Nombre -->
+        <ion-input placeholder="Nombre" formControlName="nombre" required></ion-input>
+        <div *ngIf="ticketForm?.get('nombre')?.invalid && ticketForm?.get('nombre')?.touched">
+          Nombre es requerido.
+        </div>
+
+        <!-- Correo Electrónico -->
+        <ion-input placeholder="Correo Electrónico" formControlName="email" type="email" required></ion-input>
+        <div *ngIf="ticketForm?.get('email')?.invalid && ticketForm?.get('email')?.touched">
+          Correo electrónico inválido.
+        </div>
+
+        <!-- Tipo de Problema -->
+        <ion-select placeholder="Tipo de Problema" formControlName="tipoProblema" required>
+          <ion-select-option *ngFor="let tipo of tiposTickets" [value]="tipo.id">
+            {{ tipo.descripcion }}
+          </ion-select-option>
+        </ion-select>
+
+        <!-- Descripción del Ticket -->
+        <ion-textarea placeholder="Descripción del Ticket" formControlName="descripcion" required></ion-textarea>
+        <div *ngIf="ticketForm?.get('descripcion')?.invalid && ticketForm?.get('descripcion')?.touched">
+          Descripción es requerida.
+        </div>
+
+        <!-- Comentarios Adicionales -->
+        <ion-textarea placeholder="Comentarios Adicionales" formControlName="comentarios"></ion-textarea>
+
+        <ion-button type="submit" style="width: 100%" color="primary" [disabled]="ticketForm.invalid">Enviar
+          Ticket</ion-button>
+
+      </form>
+    </div>
+  </div>
+
+
+  <!-- <ion-button id="open-modal" (click)="openModal()">Open modal</ion-button>
+
+  <ion-modal [isOpen]="isModalOpen" (didDismiss)="onDidDismiss($event)" class="centered-modal">
+    <ng-template>
+      <ion-toolbar>
+        <ion-buttons slot="start">
+          <ion-button (click)="dismissModal()">Cancel</ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button (click)="dismissModal('confirm')">Done</ion-button>
+        </ion-buttons>
+      </ion-toolbar>
+
+      <ion-picker>
+        <ion-picker-column [value]="currentValue" (ionChange)="onIonChange($event)">
+          <ion-picker-column-option value="" disabled="true">--</ion-picker-column-option>
+          <ion-picker-column-option *ngFor="let tipo of tiposTickets" [value]="tipo.id">
+            {{ tipo.descripcion }}
+          </ion-picker-column-option>
+        </ion-picker-column>
+      </ion-picker>
+    </ng-template>
+  </ion-modal> -->
+
+</ion-content>

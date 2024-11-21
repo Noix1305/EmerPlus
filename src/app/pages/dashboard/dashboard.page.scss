@@ -1,17 +1,10 @@
-:root {
-    --ion-color-primary: #4CAF50;
-    /* Verde vibrante */
-    --ion-color-secondary: #FF5722;
-    /* Naranja vibrante */
-    --ion-color-warning: #FFC107;
-    /* Amarillo para alertas */
-    --ion-color-danger: #f44336;
-    /* Rojo para botones de peligro */
-    --ion-color-light: #f1f1f1;
-    /* Fondo claro */
-    --ion-color-dark: #212121;
-    /* Texto oscuro */
+.custom-badge {
+    --mat-badge-background-color: red;
+    /* Cambia el color de fondo a rojo */
+    --mat-badge-color: white;
+    /* Cambia el color del texto (número) a blanco */
 }
+
 
 /* Estilo de los botones de acción rápida */
 .colorVerdeMusgo {
@@ -133,8 +126,6 @@ ion-content {
     flex-direction: column;
 
 }
-
-
 
 /* Ajustes para pantallas pequeñas */
 @media (max-width: 600px) {

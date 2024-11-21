@@ -6,7 +6,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -19,13 +19,15 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { FooterComponent } from './components/footer/footer.component';
+import { ModalInfoComponent } from './components/modal-info/modal-info.component';
 
 @NgModule({
-  declarations: [AppComponent, FooterComponent],
+  declarations: [AppComponent, FooterComponent, ModalInfoComponent],
   imports: [BrowserModule,
     IonicModule.forRoot(),
     AppRoutingModule,
     FormsModule,
+    ReactiveFormsModule,
     BrowserAnimationsModule,
     MatCardModule,
     MatButtonModule,
@@ -36,7 +38,7 @@ import { FooterComponent } from './components/footer/footer.component';
     MatMenuModule,  // Asegúrate de agregarlo aquí
     MatIconModule,
   ],
-  
+
   exports: [BrowserAnimationsModule,
     MatCardModule,
     MatButtonModule,
@@ -53,7 +55,7 @@ import { FooterComponent } from './components/footer/footer.component';
     MatOptionModule,
     MatDialogModule,  // Asegúrate de agregarlo aquí
     MatMenuModule,  // Asegúrate de agregarlo aquí
-    ],
+  ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, provideHttpClient(withInterceptorsFromDi()), provideAnimationsAsync()],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]

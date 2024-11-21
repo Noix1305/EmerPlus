@@ -16,6 +16,7 @@ export class AppComponent implements OnInit, OnDestroy {
   isAdmin = false;
   isUser = false;
   isStaff = false;
+  isGuest = false;
   usuario: Usuario | null = null;
   private userSubscription: Subscription | undefined;
 
@@ -28,20 +29,26 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     // Obtener y desencriptar el usuario al iniciar la aplicación
-    this._usuarioService.cargarUsuario();
-    this.userSubscription = this._usuarioService.usuario$.subscribe((usuario) => {
-      this.usuario = usuario;
-      if (this.usuario) {
-        const rol = this.usuario.rol[0];
-        this.isAdmin = rol === 1;
-        this.isUser = rol === 2;
-        this.isStaff = rol !== 2 && rol !== 1;
+    try {
+      this._usuarioService.cargarUsuario();
+      this.userSubscription = this._usuarioService.usuario$.subscribe((usuario) => {
+        this.usuario = usuario;
+        if (this.usuario) {
+          const rol = this.usuario.rol[0];
+          this.isAdmin = rol === 1;
+          this.isUser = rol === 2;
+          this.isStaff = rol !== 2 && rol !== 1;
+          this.isGuest = rol === 0;
 
-      } else {
-        this.isAdmin = false;
-        this.isUser = false;
-      }
-    });
+        } else {
+          this.isAdmin = false;
+          this.isUser = false;
+          this.isGuest = false;
+        }
+      });
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   ngOnDestroy() {
