@@ -13,4 +13,5 @@ export interface Ticket {
     comentarios: string;
     tipo_problema_id:number;
     satisfaccion_id?: number;
+    asignado?:string
 }

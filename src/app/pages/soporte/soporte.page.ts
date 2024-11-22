@@ -16,18 +16,15 @@ import Swal, { SweetAlertIcon } from 'sweetalert2';
   styleUrls: ['./soporte.page.scss'],
 })
 export class SoportePage implements OnInit {
-  @ViewChild('modalTemplate', { static: false }) modalTemplate!: TemplateRef<any>;
 
   usuario: Usuario | undefined;
   rolUsuario: number = 0;
 
   constructor(
     private _encriptadorService: EncriptadorService,
-    private _tipoTicketService: TipoTicketService,
     private loadingController: LoadingController,
     private router: Router,
     private modalController: ModalController,
-    private pickerController: PickerController
   ) { }
 
   async ngOnInit() {
@@ -75,6 +72,9 @@ export class SoportePage implements OnInit {
     return await modal.present();
   }
 
+  public navegacion(nav:string) {
+    this.router.navigate(['/' + nav]);
+  }
 
   async cerrarModalInformacion() {
     await this.modalController.dismiss();

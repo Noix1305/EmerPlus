@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button href="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mis Tickets</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Cargando indicadores -->
+  <ion-spinner *ngIf="ticketsFiltrados.length === 0"></ion-spinner>
+
+  <!-- Mostrar mensaje si no hay tickets filtrados -->
+  <ion-item *ngIf="ticketsFiltrados.length === 0" lines="none" class="no-tickets-message">
+    <ion-label>No tienes tickets registrados.</ion-label>
+  </ion-item>
+
+  <!-- Mostrar la lista de tickets filtrados -->
+  <ion-list *ngIf="ticketsFiltrados.length > 0" class="ticket-list">
+    <ion-item *ngFor="let ticket of ticketsFiltrados" (click)="verDetallesTicket(ticket)" class="ticket-card">
+      <ion-label>
+        <h1 class="ticket-title">ID Ticket: {{ ticket.id }}</h1>        
+        <!-- Mostrar la descripción del tipo de problema basado en tipo_problema_id -->
+        <p class="ticket-problem-type">
+          {{ getTipoTicketDescripcion(ticket.tipo_problema_id) }}
+        </p>
+        
+        <p class="ticket-description">{{ ticket.descripcion }}</p>
+        <div class="ticket-status">
+          <ion-badge color="primary" *ngIf="ticket.estado_id === 1">Abierto</ion-badge>
+          <ion-badge color="secondary" *ngIf="ticket.estado_id === 2">En progreso</ion-badge>
+          <ion-badge color="tertiary" *ngIf="ticket.estado_id === 3">Resuelto</ion-badge>
+          <ion-badge color="success" *ngIf="ticket.estado_id === 4">Cerrado</ion-badge>
+        </div>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

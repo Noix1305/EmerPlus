@@ -15,16 +15,19 @@
     <h5 style="font-weight: bold; text-size-adjust: inherit;">Opciones de Soporte</h5>
 
     <!-- Botón para abrir el popup/modal -->
-    <ion-button expand="full" color="primary" (click)="abrirInformacionTicket()">¿Cómo funciona el sistema de
+    <ion-button *ngIf="rolUsuario!==0" expand="full" color="primary" (click)="abrirInformacionTicket()">¿Cómo funciona
+      el sistema de
       Tickets?</ion-button>
     <!-- Sección visible para todos los usuarios -->
-    <ion-button expand="full" color="primary" href="formulario-ticket">Enviar Ticket de Soporte</ion-button>
+    <ion-button expand="full" color="primary" (click)="navegacion('formulario-ticket')">Enviar Ticket de
+      Soporte</ion-button>
+    <ion-button *ngIf="rolUsuario ===2 || rolUsuario ===6" expand="full" color="primary" (click)="navegacion('mis-tickets')">Ver Mis
+      Tickets</ion-button>
 
     <!-- Sección visible solo para usuarios avanzados -->
-    <div *ngIf="rolUsuario !== 2">
+    <div *ngIf="rolUsuario !== 2 && rolUsuario !==0">
       <div>
         <ion-button expand="full" color="secondary">Acceder a la Base de Conocimientos</ion-button>
-        <ion-button expand="full" color="secondary">Gestionar Mis Tickets</ion-button>
       </div>
 
       <!-- Sección visible solo para administradores -->
@@ -33,5 +36,22 @@
         <ion-button expand="full" color="danger">Ver Todos los Tickets</ion-button>
       </div>
     </div>
+  </div>
+
+  <div *ngIf="rolUsuario === 0" class="ticket-info">
+    <p><strong>¿Cómo funciona el sistema de Tickets de Soporte?</strong></p>
+    <p>Para ayudar con cualquier problema o consulta, puedes crear un Ticket de Soporte. A continuación te explicamos
+      cómo funciona:</p>
+    <ol>
+      <li><strong>Enviar un Ticket</strong>: Al hacer clic en "Enviar Ticket de Soporte", podrás describir el problema
+        que estás experimentando.</li>
+      <li><strong>Seguimiento</strong>: Después de enviar tu ticket, nuestro equipo revisará tu solicitud y te
+        proporcionará una respuesta.</li>
+      <li><strong>Gestión de Tickets</strong>: Los usuarios avanzados pueden gestionar sus tickets y ver el estado de
+        los mismos.</li>
+      <li><strong>Base de Conocimientos</strong>: Accede a la base de conocimientos para encontrar soluciones rápidas a
+        problemas comunes.</li>
+    </ol>
+    <p>Si eres administrador, tendrás opciones adicionales para gestionar usuarios y ver todos los tickets.</p>
   </div>
 </ion-content>

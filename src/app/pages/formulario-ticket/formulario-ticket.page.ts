@@ -10,7 +10,8 @@ import { Usuario } from 'src/app/models/usuario';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { TicketService } from 'src/app/services/ticketService/ticket.service';
 import { TipoTicketService } from 'src/app/services/tipoTicket/tipo-ticket-service.service';
-import { KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, SWAL_ERROR } from 'src/constantes';
+import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import { KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, SWAL_ERROR, SWAL_SUCCESS } from 'src/constantes';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
@@ -26,7 +27,7 @@ export class FormularioTicketPage implements OnInit {
   selectedTipoProblema: string = '';
   currentValue = '';
   // isModalOpen = false;  // Controla la apertura del modal
-  usuario: Usuario | undefined;
+  usuario: Usuario | null = null;
 
   ticket: Ticket | undefined;
 
@@ -42,10 +43,8 @@ export class FormularioTicketPage implements OnInit {
     private _tipoTicketService: TipoTicketService,
     // private pickerController: PickerController,
     private loadingController: LoadingController,
-    private _encriptadorService: EncriptadorService,
-    private router: Router,
-    private _ticketService: TicketService)
-     { }
+    private _ticketService: TicketService,
+    private _usuarioService: UsuarioService) { }
 
   async ngOnInit() {
 
@@ -57,36 +56,12 @@ export class FormularioTicketPage implements OnInit {
 
     await loading.present();
 
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
+    await this._usuarioService.cargarUsuario(); // Cargar el usuario desde el servicio
+    this.usuario = this._usuarioService.getUsuario();
 
     if (!this.usuario) {
-      const { value } = await Preferences.get({ key: KEY_USER_INFO });
-
-      if (value) {
-        try {
-          // Desencriptar el valor usando el servicio de desencriptación
-          const decryptedData = this._encriptadorService.decrypt(value);
-
-          if (decryptedData) {
-            this.usuario = JSON.parse(decryptedData) as Usuario;
-            if (this.usuario.rol[0] === 0) {
-              console.log(this.usuario.rol[0])
-              this.usuario.rut = 'Invitado';
-            } // Convierte el JSON desencriptado a Usuario
-          } else {
-            console.error('Error al desencriptar los datos');
-            this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
-          }
-        } catch (error) {
-          console.error('Error al parsear JSON o desencriptar:', error);
-          this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
-        }
-      } else {
-        console.log('No se encontró el usuario en Preferences.');
-        this.usuario = { rut: 'Invitado' } as Usuario;
-      }
-    } else {
-      console.log('Usuario obtenido desde la navegación:', this.usuario);
+      console.log('No se encontró el usuario en Preferences.');
+      this.usuario = { rut: 'Invitado' } as Usuario;
     }
     loading.dismiss();
   }
@@ -107,7 +82,7 @@ export class FormularioTicketPage implements OnInit {
     await Swal.fire({
       icon: icon,
       title: tittle,
-      text: text,
+      html: text, // Usamos 'html' en lugar de 'text' para interpretar HTML
       heightAuto: false
     });
   }
@@ -125,11 +100,18 @@ export class FormularioTicketPage implements OnInit {
     console.log('Modal dismissed', event);
   }
 
-  enviarTicket() {
-    console.log(this.usuario?.rut)
+  async enviarTicket() {
+    const loading = await this.loadingController.create({
+      message: MENSAJE_CARGANDO,
+    });
+
+    await loading.present();
+
+    console.log(this.usuario?.rut);
+
     if (this.ticketForm.valid && this.usuario) {
       const ticket: Ticket = {
-        usuario_id: this.usuario?.rut,  // Aquí debes agregar el valor real de usuario
+        usuario_id: this.usuario?.rut,
         nombreUsuario: this.ticketForm.value.nombre,
         correo: this.ticketForm.value.email,
         tipo_problema_id: this.ticketForm.value.tipoProblema,
@@ -140,20 +122,31 @@ export class FormularioTicketPage implements OnInit {
         fecha_actualizacion: new Date(),
       };
 
-      // Enviar el ticket usando el servicio
+      // Llama al servicio para enviar el ticket
       this._ticketService.enviarTicket(ticket).subscribe({
         next: (response: HttpResponse<Ticket>) => {
-          console.log('Ticket creado correctamente:', response.body);
+          const ticketCreado = response.body;
+          if (ticketCreado?.id) {
+            loading.dismiss();
+            const tipoProblema = this.ticketForm.value.tipoProblema; // Tipo de problema elegido
+
+            const mensaje = `Ticket creado con éxito.<br>ID: ${ticketCreado.id}.<br>Tipo de problema: ${this.tiposTickets[tipoProblema].descripcion}.<br>Nos pondremos en contacto contigo pronto.`;
+            this.mostrarSwal(SWAL_SUCCESS, 'Éxito', mensaje);
+          } else {
+            console.warn('No se recibió un ID de ticket en la respuesta.');
+          }
         },
         error: (error) => {
           console.error('Error al crear el ticket:', error);
+          loading.dismiss();
+          this.mostrarSwal(SWAL_ERROR, 'Error', 'Error al crear el ticket:' + error);
+
         },
         complete: () => {
           console.log('Proceso de envío de ticket completado');
+          loading.dismiss();
         },
       });
-    } else {
-      console.log('El formulario no es válido');
     }
   }
 

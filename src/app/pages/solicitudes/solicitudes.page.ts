@@ -36,27 +36,21 @@ export class SolicitudesPage implements OnInit {
 
   constructor(
     private _solicitudService: SolicitudDeEmergenciaService,
-    private _usuarioService: UsuarioService,
     private _estadoSolicitudService: EstadoSolicitudService,
+    private _usuarioService:UsuarioService,
     private router: Router
   ) { }
 
   async ngOnInit() {
-    await this.suscribirUsuario();
     await this.inicializarDatos();
   }
 
   private async inicializarDatos() {
+    await this._usuarioService.cargarUsuario();
+    this.usuario = this._usuarioService.getUsuario();
     this.solicitudes = [];
     this.solicitudesFiltradas = [];
     await this.cargarSolicitudes();
-  }
-
-  private async suscribirUsuario() {
-    this._usuarioService.usuario$.subscribe((usuario) => {
-      this.usuario = usuario;
-      this.setRolesUsuario();
-    });
   }
 
   private setRolesUsuario() {

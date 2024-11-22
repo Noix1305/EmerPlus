@@ -7,6 +7,7 @@ import { MailSenderService } from '../mailService/mail-sender.service';
 import { ActualizarRol } from 'src/app/models/actualizarRol';
 import { Preferences } from '@capacitor/preferences';
 import Swal from 'sweetalert2';
+import { EncriptadorService } from '../encriptador/encriptador.service';
 
 
 
@@ -18,7 +19,10 @@ export class UsuarioService {
   private usuarioSubject = new BehaviorSubject<Usuario | null>(null);
   public usuario$ = this.usuarioSubject.asObservable();
 
-  constructor(private apiConfig: ApiConfigService, private mailSenderService: MailSenderService) {
+  constructor(
+    private apiConfig: ApiConfigService,
+    private mailSenderService: MailSenderService,
+    private _encriptadorService: EncriptadorService) {
     this.cargarUsuario();
   }
 
@@ -269,17 +273,20 @@ export class UsuarioService {
 
     if (value) {
       try {
+        // Desencriptar el valor antes de intentar parsearlo
+        const decryptedValue = this._encriptadorService.decrypt(value);
+        console.log('Valor desencriptado:', decryptedValue); // Verifica el valor desencriptado
+
         // Validar que el valor es un JSON antes de intentar parsearlo
-        if (this.esJsonValido(value)) {
-          const usuario = JSON.parse(value) as Usuario;
+        if (this.esJsonValido(decryptedValue)) {
+          const usuario = JSON.parse(decryptedValue) as Usuario;
           this.usuarioSubject.next(usuario); // Emite el nuevo usuario
         } else {
           console.error('El valor almacenado no es un JSON válido');
-          await Preferences.remove({ key: 'userInfo' }); // Eliminar el valor corrupto
         }
       } catch (error) {
-        console.error('Error al parsear el JSON:', error);
-        await Preferences.remove({ key: 'userInfo' }); // Eliminar el valor corrupto si el parseo falla
+        console.error('Error al desencriptar o parsear el JSON:', error);
+        await Preferences.remove({ key: 'userInfo' }); // Eliminar el valor corrupto si el parseo o desencriptado falla
       }
     } else {
       console.log('No hay información del usuario');
@@ -295,6 +302,7 @@ export class UsuarioService {
       return false;
     }
   }
+
 
 
   async guardarUsuario(usuario: Usuario) {
