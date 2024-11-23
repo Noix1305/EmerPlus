@@ -8,6 +8,7 @@ import { ActualizarRol } from 'src/app/models/actualizarRol';
 import { Preferences } from '@capacitor/preferences';
 import Swal from 'sweetalert2';
 import { EncriptadorService } from '../encriptador/encriptador.service';
+import { KEY_USER_INFO, SWAL_ERROR, SWAL_SUCCESS } from 'src/constantes';
 
 
 
@@ -64,7 +65,7 @@ export class UsuarioService {
           await this.enviarCorreoConContraseña(email, passDesencriptada);
         } else {
           await Swal.fire({
-            icon: 'error',
+            icon: SWAL_ERROR,
             title: 'Error',
             text: 'El correo electrónico no está disponible para el usuario.',
             heightAuto: false
@@ -74,7 +75,7 @@ export class UsuarioService {
         }
       } else {
         await Swal.fire({
-          icon: 'error',
+          icon: SWAL_ERROR,
           title: 'Error',
           text: 'Usuario no encontrado.',
           heightAuto: false
@@ -111,7 +112,7 @@ export class UsuarioService {
     this.mailSenderService.enviarCorreo(email, asunto, html).subscribe({
       next: () => {
         Swal.fire({
-          icon: 'success',
+          icon: SWAL_SUCCESS,
           title: 'Éxito',
           text: 'Se ha enviado un correo con la recuperación de contraseña.',
           heightAuto: false
@@ -120,7 +121,7 @@ export class UsuarioService {
       error: (error) => {
         console.error('Error al enviar el correo:', error);
         Swal.fire({
-          icon: 'error',
+          icon: SWAL_ERROR,
           title: 'Error',
           text: 'Error al enviar el correo de recuperación',
           heightAuto: false
@@ -156,7 +157,7 @@ export class UsuarioService {
       error: (error) => {
         console.error('Error al enviar el correo:', error);
         Swal.fire({
-          icon: 'error',
+          icon: SWAL_ERROR,
           title: 'Error',
           text: 'Error al enviar el correo',
           heightAuto: false
@@ -266,16 +267,13 @@ export class UsuarioService {
   }
 
   async cargarUsuario() {
-    const result = await Preferences.get({ key: 'userInfo' });
+    const result = await Preferences.get({ key: KEY_USER_INFO });
     const value = result.value;
-
-    console.log('Valor recuperado de userInfo:', value); // Verifica el valor almacenado
 
     if (value) {
       try {
         // Desencriptar el valor antes de intentar parsearlo
         const decryptedValue = this._encriptadorService.decrypt(value);
-        console.log('Valor desencriptado:', decryptedValue); // Verifica el valor desencriptado
 
         // Validar que el valor es un JSON antes de intentar parsearlo
         if (this.esJsonValido(decryptedValue)) {
@@ -286,7 +284,7 @@ export class UsuarioService {
         }
       } catch (error) {
         console.error('Error al desencriptar o parsear el JSON:', error);
-        await Preferences.remove({ key: 'userInfo' }); // Eliminar el valor corrupto si el parseo o desencriptado falla
+        await Preferences.remove({ key: KEY_USER_INFO }); // Eliminar el valor corrupto si el parseo o desencriptado falla
       }
     } else {
       console.log('No hay información del usuario');
@@ -308,13 +306,11 @@ export class UsuarioService {
   async guardarUsuario(usuario: Usuario) {
     try {
       const value = JSON.stringify(usuario);  // Convertir el objeto a JSON
-      await Preferences.set({ key: 'userInfo', value });
+      await Preferences.set({ key: KEY_USER_INFO, value });
     } catch (error) {
       console.error('Error al guardar el usuario:', error);
     }
   }
-
-
 
   actualizarUsuario(usuario: Usuario) {
     this.usuarioSubject.next(usuario); // Actualiza el estado del usuario

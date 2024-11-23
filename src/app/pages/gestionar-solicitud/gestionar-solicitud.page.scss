@@ -1,13 +1,7 @@
 .selected {
-    background-color: #d1e7ff;  /* Color de fondo cuando se selecciona */
     border-left: 5px solid #4caf50;  /* Borde para resaltar el ítem seleccionado */
     font-weight: bold;  /* Hacer el texto negrita */
     color: #4caf50;  /* Cambiar el color del texto a verde */
-  }
-  
-  ion-header {
-    --background: #ffffff;
-    --color: #000000;
   }
   
   ion-title {
@@ -17,14 +11,7 @@
   }
   
   ion-button {
-    --background: #3880ff; /* Color predeterminado para los botones */
-    --color: white;
-    --border-radius: 12px; /* Bordes redondeados */
-  }
-  
-  ion-button[expand="full"] {
-    --border-radius: 20px;
-    margin: 10px 0; /* Margen entre botones */
+    padding: 10px;
   }
   
   ion-card {
@@ -35,7 +22,6 @@
   
   ion-card-header {
     background-color: #3880ff;
-    color: white;
     padding: 16px;
   }
   
@@ -46,13 +32,7 @@
   
   ion-card-content {
     padding: 16px;
-    background-color: #f9f9f9;
     color: #333;
-  }
-  
-  ion-card-content p {
-    font-size: 16px;
-    margin: 8px 0;
   }
   
   ion-modal {
@@ -73,27 +53,6 @@
   
   ion-item.selected {
     background-color: #e0e0e0; /* Color de selección */
-  }
-  
-  ion-button[expand="full"] {
-    --background: #28a745; /* Botón verde para "Asignar" */
-    margin-top: 20px;
-  }
-  ion-buttons {
-    margin-top: 10px;
-    text-align: right;
-  }
-  
-  ion-button {
-    --background: #ff0000;
-    --color: white;
-    --border-radius: 8px;
-    padding: 10px;
-  }
-
-  ion-back-button {
-    --color: #3880ff;
-    font-size: 16px;
   }
 
   

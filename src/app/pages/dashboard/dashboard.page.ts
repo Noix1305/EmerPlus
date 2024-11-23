@@ -34,7 +34,6 @@ export class DashboardPage implements OnInit {
   intervalId: any;
   isLoadingNotificaciones: boolean = false;
 
-
   constructor(
     private emergenciaService: SolicitudDeEmergenciaService,
     private _usuarioService: UsuarioService,
@@ -46,6 +45,7 @@ export class DashboardPage implements OnInit {
   ) { }
 
   async ngOnInit() {
+
     const loading = await this.loadingController.create({
       message: 'Cargando...',
     });

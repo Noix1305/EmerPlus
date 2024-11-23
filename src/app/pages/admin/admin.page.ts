@@ -6,6 +6,7 @@ import { Usuario } from 'src/app/models/usuario';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service'; // Importar el servicio de encriptación
 import { RUTA_AGREGAR_USER_ADMIN, RUTA_GESTOR_ROLES, RUTA_SOLICITUDES, RUTA_SOPORTE, KEY_USER_INFO, RUTA_HOME } from 'src/constantes';
+import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 
 @Component({
   selector: 'app-admin',
@@ -18,7 +19,7 @@ export class AdminPage implements OnInit {
     private router: Router,
     private _rolService: RolService,
     private loadingController: LoadingController,
-    private _encriptadorService: EncriptadorService // Inyectar el servicio de encriptación
+    private _usuarioService: UsuarioService
   ) { }
 
   rolUsuarioActivo: string = '';
@@ -26,26 +27,25 @@ export class AdminPage implements OnInit {
   rolUsuario: number = 0;
 
   async ngOnInit() {
-    await this.presentLoading();
 
-    // Obtener el valor encriptado desde Preferences
-    const { value } = await Preferences.get({ key: KEY_USER_INFO });
+    const loading = await this.loadingController.create({
+      message: 'Cargando...',
+    });
+    await loading.present();
 
-    if (value) {
-      // Desencriptar el valor obtenido
-      const decryptedValue = this._encriptadorService.decrypt(value);
+    await this._usuarioService.cargarUsuario(); // Cargar el usuario desde el servicio
+    this.usuarioActivo = this._usuarioService.getUsuario();
 
-      // Parsear el valor desencriptado a un objeto Usuario
-      this.usuarioActivo = JSON.parse(decryptedValue) as Usuario;
-
-      if (this.usuarioActivo) {
-        // Si obtenerNombreRol devuelve undefined, se asigna 'Desconocido' como valor por defecto
-        this.rolUsuarioActivo = await this._rolService.obtenerNombreRol(this.usuarioActivo.rol[0]) || 'Desconocido';
-      }
+    if (this.usuarioActivo) {
+      // Si obtenerNombreRol devuelve undefined, se asigna 'Desconocido' como valor por defecto
+      this.rolUsuarioActivo = await this._rolService.obtenerNombreRol(this.usuarioActivo.rol[0]) || 'Desconocido';
     }
+
 
     this.cargarRolUsuario();
     console.log(this.rolUsuarioActivo);
+
+    loading.dismiss();
   }
 
   private cargarRolUsuario() {
@@ -97,7 +97,7 @@ export class AdminPage implements OnInit {
   async presentLoading() {
     const loading = await this.loadingController.create({
       message: 'Cargando...',
-      duration: 1000,
+      duration: 500,
     });
     await loading.present();
   }

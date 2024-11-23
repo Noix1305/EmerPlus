@@ -15,6 +15,8 @@ import { MatOptionModule } from '@angular/material/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @NgModule({
   imports: [
@@ -29,7 +31,10 @@ import { MatIconModule } from '@angular/material/icon';
     MatOptionModule,
     MatDialogModule,  // Asegúrate de agregarlo aquí
     MatMenuModule,  // Asegúrate de agregarlo aquí
-    MatIconModule
+    MatIconModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatBadgeModule
 
   ],
   declarations: [
