@@ -83,6 +83,51 @@ export class GestionarSolicitudPage implements OnInit {
 
   }
 
+  verImagen() {
+    Swal.fire({
+      html: `<div class="swal-image-container">
+               <img src="${this.solicitud?.imageUrl}" alt="Imagen" style="width: 100%; max-height: 80vh; object-fit: contain;" id="swal-image" />
+             </div>`,
+      showCloseButton: true,
+      showConfirmButton: false,
+      heightAuto: false,
+      customClass: {
+        popup: 'swal-popup-image'
+      },
+      didOpen: () => {
+        // Usamos un pequeño retraso para asegurarnos de que la imagen esté disponible
+        setTimeout(() => {
+          const image = document.getElementById('swal-image') as HTMLImageElement;
+          if (image) {
+            let scale = 1;
+
+            // Función para aplicar el zoom
+            const applyZoom = (e: WheelEvent) => {
+              e.preventDefault();
+              if (e.deltaY > 0) {
+                scale = Math.max(scale - 0.1, 1); // Zoom out
+              } else {
+                scale = Math.min(scale + 0.1, 3); // Zoom in
+              }
+              image.style.transform = `scale(${scale})`;
+            };
+
+            image.addEventListener('wheel', applyZoom);
+          }
+        }, 50);  // 50ms de retraso para asegurar que el DOM está listo
+      },
+      willClose: () => {
+        const image = document.getElementById('swal-image') as HTMLImageElement;
+        if (image) {
+          image.removeEventListener('wheel', applyZoom);
+        }
+      }
+    });
+  }
+
+
+
+
   asignarSolicitud() {
     if (this.solicitud && this.solicitud.id && this.usuarioSeleccionado) {
 
@@ -168,3 +213,7 @@ export class GestionarSolicitudPage implements OnInit {
 
 
 }
+function applyZoom(this: HTMLImageElement, ev: WheelEvent) {
+  throw new Error('Function not implemented.');
+}
+

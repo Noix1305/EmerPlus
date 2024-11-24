@@ -3,25 +3,24 @@
     text-align: center;
     font-size: 1.2rem;
     margin-top: 20px;
-    color: rgba(0, 0, 0, 0.7);  /* Sutil color para el texto */
+    color: rgba(0, 0, 0, 0.7);
 }
 
 /* Estilo para la lista de tickets */
 .ticket-list {
     margin: 20px;
     padding-left: 0;
-    background-color: transparent;  /* Fondo transparente */
+    background-color: transparent;
 }
 
 /* Estilo para cada ítem de la lista (separación y transparencia) */
 .ticket-card {
-    /* Fondo transparente */
     border-radius: 12px;
     margin-bottom: 20px;
     padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);  /* Sombra sutil */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.1);  /* Borde sutil */
+    border: 1px solid rgba(0, 0, 0, 0.1);
     background-color: rgb(207, 229, 248);
 }
 
@@ -29,28 +28,28 @@
 .ticket-card:hover,
 .ticket-card:active {
     transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);  /* Aumentar la sombra solo al hover */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 /* Estilo para el título del ticket */
 .ticket-title {
     font-size: 1.4rem;
     font-weight: bold;
-    margin: 5px;
-    color: rgba(0, 0, 0, 0.8);  /* Color sutil para el texto */
+    margin-bottom: 10px;  /* Separación inferior */
+    color: rgba(0, 0, 0, 0.8);
 }
 
 /* Estilo para el tipo de problema */
 .ticket-problem-type {
     font-size: 1rem;
-    margin: 5px;
+    margin-bottom: 8px;  /* Separación inferior */
     color: rgba(0, 0, 0, 0.6);
 }
 
 /* Estilo para la descripción del ticket */
 .ticket-description {
     font-size: 0.9rem;
-    margin: 10px;
+    margin-bottom: 12px;  /* Separación inferior */
     color: rgba(0, 0, 0, 0.5);
 }
 
@@ -58,5 +57,19 @@
 .ticket-status {
     display: flex;
     gap: 10px;
+    margin-top: 12px;  /* Separación superior */
     color: rgba(0, 0, 0, 0.7);
+}
+
+/* Separación adicional para la información de resolvedor */
+.resolved-info {
+    margin-top: 15px;  /* Separación entre resolvedor y otros elementos */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;  /* Espacio entre botón e información */
+}
+
+/* Ajuste del botón dentro de la tarjeta */
+.resolved-info ion-button {
+    align-self: flex-start;
 }

@@ -7,6 +7,7 @@ import { TipoTicket } from 'src/app/models/tituloTicket';
 import { Usuario } from 'src/app/models/usuario';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { TipoTicketService } from 'src/app/services/tipoTicket/tipo-ticket-service.service';
+import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, SWAL_ERROR } from 'src/constantes';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
@@ -17,14 +18,14 @@ import Swal, { SweetAlertIcon } from 'sweetalert2';
 })
 export class SoportePage implements OnInit {
 
-  usuario: Usuario | undefined;
+  usuario: Usuario | null = null;
   rolUsuario: number = 0;
 
   constructor(
-    private _encriptadorService: EncriptadorService,
     private loadingController: LoadingController,
     private router: Router,
     private modalController: ModalController,
+    private _usuarioService: UsuarioService
   ) { }
 
   async ngOnInit() {
@@ -34,32 +35,11 @@ export class SoportePage implements OnInit {
     });
 
     await loading.present();
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
+    await this._usuarioService.cargarUsuario();
+    this.usuario = this._usuarioService.getUsuario();
 
-    if (!this.usuario) {
-      const { value } = await Preferences.get({ key: KEY_USER_INFO });
-
-      if (value) {
-        try {
-          // Desencriptar el valor usando el servicio de desencriptación
-          const decryptedData = this._encriptadorService.decrypt(value);
-
-          if (decryptedData) {
-            this.usuario = JSON.parse(decryptedData) as Usuario; // Convierte el JSON desencriptado a Usuario
-            this.rolUsuario = this.usuario.rol[0];
-          } else {
-            console.error('Error al desencriptar los datos');
-            this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
-          }
-        } catch (error) {
-          console.error('Error al parsear JSON o desencriptar:', error);
-          this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
-        }
-      } else {
-        console.log('No se encontró el usuario en Preferences.');
-      }
-    } else {
-      console.log('Usuario obtenido desde la navegación:', this.usuario);
+    if (this.usuario) {
+      this.rolUsuario = this.usuario.rol[0];
     }
 
     loading.dismiss();
@@ -72,7 +52,7 @@ export class SoportePage implements OnInit {
     return await modal.present();
   }
 
-  public navegacion(nav:string) {
+  public navegacion(nav: string) {
     this.router.navigate(['/' + nav]);
   }
 

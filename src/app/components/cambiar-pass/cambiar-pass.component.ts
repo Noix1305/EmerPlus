@@ -5,6 +5,7 @@ import { firstValueFrom } from 'rxjs';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { LoginService } from 'src/app/services/loginService/login.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
+import { SWAL_ERROR, SWAL_SUCCESS } from 'src/constantes';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -23,7 +24,6 @@ export class CambiarPassComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController,
-    private _loginService: LoginService,
     private _usuarioService: UsuarioService,
     private _encriptadorService:EncriptadorService,
     private navParams: NavParams,
@@ -72,11 +72,11 @@ export class CambiarPassComponent implements OnInit {
       const response = await firstValueFrom(this._usuarioService.cambiarContrasena(this.rut, nuevaContrasenaEncriptada));
       console.log("response: " + response.status)
       // Verificar el código de estado de la respuesta
-      if (response.status === 204) {
+      if (response.status === 200) {
         this.successMessage = 'Contraseña cambiada con éxito.';
 
         await Swal.fire({
-          icon: 'success',
+          icon: SWAL_SUCCESS,
           title: 'Éxito',
           text: this.successMessage,
           timer: 2000,
@@ -87,7 +87,7 @@ export class CambiarPassComponent implements OnInit {
       } else {
         // Mostrar mensaje de error si el código de estado no es 200
         await Swal.fire({
-          icon: 'error',
+          icon: SWAL_ERROR,
           title: 'Error',
           text: 'Hubo un problema al cambiar la contraseña.',
           timer: 2000,

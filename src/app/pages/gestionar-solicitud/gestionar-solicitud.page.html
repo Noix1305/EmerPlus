@@ -42,6 +42,11 @@
     <ion-button *ngIf="!tipoUsuarioAdmin" expand="block" color="tertiary" (click)="solicitudAtendida()">
       Marcar como Atendida
     </ion-button>
+
+    <ion-button *ngIf="solicitud.imageUrl" expand="block" color="secondary" (click)="verImagen()">
+      Ver Imagen
+    </ion-button>
+
   </ion-card>
 
 
