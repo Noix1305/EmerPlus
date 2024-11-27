@@ -92,7 +92,7 @@ export class MisTicketsPage implements OnInit {
     if (!this.usuario) return;
     switch (this.usuario.rol[0]) {
       case 2: // Si es usuario, filtrar por usuario_id
-        this.ticketsFiltrados = this.listaTickets.filter(ticket => ticket.usuario_id === this.usuario?.rut);
+        this.ticketsFiltrados = this.listaTickets.filter(ticket => ticket.usuario_id === this.usuario?.rut && ticket.estado_id !== 4);
         break;
       case 6: // Si es staff, filtrar por asignado
         this.ticketsFiltrados = this.listaTickets.filter(ticket => ticket.asignado === this.usuario?.rut);
@@ -149,64 +149,89 @@ export class MisTicketsPage implements OnInit {
   }
 
   async cargarTiposTickets() {
+    const loading = await this.loadingController.create({
+      message: MENSAJE_CARGANDO,
+    });
+
+    await loading.present();
     try {
       (await this._ticketService.getTiposTickets()).subscribe({
         next: (response: HttpResponse<TipoTicket[]>) => {
           // Asigna los tipos de tickets a la lista
           this.tiposTicket = response.body || [];
           console.log('Tipos de tickets:', this.tiposTicket);
+          loading.dismiss();
         },
         error: (error) => {
           console.error('Error al obtener los tipos de tickets:', error);
         },
         complete: () => {
           console.log('Carga de tipos de tickets completada.');
+          loading.dismiss();
         }
       });
     } catch (error) {
+      loading.dismiss();
       console.error('Error en la carga de tipos de tickets:', error);
     }
   }
 
 
   async cargarEstadosTickets() {
-    // Aquí no necesitamos 'async' ya que estamos usando 'subscribe'
+    const loading = await this.loadingController.create({
+      message: MENSAJE_CARGANDO,
+    });
+
+    await loading.present();
     this._ticketService.obtenerEstadosTickets().subscribe({
       next: (response: EstadoTicket[]) => {
         // Asigna los estados de tickets a la lista
         this.estadosTickets = response || [];
         console.log('Estados de tickets:', this.estadosTickets);
+        loading.dismiss();
       },
       error: (error) => {
         console.error('Error al obtener los estados de tickets:', error);
+        loading.dismiss();
       },
       complete: () => {
+        loading.dismiss();
         console.log('Carga de estados de tickets completada.');
       }
     });
   }
 
   async cargarValoresTickets() {
+    const loading = await this.loadingController.create({
+      message: MENSAJE_CARGANDO,
+    });
+
+    await loading.present();
     try {
       (await this._ticketService.getSatisfaccionTicket()).subscribe({
         next: (response: HttpResponse<SatisfaccionTicket[]>) => {
           // Asigna los tipos de tickets a la lista
           this.valoresTicket = response.body || [];
           console.log('Tipos de tickets:', this.valoresTicket);
+          loading.dismiss();
         },
         error: (error) => {
           console.error('Error al obtener los valores de tickets:', error);
         },
         complete: () => {
           console.log('Carga de valores de tickets completada.');
+          loading.dismiss();
         }
       });
     } catch (error) {
       console.error('Error en la carga de valores de tickets:', error);
+      loading.dismiss();
     }
   }
 
   async valorarTicket(ticket: Ticket) {
+
+
     if (ticket && ticket.id) {
       const ticketPatch: TicketPatch = {
         id: ticket.id,
@@ -228,7 +253,12 @@ export class MisTicketsPage implements OnInit {
     console.log(`Valoración: ${this.rating}`);
   }
 
-  modificarSolicitud(ticket: TicketPatch) {
+  async modificarSolicitud(ticket: TicketPatch) {
+    const loading = await this.loadingController.create({
+      message: MENSAJE_CARGANDO,
+    });
+
+    await loading.present();
 
     Swal.fire({
       title: '¿Estás seguro?',
@@ -250,6 +280,7 @@ export class MisTicketsPage implements OnInit {
               icon: SWAL_SUCCESS,
               heightAuto: false
             });
+            loading.dismiss();
           },
           error: (error) => {
             console.error('Error al realizar la calificación:', error);
@@ -259,6 +290,7 @@ export class MisTicketsPage implements OnInit {
               icon: SWAL_ERROR,
               heightAuto: false
             });
+            loading.dismiss();
           }
         });
       } else if (result.dismiss === Swal.DismissReason.cancel) {
@@ -270,6 +302,7 @@ export class MisTicketsPage implements OnInit {
           icon: 'info',
           heightAuto: false
         });
+        loading.dismiss();
       }
     });
 

@@ -53,7 +53,7 @@
 ion-button {
     height: 100%;
     border-radius: 15px;
-    font-size: 15px !important;
+    font-size: 12px !important;
     font-weight: bold;
     --background: transparent;
     color: white;
@@ -155,7 +155,7 @@ ion-content {
 
     ion-button {
         border: none;
-        font-size: 1.25rem;
+        font-size: 1rem;
         /* Los botones ocupan el 100% del ancho en pantallas pequeñas */
     }
 
