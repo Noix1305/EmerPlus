@@ -111,7 +111,7 @@ export class SolicitudesPage implements OnInit {
     }
   }
 
-  gestionarsolicitud(solicitud: SolicitudDeEmergencia) {
+  navGestionarSolicitud(solicitud: SolicitudDeEmergencia) {
     this.crearSolicitudRecibida(solicitud);
     this.router.navigate([RUTA_GESTION_SOLICITUD], {
       state: {

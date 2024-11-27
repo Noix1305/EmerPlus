@@ -1,0 +1,61 @@
+.selected {
+    border-left: 5px solid #4caf50;  /* Borde para resaltar el ítem seleccionado */
+    font-weight: bold;  /* Hacer el texto negrita */
+    color: #4caf50;  /* Cambiar el color del texto a verde */
+  }
+  
+  ion-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333; /* Titulo más oscuro para contraste */
+  }
+  
+  ion-button {
+    padding: 10px;
+  }
+  
+  ion-card {
+    margin: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 12px; /* Bordes redondeados */
+  }
+  
+  ion-card-header {
+    background-color: #3880ff;
+    padding: 16px;
+  }
+  
+  ion-card-title {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  ion-card-content {
+    padding: 16px;
+    color: #333;
+  }
+  
+  ion-modal {
+    --width: 90%; /* Modal más ancho */
+    --max-width: 500px; /* Limitar el ancho máximo */
+  }
+  
+  ion-item {
+    font-size: 16px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  ion-item:hover {
+    background-color: #f1f1f1; /* Color de hover suave */
+  }
+  
+  ion-item.selected {
+    background-color: #e0e0e0; /* Color de selección */
+  }
+
+
+
+  
+  

@@ -14,4 +14,5 @@ export interface Usuario {
   rol: [number]; // Puede ser un array
   rolNombre?:string;
   estado: number;
+  pseudonimo?:string;
 }

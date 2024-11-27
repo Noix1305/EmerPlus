@@ -14,4 +14,5 @@ export interface Ticket {
     tipo_problema_id:number;
     satisfaccion_id?: number;
     asignado?:string
+    showStars?:boolean;
 }

@@ -1,8 +1,9 @@
 export const environment = {
   production: false,
-  API_URL: '',
-  API_KEY_SUPABASE: '',
-  CORREO_USER_DB: '',
-  PASSWORD_DB: '',
-  GOOGLE_MAP_TOKEN: ''
+  API_URL: 'https://ndmnmgusnnmndqwigiyp.supabase.co',
+  API_KEY_SUPABASE: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kbW5tZ3Vzbm5tbmRxd2lnaXlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjczOTExNzEsImV4cCI6MjA0Mjk2NzE3MX0.ESF_jBHTyESdtYoCWIHv9uo-hX4caAtGiCbstBf3ITc',
+  CORREO_USER_DB: 'admin@gmail.com',
+  PASSWORD_DB: '!a%i&dmi#m0e%sn123',
+  GOOGLE_MAP_TOKEN: 'AIzaSyA3DnwSGKX33LN88ZILdR-6chgnorim2PA',
+  ENCRYPT_KEY: 'emerplus2024'
 };

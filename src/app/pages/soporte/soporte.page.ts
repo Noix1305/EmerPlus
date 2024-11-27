@@ -1,14 +1,10 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { Preferences } from '@capacitor/preferences';
-import { IonModal, LoadingController, ModalController, PickerController } from '@ionic/angular';
+import { LoadingController, ModalController, PickerController } from '@ionic/angular';
 import { ModalInfoComponent } from 'src/app/components/modal-info/modal-info.component';
-import { TipoTicket } from 'src/app/models/tituloTicket';
 import { Usuario } from 'src/app/models/usuario';
-import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
-import { TipoTicketService } from 'src/app/services/tipoTicket/tipo-ticket-service.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
-import { KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, SWAL_ERROR } from 'src/constantes';
+import { MENSAJE_CARGANDO } from 'src/constantes';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({

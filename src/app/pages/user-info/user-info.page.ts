@@ -395,9 +395,9 @@ export class UserInfoPage {
         let response;
 
         // Verifica si ya existe el contacto
-        if (this.contacto?.id) {
+        if (this.usuario.contactoEmergencia?.id) {
           // Si existe, editar contacto
-          response = await firstValueFrom(this._contactoService.editarContacto(this.contacto.id, updatedContact));
+          response = await firstValueFrom(this._contactoService.editarContacto(this.usuario.contactoEmergencia?.id, updatedContact));
         } else {
           // Si no existe, crear nuevo contacto
           response = await firstValueFrom(this._contactoService.crearContacto(updatedContact));
@@ -406,7 +406,7 @@ export class UserInfoPage {
 
         // Verifica si la respuesta fue exitosa
         if (response.ok) {
-          this.successMessage = this.contacto?.id
+          this.successMessage = this.usuario.contactoEmergencia?.id
             ? 'Contacto actualizado con éxito, se le ha enviado una notificación.'
             : 'Nuevo contacto creado con éxito, se le ha enviado una notificación.';
 
@@ -455,7 +455,7 @@ export class UserInfoPage {
             this.contacto = response.body[0];
 
             // Verifica si hay un contacto de emergencia
-            if (this.contacto && this.usuario?.contactoEmergencia) {
+            if (this.contacto && this.usuario) {
               this.usuario.contactoEmergencia = this.contacto;
             }
           } else {

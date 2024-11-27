@@ -12,26 +12,28 @@
 
 <ion-content>
   <!-- Cargando indicadores -->
-  <ion-spinner *ngIf="ticketsFiltrados.length === 0"></ion-spinner>
+  <div *ngIf="ticketsFiltrados.length === 0 && this.usuario?.rut !== 'staff'">
+    <ion-spinner></ion-spinner>
+    <!-- Mostrar mensaje si no hay tickets filtrados -->
+    <ion-item lines="none" class="no-tickets-message">
+      <ion-label>No tienes tickets registrados.</ion-label>
+    </ion-item>
+  </div>
 
-  <!-- Mostrar mensaje si no hay tickets filtrados -->
-  <ion-item *ngIf="ticketsFiltrados.length === 0" lines="none" class="no-tickets-message">
-    <ion-label>No tienes tickets registrados.</ion-label>
-  </ion-item>
 
   <!-- Mostrar la lista de tickets filtrados -->
   <ion-list *ngIf="ticketsFiltrados.length > 0" class="ticket-list">
-    <ion-item *ngFor="let ticket of ticketsFiltrados" (click)="verDetallesTicket(ticket)" class="ticket-card">
-      <ion-label>
+    <ion-item *ngFor="let ticket of ticketsFiltrados" class="ticket-card">
+      <ion-label *ngIf="ticket.estado_id !== 4">
         <h1 class="ticket-title">ID Ticket: {{ ticket.id }}</h1>
-        
+
         <!-- Mostrar la descripción del tipo de problema basado en tipo_problema_id -->
         <p class="ticket-problem-type">
           {{ getTipoTicketDescripcion(ticket.tipo_problema_id) }}
         </p>
-        
+
         <p class="ticket-description">{{ ticket.descripcion }}</p>
-        
+
         <div class="ticket-status">
           <ion-badge color="primary" *ngIf="ticket.estado_id === 1">Abierto</ion-badge>
           <ion-badge color="secondary" *ngIf="ticket.estado_id === 2">En progreso</ion-badge>
@@ -42,13 +44,57 @@
         <!-- Mostrar el botón y el campo resuelto_por si el ticket está resuelto o cerrado -->
         <div *ngIf="ticket.estado_id === 3 || ticket.estado_id === 4" class="resolved-info">
           <p class="resolved-by"><strong>Resuelto por:</strong> {{ ticket.resuelto_por || 'Sin información' }}</p>
-          
+
           <!-- Botón de "Valorar" solo si satisfaccion_id no existe o es nulo -->
-          <ion-button color="primary" *ngIf="!ticket.satisfaccion_id">Valorar</ion-button>
         </div>
+        <ion-button color="primary" (click)="gestionarTicket(ticket)" *ngIf="rolUsuario === 6">Gestionar</ion-button>
+
+        <ion-button color="success" (click)="toggleStars(ticket)" *ngIf="!ticket.showStars && ticket.estado_id === 3">Valorar</ion-button>
+
+        <ion-row *ngIf="ticket.showStars" class="rating-container">
+          <ion-col *ngFor="let star of stars; let i = index" (click)="rate(i + 1)">
+            <ion-icon [name]="i < rating ? 'star' : 'star-outline'" size="large" [class.selected]="i < rating">
+            </ion-icon>
+          </ion-col>
+        </ion-row>
+
+        <ion-row *ngIf="ticket.showStars" >
+          <ion-col>
+            <ion-button color="success" *ngIf="!ticket.satisfaccion_id && rolUsuario === 2" (click)="valorarTicket(ticket)" style="margin: 10px;">Valorar</ion-button>
+          </ion-col>
+        </ion-row>
+
       </ion-label>
+      <ion-button color="primary" (click)="verDetallesTicket(ticket)" *ngIf="ticket.estado_id !== 4">Detalles</ion-button>
     </ion-item>
   </ion-list>
+
+  <ion-list *ngIf="listaTickets.length > 0 && usuario?.rut ==='staff'" class="ticket-list">
+    <ion-item *ngFor="let ticket of listaTickets" class="ticket-card">
+      <ion-label>
+        <h1 class="ticket-title">ID Ticket: {{ ticket.id }}</h1>
+
+        <!-- Mostrar la descripción del tipo de problema basado en tipo_problema_id -->
+        <p class="ticket-problem-type">
+          {{ getTipoTicketDescripcion(ticket.tipo_problema_id) }}
+        </p>
+
+        <p class="ticket-description">{{ ticket.descripcion }}</p>
+
+        <div class="ticket-status">
+          <ion-badge color="primary" *ngIf="ticket.estado_id === 1">Abierto</ion-badge>
+          <ion-badge color="secondary" *ngIf="ticket.estado_id === 2">En progreso</ion-badge>
+          <ion-badge color="tertiary" *ngIf="ticket.estado_id === 3">Resuelto</ion-badge>
+          <ion-badge color="success" *ngIf="ticket.estado_id === 4">Cerrado</ion-badge>
+        </div>
+
+        <!-- Mostrar el botón y el campo resuelto_por si el ticket está resuelto o cerrado -->
+        <div *ngIf="ticket.estado_id === 3 || ticket.estado_id === 4" class="resolved-info">
+          <p class="resolved-by"><strong>Resuelto por:</strong> {{ ticket.resuelto_por || 'Sin información' }}</p>
+        </div>
+      </ion-label>
+      <ion-button color="primary" (click)="gestionarTicket(ticket)">Asignar</ion-button>
+    </ion-item>
+
+  </ion-list>
 </ion-content>
-
-

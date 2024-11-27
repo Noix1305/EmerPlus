@@ -1,17 +1,13 @@
 import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
-import { Preferences } from '@capacitor/preferences';
-import { LoadingController, PickerController } from '@ionic/angular';
+import { LoadingController } from '@ionic/angular';
 import { Ticket } from 'src/app/models/ticket';
 import { TipoTicket } from 'src/app/models/tituloTicket';
 import { Usuario } from 'src/app/models/usuario';
-import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { TicketService } from 'src/app/services/ticketService/ticket.service';
-import { TipoTicketService } from 'src/app/services/tipoTicket/tipo-ticket-service.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
-import { KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, SWAL_ERROR, SWAL_SUCCESS } from 'src/constantes';
+import { MENSAJE_CARGANDO, SWAL_ERROR, SWAL_SUCCESS } from 'src/constantes';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
@@ -40,7 +36,6 @@ export class FormularioTicketPage implements OnInit {
   });
 
   constructor(
-    private _tipoTicketService: TipoTicketService,
     // private pickerController: PickerController,
     private loadingController: LoadingController,
     private _ticketService: TicketService,
@@ -67,7 +62,7 @@ export class FormularioTicketPage implements OnInit {
   }
 
   async obtenerTiposTickets() {
-    (await this._tipoTicketService.getTiposTickets()).subscribe({
+    (await this._ticketService.getTiposTickets()).subscribe({
       next: (response) => {
         this.tiposTickets = response.body || []; // La lista de tipos de tickets estará en el cuerpo de la respuesta
         console.log(this.tiposTickets[0].descripcion)

@@ -4,7 +4,6 @@ import { SolicitudDeEmergencia } from 'src/app/models/solicituddemergencia';
 import { Usuario } from 'src/app/models/usuario';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 import { NAV_SOLICITUD, RUTA_MAPA, KEY_USER_INFO, SWAL_WARN, SWAL_ERROR, SWAL_SUCCESS } from 'src/constantes';
-import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { firstValueFrom } from 'rxjs';  // Importa firstValueFrom
 import { SolicitudPatch } from 'src/app/models/solicitudPatch';
 import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergencia/solicitud-de-emergencia.service';
@@ -124,9 +123,6 @@ export class GestionarSolicitudPage implements OnInit {
       }
     });
   }
-
-
-
 
   asignarSolicitud() {
     if (this.solicitud && this.solicitud.id && this.usuarioSeleccionado) {

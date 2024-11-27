@@ -73,3 +73,58 @@
 .resolved-info ion-button {
     align-self: flex-start;
 }
+
+.rating-container {
+    display: flex;
+    justify-content: center; /* Centra las estrellas horizontalmente */
+    align-items: center;
+    flex-wrap: nowrap; /* Evita que las estrellas pasen a la siguiente línea */
+    
+    ion-icon {
+      color: gray;
+      margin: 0 5px; /* Espaciado entre estrellas */
+      transition: color 0.3s ease;
+      
+      &.selected {
+        color: gold; /* Color dorado para las estrellas seleccionadas */
+      }
+    }
+}
+
+ion-row {
+  & + ion-row {
+    margin-top: 10px; /* Espaciado entre las estrellas y el botón */
+  }
+
+  /* Agregar margen al contenedor del botón "Valorar" */
+  .rating-button-container {
+    margin-top: 15px; /* Separación del botón con respecto a las estrellas */
+    display: flex;
+    justify-content: center; /* Centrado del botón */
+  }
+}
+
+ion-button {
+  font-size: 0.8rem; /* Aumenta ligeramente el tamaño del texto */
+}
+
+/* Estilo para los tickets de la lista */
+.ticket-card {
+    border-radius: 12px;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: rgb(207, 229, 248);
+    margin-bottom: 20px;
+}
+
+/* Añadir margen a los botones "Gestionar" y "Asignar" para que no estén pegados */
+ion-button {
+    margin-top: 10px;
+    margin-bottom: 10px; /* Separación adicional */
+}
+  
+  
+  
