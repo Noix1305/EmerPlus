@@ -1,0 +1,57 @@
+/* Estilos para el formulario */
+form {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 5% !important;
+}
+
+/* Estilos para los inputs */
+ion-input, ion-select, ion-textarea {
+  --padding-start: 16px; /* Aumenta el padding al inicio del campo */
+  --padding-end: 16px; /* Aumenta el padding al final del campo */
+  margin-bottom: 15px; /* Espacio entre los campos */
+  --border-radius: 10px; /* Bordes redondeados */
+  --background: #ffffff; /* Fondo blanco */
+  --border-color: #2b2828; /* Color del borde */
+  --border-width: 1px; /* Grosor del borde */
+  
+}
+
+/* Estilo cuando el input está enfocado */
+ion-input:focus, ion-select:focus, ion-textarea:focus {
+  --border-color: #80b0e4; /* Color del borde al enfocarse */
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3); /* Sombra de enfoque */
+}
+
+/* Estilos para el botón */
+ion-button {
+  --background: #007bff; /* Color de fondo del botón */
+  --color: white; /* Color del texto */
+  --border-radius: 8px; /* Bordes redondeados */
+  padding: 12px 20px; /* Relleno del botón */
+  margin-top: 10px; /* Margen superior */
+  font-size: 16px; /* Tamaño de fuente */
+}
+
+/* Estilos para el texto de los placeholder */
+ion-input::part(input), ion-textarea::part(textarea) {
+  font-size: 16px;
+  color: #333;
+}
+
+/* Estilos específicos para el ion-select */
+ion-select {
+  --placeholder-color: #aaa; /* Color del placeholder */
+  --padding-start: 10px;
+  --padding-end: 10px;
+  font-size: 16px;
+  border-radius: 5% !important;
+}
+
+/* Añadir un margen al final del formulario */
+form ion-button:last-child {
+  margin-bottom: 20px;
+  border-radius: 5% !important;
+}

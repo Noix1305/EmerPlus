@@ -9,7 +9,7 @@ import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
 import { LoadingController } from '@ionic/angular';
-import { KEY_USER_INFO, MENSAJE_CARGANDO, RUTA_ADMIN, RUTA_DASHBOARD, RUTA_HOME, SWAL_ERROR } from 'src/constantes';
+import { KEY_USER_INFO, MENSAJE_CARGANDO, RUTA_ADMIN, RUTA_DASHBOARD, RUTA_HOME, RUTA_SOPORTE, SWAL_ERROR } from 'src/constantes';
 
 @Component({
   selector: 'app-login',
@@ -126,8 +126,6 @@ export class LoginPage implements OnInit {
           value: encryptedUser // Guardamos el usuario encriptado
         });
 
-        this._usuarioService.actualizarUsuario(user);
-
         loading.dismiss();
 
         // Navegar según el rol del usuario
@@ -164,6 +162,10 @@ export class LoginPage implements OnInit {
       heightAuto: false
     });
   }
+
+  public navSoporte() {
+    this.router.navigate([RUTA_SOPORTE]);
+  } 
 
 }
 

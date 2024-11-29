@@ -4,7 +4,8 @@
       <ion-buttons slot="end">
         <button mat-icon-button (click)="limpiarNotificaciones($event)">
           <mat-icon style="color: blue;">notifications</mat-icon>
-          <span *ngIf="notificacion > 0" matBadge="{{ notificacion }}" matBadgeColor="warn"></span>
+          <span *ngIf="notificacion > 0" matBadge="{{ notificacion }}" class="custom-badge"></span>
+
         </button>
         <ion-menu-button></ion-menu-button>
       </ion-buttons>

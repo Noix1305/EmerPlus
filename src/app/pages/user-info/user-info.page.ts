@@ -3,7 +3,7 @@ import { Component, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { IonModal, ModalController } from '@ionic/angular';
+import { IonModal, LoadingController, ModalController } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
 import { firstValueFrom } from 'rxjs';
 import { CambiarPassComponent } from 'src/app/components/cambiar-pass/cambiar-pass.component';
@@ -16,7 +16,7 @@ import { EncriptadorService } from 'src/app/services/encriptador/encriptador.ser
 import { RegionComunaService } from 'src/app/services/region_comuna/region-comuna.service';
 import { RolService } from 'src/app/services/rolService/rol.service';
 import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
-import { COLOR_ERROR, COLOR_EXITO, KEY_USER_INFO, NAV_CONTACTO, NAV_USUARIO, RUTA_LOGIN, SWAL_ERROR, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
+import { COLOR_ERROR, COLOR_EXITO, KEY_USER_INFO, MENSAJE_CARGANDO, NAV_CONTACTO, NAV_USUARIO, RUTA_LOGIN, RUTA_SOLICITUDES, SWAL_ERROR, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
 import Swal, { SweetAlertIcon } from 'sweetalert2';
 
 @Component({
@@ -31,35 +31,13 @@ export class UserInfoPage {
   @ViewChild('modalEditContact', { static: false }) modalEditContact!: IonModal;
 
   rolUsuario: string | undefined;
-  usuario: Usuario = {
-    rut: '',
-    password: '',
-    nombre: '',
-    papellido: '',
-    sapellido: '',
-    telefono: 0,
-    regionid: undefined,
-    comunaid: undefined,
-    contactoEmergencia: undefined, // Inicializar como undefined
-    correo: '',
-    rol: [0], // Inicializar como un array vacío
-    rolNombre: '',
-    estado: 1 // O el valor que desees
-  };
+  usuario: Usuario | null = null;
 
 
   colorVerde: string = COLOR_EXITO
   colorRojo: string = COLOR_ERROR
 
-  contacto: Contacto = {
-    rut_usuario: '',
-    nombre: '',
-    apaterno: '',
-    amaterno: '',
-    telefono: 0,
-    correo: '',
-    relacion: ''
-  };
+  contacto: Contacto | null = null;
 
   rut: string = '';
   password: string = '';
@@ -89,7 +67,8 @@ export class UserInfoPage {
     private fb: FormBuilder,
     private modalCtrl: ModalController,
     private _contactoService: ContactosemergenciaService,
-    private _encriptadorService: EncriptadorService) {
+    private _encriptadorService: EncriptadorService,
+    private loadingController: LoadingController) {
 
     this.form = this.fb.group({
       nombre: ['', Validators.required],
@@ -104,36 +83,18 @@ export class UserInfoPage {
   }
 
   async ngOnInit() {
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
+
+    const loading = await this.loadingController.create({
+      message: MENSAJE_CARGANDO,
+    });
 
     this.cargarRegiones();
     this.cargarComunas();
 
-    if (!this.usuario) {
-      const { value } = await Preferences.get({ key: KEY_USER_INFO });
+    await loading.present();
 
-      if (value) {
-        try {
-          // Desencripta el valor antes de parsearlo
-          const decryptedValue = this._encriptadorService.decrypt(value);
-
-          // Verifica que la desencriptación haya sido exitosa
-          if (decryptedValue) {
-            // Intenta parsear el JSON solo si la desencriptación fue exitosa
-            this.usuario = JSON.parse(decryptedValue) as Usuario;
-            console.log('Usuario obtenido de Preferences:', this.usuario);
-          } else {
-            console.error('La desencriptación no fue exitosa');
-          }
-        } catch (error) {
-          console.error('Error al desencriptar o parsear JSON:', error);
-        }
-      } else {
-        console.log('No se encontró el usuario en Preferences.');
-      }
-    } else {
-      console.log('Usuario obtenido desde la navegación:', this.usuario);
-    }
+    await this._usuarioService.cargarUsuario(); // Cargar el usuario desde el servicio
+    this.usuario = this._usuarioService.getUsuario();
 
     if (this.usuario) {
 
@@ -160,6 +121,7 @@ export class UserInfoPage {
         console.error('Usuario o rol no disponibles');
       }
     }
+    loading.dismiss();
   }
 
 
@@ -184,10 +146,11 @@ export class UserInfoPage {
           // Actualiza la contraseña del usuario en `this.usuario`
           this.usuario.password = data.nuevaContrasena;
 
+          let usuario = this._encriptadorService.encrypt(JSON.stringify(this.usuario));
           // También puedes actualizar `Preferences` si es necesario
           await Preferences.set({
             key: KEY_USER_INFO,
-            value: JSON.stringify(this.usuario)
+            value: usuario
           });
         }
       } catch (error) {
@@ -350,7 +313,7 @@ export class UserInfoPage {
   }
 
   async mostrarContacto() {
-    if (this.usuario.contactoEmergencia) {
+    if (this.usuario?.contactoEmergencia) {
       await this.modalContacto.present();
     } else {
       this.errorMessage = 'No se ha registrado información de contacto de emergencia.'
@@ -432,9 +395,9 @@ export class UserInfoPage {
         let response;
 
         // Verifica si ya existe el contacto
-        if (this.contacto.id) {
+        if (this.usuario.contactoEmergencia?.id) {
           // Si existe, editar contacto
-          response = await firstValueFrom(this._contactoService.editarContacto(this.contacto.id, updatedContact));
+          response = await firstValueFrom(this._contactoService.editarContacto(this.usuario.contactoEmergencia?.id, updatedContact));
         } else {
           // Si no existe, crear nuevo contacto
           response = await firstValueFrom(this._contactoService.crearContacto(updatedContact));
@@ -443,7 +406,7 @@ export class UserInfoPage {
 
         // Verifica si la respuesta fue exitosa
         if (response.ok) {
-          this.successMessage = this.contacto.id
+          this.successMessage = this.usuario.contactoEmergencia?.id
             ? 'Contacto actualizado con éxito, se le ha enviado una notificación.'
             : 'Nuevo contacto creado con éxito, se le ha enviado una notificación.';
 
@@ -482,65 +445,32 @@ export class UserInfoPage {
   }
 
   async getContacto() {
-    this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
-      next: (response) => {
-        console.log('Respuesta del servicio de contacto:', response);
+    if (this.usuario) {
+      this._contactoService.getContactoPorParametro('rut_usuario', this.usuario.rut).subscribe({
+        next: (response) => {
+          console.log('Respuesta del servicio de contacto:', response);
 
-        // Verifica que la respuesta tenga datos
-        if (response.body && response.body.length > 0) {
-          this.contacto = response.body[0];
+          // Verifica que la respuesta tenga datos
+          if (response.body && response.body.length > 0) {
+            this.contacto = response.body[0];
 
-          // Verifica si hay un contacto de emergencia
-          if (this.contacto) {
-            // Verifica si el contacto de emergencia ya está presente
-            if (this.usuario.contactoEmergencia) {
-              try {
-                const decryptedContact = this._encriptadorService.decrypt(JSON.stringify(this.usuario.contactoEmergencia));
-
-                // Verifica si el JSON desencriptado es válido antes de parsear
-                if (this.esJsonValido(decryptedContact)) {
-                  this.usuario.contactoEmergencia = JSON.parse(decryptedContact);
-                  console.log('Contacto de emergencia desencriptado:', this.usuario.contactoEmergencia);
-                } else {
-                  console.error('El valor desencriptado no es un JSON válido');
-                }
-              } catch (error) {
-                console.error('Error al desencriptar el contacto de emergencia:', error);
-              }
+            // Verifica si hay un contacto de emergencia
+            if (this.contacto && this.usuario) {
+              this.usuario.contactoEmergencia = this.contacto;
             }
+          } else {
+            console.log('No se encontró ningún contacto de emergencia.');
           }
-        } else {
-          console.log('No se encontró ningún contacto de emergencia.');
-        }
-      },
-      error: (error) => {
-        console.error('Error al obtener contacto:', error);
-      },
-      complete: async () => {
-        console.log('Solicitud completada');
+        },
+        error: (error) => {
+          console.error('Error al obtener contacto:', error);
+        },
+        complete: async () => {
+          console.log('Solicitud completada');
 
-        // Solo guarda el contacto si es válido
-        if (this.usuario.contactoEmergencia) {
-          try {
-            // Verifica si el contacto de emergencia es un JSON válido
-            const contactoString = JSON.stringify(this.usuario.contactoEmergencia);
-            if (this.esJsonValido(contactoString)) {
-              await Preferences.set({
-                key: NAV_CONTACTO,
-                value: this._encriptadorService.encrypt(contactoString) // Guarda el contacto de emergencia de forma encriptada
-              });
-              console.log('Contacto de emergencia guardado en Preferences:', this.usuario.contactoEmergencia);
-            } else {
-              console.error('El contacto de emergencia no es un JSON válido para guardar.');
-            }
-          } catch (error) {
-            console.error('Error al guardar el contacto de emergencia:', error);
-          }
-        } else {
-          console.log('No hay contacto de emergencia para guardar');
         }
-      }
-    });
+      });
+    }
   }
 
   // Función para verificar si una cadena es un JSON válido
@@ -551,6 +481,10 @@ export class UserInfoPage {
     } catch (e) {
       return false;
     }
+  }
+
+  navSolicitudes() {
+    this.router.navigate([RUTA_SOLICITUDES]);
   }
 
 

@@ -51,6 +51,8 @@
     "jspdf": "^2.5.2",
     "jspdf-autotable": "^3.8.4",
     "multer": "^1.4.5-lts.1",
+    "onsenui": "^2.12.8",
+    "react-native-wheel-picker": "^1.2.0",
     "rxjs": "~7.8.0",
     "sweetalert2": "^11.14.4",
     "tslib": "^2.3.0",

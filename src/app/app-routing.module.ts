@@ -4,7 +4,6 @@ import { isUsuarioGuard } from './guards/isUsuario/is-usuario.guard';
 import { isAdminGuard } from './guards/isAdmin/is-admin.guard';
 import { isAdminOrUserGuard } from './guards/isAdminOrUser/is-admin-or-user.guard';
 import { isStaffGuard } from './guards/isStaff/is-staff.guard';
-import { isTecnicoGuard } from './guards/isTecnico/is-tecnico.guard';
 
 const routes: Routes = [
   {
@@ -62,11 +61,26 @@ const routes: Routes = [
     loadChildren: () => import('./pages/gestionar-solicitud/gestionar-solicitud.module').then(m => m.GestionarSolicitudPageModule)
   },
   {
+    path: 'formulario-ticket',
+    loadChildren: () => import('./pages/formulario-ticket/formulario-ticket.module').then( m => m.FormularioTicketPageModule)
+  },
+  {
+    path: 'mis-tickets',
+    loadChildren: () => import('./pages/mis-tickets/mis-tickets.module').then( m => m.MisTicketsPageModule)
+  },
+  {
+    path: 'bases-conocimiento',
+    loadChildren: () => import('./pages/basesConocimiento/bases-conocimiento.module').then( m => m.BasesConocimientoPageModule)
+  },
+  {
+    path: 'gestionar-ticket',
+    loadChildren: () => import('./pages/gestionar-ticket/gestionar-ticket.module').then( m => m.GestionarTicketPageModule)
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
   },
-
 
 
 

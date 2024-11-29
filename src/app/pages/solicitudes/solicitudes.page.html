@@ -5,71 +5,106 @@
     </ion-buttons>
     <ion-title>Solicitudes de Emergencia</ion-title>
     <ion-buttons slot="end">
+      <button mat-icon-button>
+        <mat-icon style="color: blue;">notifications</mat-icon>
+        <span *ngIf="notificaciones > 0" matBadge="{{ notificaciones }}" class="custom-badge"></span>
+      </button>
+    </ion-buttons>
+    <ion-buttons slot="end">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="text-center">
-    <h2>Lista de Solicitudes de Emergencia</h2>
 
-    <!-- Filtros para Usuarios -->
-    <ion-card *ngIf="!esAdmin" class="filters-container">
-      <form (ngSubmit)="filtrar()">
-        <!-- Select de Fecha Desde -->
+  <!-- Filtros para Usuarios -->
+  <ion-card class="filters-container">
+    <form (ngSubmit)="filtrar()">
+      <!-- Select de Fecha Desde -->
+      <ion-item>
+        <ion-label>Fecha Desde</ion-label>
+        <ion-select [(ngModel)]="fechaDesde" name="fechaDesde">
+          <ion-select-option value="hoy">Hoy</ion-select-option>
+          <ion-select-option value="ayer">Ayer</ion-select-option>
+          <ion-select-option value="semana">Última semana</ion-select-option>
+          <ion-select-option value="mes">Último mes</ion-select-option>
+          <ion-select-option value="personalizado">Personalizado</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Select de Fecha Hasta -->
+      <ion-item>
+        <ion-label>Fecha Hasta</ion-label>
+        <ion-select [(ngModel)]="fechaHasta" name="fechaHasta">
+          <ion-select-option value="hoy">Hoy</ion-select-option>
+          <ion-select-option value="ayer">Ayer</ion-select-option>
+          <ion-select-option value="semana">Última semana</ion-select-option>
+          <ion-select-option value="mes">Último mes</ion-select-option>
+          <ion-select-option value="personalizado">Personalizado</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Select de Estado -->
+      <ion-item>
+        <ion-label>Estado</ion-label>
+        <ion-select [(ngModel)]="estadoFiltro" name="estadoFiltro">
+          <ion-select-option value="0">Todos</ion-select-option>
+          <ion-select-option value="1">Atendida</ion-select-option>
+          <ion-select-option value="2">En ejecución</ion-select-option>
+          <ion-select-option value="3">Recibida</ion-select-option>
+          <ion-select-option value="4">Enviada</ion-select-option>
+          <ion-select-option value="5">Cancelada</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Botones para Filtrar y Limpiar -->
+      <div class="button-group">
+        <ion-button expand="full" color="warning" (click)="limpiarFiltro()">Limpiar Filtro</ion-button>
+        <ion-button expand="full" color="primary" type="submit">Filtrar</ion-button>
+      </div>
+    </form>
+  </ion-card>
+
+  <!-- Mostrar solicitudes filtradas -->
+  <ion-card *ngIf="solicitudesFiltradas.length > 0; else todasSolicitudes">
+    <ion-list>
+      <ion-item-sliding *ngFor="let solicitud of solicitudesFiltradas">
         <ion-item>
-          <ion-label>Fecha Desde</ion-label>
-          <ion-select [(ngModel)]="fechaDesde" name="fechaDesde">
-            <ion-select-option value="hoy">Hoy</ion-select-option>
-            <ion-select-option value="ayer">Ayer</ion-select-option>
-            <ion-select-option value="semana">Última semana</ion-select-option>
-            <ion-select-option value="mes">Último mes</ion-select-option>
-            <ion-select-option value="personalizado">Personalizado</ion-select-option>
-          </ion-select>
+          <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+          <ion-label>
+            <h4>{{ solicitud.tipo }}</h4>
+            <p>ID: {{ solicitud.id }}</p>
+            <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+            <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
+            <p>Estado: {{ solicitud.estadoDescripcion }}</p>
+          </ion-label>
         </ion-item>
 
-        <!-- Select de Fecha Hasta -->
-        <ion-item>
-          <ion-label>Fecha Hasta</ion-label>
-          <ion-select [(ngModel)]="fechaHasta" name="fechaHasta">
-            <ion-select-option value="hoy">Hoy</ion-select-option>
-            <ion-select-option value="ayer">Ayer</ion-select-option>
-            <ion-select-option value="semana">Última semana</ion-select-option>
-            <ion-select-option value="mes">Último mes</ion-select-option>
-            <ion-select-option value="personalizado">Personalizado</ion-select-option>
-          </ion-select>
-        </ion-item>
+        <!-- Botón para ver la solicitud en el mapa -->
+        <ion-item-options side="end">
+          <ion-item-option color="tertiary" (click)="verEnMapa(solicitud)">
+            Ver en el mapa
+          </ion-item-option>
+          <ion-item-option *ngIf="esUsuario" color="warning" (click)="gestionarSolicitud(solicitud)">Gestionar
+            Solicitud</ion-item-option>
 
-        <!-- Select de Estado -->
-        <ion-item>
-          <ion-label>Estado</ion-label>
-          <ion-select [(ngModel)]="estadoFiltro" name="estadoFiltro">
-            <ion-select-option value="0">Todos</ion-select-option>
-            <ion-select-option value="1">Atendida</ion-select-option>
-            <ion-select-option value="2">En ejecución</ion-select-option>
-            <ion-select-option value="3">Recibida</ion-select-option>
-            <ion-select-option value="4">Enviada</ion-select-option>
-            <ion-select-option value="5">Cancelada</ion-select-option>
-          </ion-select>
-        </ion-item>
+          <ion-item-option *ngIf="!esUsuario" color="success"
+            (click)="navGestionarSolicitud(solicitud)">Gestionar</ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+  </ion-card>
 
-        <!-- Botones para Filtrar y Limpiar -->
-        <div class="button-group">
-          <ion-button expand="full" color="warning" (click)="limpiarFiltro()">Limpiar Filtro</ion-button>
-          <ion-button expand="full" color="primary" type="submit">Filtrar</ion-button>
-        </div>
-      </form>
-    </ion-card>
-
-    <!-- Mostrar solicitudes filtradas -->
-    <ion-card *ngIf="solicitudesFiltradas.length > 0; else todasSolicitudes">
+  <!-- Plantilla para mostrar todas las solicitudes si no hay filtradas -->
+  <ng-template #todasSolicitudes>
+    <ion-card *ngIf="esUsuario">
       <ion-list>
-        <ion-item-sliding *ngFor="let solicitud of solicitudesFiltradas">
+        <ion-item-sliding *ngFor="let solicitud of solicitudes">
           <ion-item>
             <ion-icon name="checkmark-circle" slot="start"></ion-icon>
             <ion-label>
-              <h4>{{ solicitud.tipo }}</h4>
+              <h5 style="font-size: 1.25rem; color: rgb(4, 4, 63);">{{ solicitud.tipo }}</h5>
               <p>ID: {{ solicitud.id }}</p>
               <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
               <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
@@ -79,53 +114,52 @@
 
           <!-- Botón para ver la solicitud en el mapa -->
           <ion-item-options side="end">
-            <ion-item-option color="success" (click)="verEnMapa(solicitud)">
+            <ion-item-option color="tertiary" (click)="verEnMapa(solicitud)">
               Ver en el mapa
             </ion-item-option>
-            <ion-item-option *ngIf="esUsuario" color="secondary">Cancelar</ion-item-option>
-            <ion-item-option *ngIf="esUsuario" color="danger">Eliminar</ion-item-option>
+            <ion-item-option *ngIf="esUsuario" color="warning" (click)="gestionarSolicitud(solicitud)">Gestionar
+              Solicitud</ion-item-option>
+
             <ion-item-option *ngIf="!esUsuario" color="success"
-              (click)="gestionarsolicitud(solicitud)">Gestionar</ion-item-option>
+              (click)="gestionarSolicitud(solicitud)">Gestionar</ion-item-option>
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
     </ion-card>
+  </ng-template>
 
-    <!-- Plantilla para mostrar todas las solicitudes si no hay filtradas -->
-    <ng-template #todasSolicitudes>
-      <ion-card>
-        <ion-list>
-          <ion-item-sliding *ngFor="let solicitud of solicitudes">
-            <ion-item>
-              <ion-icon name="checkmark-circle" slot="start"></ion-icon>
-              <ion-label>
-                <h4>{{ solicitud.tipo }}</h4>
-                <p>ID: {{ solicitud.id }}</p>
-                <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
-                <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
-                <p>Estado: {{ solicitud.estadoDescripcion }}</p>
-              </ion-label>
-            </ion-item>
+  <ion-card *ngIf="solicitudesAsignadas.length > 0 && solicitudesFiltradas.length ===0">
+    <h5 style="text-align: center;"> Mis Solicitudes Asignadas</h5>
+    <ion-list>
+      <ion-item-sliding *ngFor="let solicitud of solicitudesAsignadas">
+        <ion-item>
+          <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+          <ion-label>
+            <h4>{{ solicitud.tipo }}</h4>
+            <p>ID: {{ solicitud.id }}</p>
+            <p>Fecha: {{ solicitud.fecha | date: 'dd/MM/yyyy' }}</p>
+            <p>Ubicación: {{ solicitud.latitud }}, {{ solicitud.longitud }}</p>
+            <p>Estado: {{ solicitud.estadoDescripcion }}</p>
+          </ion-label>
+        </ion-item>
 
-            <!-- Botón para ver la solicitud en el mapa -->
-            <ion-item-options side="end">
-              <ion-item-option color="tertiary" (click)="verEnMapa(solicitud)">
-                Ver en el mapa
-              </ion-item-option>
-              <ion-item-option *ngIf="esUsuario" color="secondary">Cancelar</ion-item-option>
-              <ion-item-option *ngIf="esUsuario" color="danger">Eliminar</ion-item-option>
-              <ion-item-option *ngIf="!esUsuario" color="success"
-                (click)="gestionarsolicitud(solicitud)">Gestionar</ion-item-option>
-            </ion-item-options>
-          </ion-item-sliding>
-        </ion-list>
-      </ion-card>
-    </ng-template>
+        <!-- Botón para ver la solicitud en el mapa -->
+        <ion-item-options side="end">
+          <ion-item-option color="primary" (click)="verEnMapa(solicitud)">
+            Ver en el mapa
+          </ion-item-option>
+          <ion-item-option *ngIf="esUsuario" color="secondary">Cancelar</ion-item-option>
+          <ion-item-option *ngIf="esUsuario" color="danger">Eliminar</ion-item-option>
+          <ion-item-option *ngIf="!esUsuario" color="success"
+            (click)="gestionarSolicitud(solicitud)">Gestionar</ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+    </ion-list>
+  </ion-card>
 
 
-    <!-- Mensaje si no hay solicitudes filtradas -->
-    <p *ngIf="solicitudesFiltradas.length === 0">No hay solicitudes filtradas.</p>
+  <!-- Mensaje si no hay solicitudes filtradas -->
+  <p *ngIf="solicitudesFiltradas.length === 0">No hay solicitudes filtradas.</p>
 
-    <!-- <ion-button expand="full" color="accent" *ngIf="esAdmin" (click)="generarPDF()">Generar PDF</ion-button> -->
-  </div>
+  <!-- <ion-button expand="full" color="accent" *ngIf="esAdmin" (click)="generarPDF()">Generar PDF</ion-button> -->
 </ion-content>

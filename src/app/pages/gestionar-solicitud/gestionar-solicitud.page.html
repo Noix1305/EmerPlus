@@ -1,22 +1,20 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/"></ion-back-button>
     </ion-buttons>
     <ion-title>Gestionar Solicitud</ion-title>
+    <ion-buttons slot="end">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Detalles de la Solicitud</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content>
 
   <ion-card *ngIf="solicitud">
     <ion-card-header>
-      <ion-card-title>Solicitud ID: {{ solicitud.id }}</ion-card-title>
+      <ion-card-title>Detalles de la Solicitud ID: {{ solicitud.id }}</ion-card-title>
     </ion-card-header>
     <ion-card-content>
       <p><strong>Tipo:</strong> {{ solicitud.tipo }}</p>
@@ -27,15 +25,30 @@
     </ion-card-content>
 
     <!-- Botón para ver la solicitud en el mapa -->
-    <ion-button expand="full" color="primary" (click)="verEnMapa(solicitud)">
+    <ion-button expand="block" color="primary" (click)="verEnMapa(solicitud)">
       Ver en el mapa
     </ion-button>
 
-    <!-- Botón para mostrar opciones con usuarios -->
-    <ion-button expand="full" color="primary" (click)="mostrarUsuarios()">
-      Mostrar opciones de usuarios
+    <!-- Botón de Asignar Solicitud solo si tipoUsuarioAdmin es true -->
+    <ion-button *ngIf="tipoUsuarioAdmin" expand="block" color="primary" (click)="mostrarUsuarios()">
+      Asignar Solicitud
     </ion-button>
+
+    <!-- Botón de Ejecutar Solicitud solo si tipoUsuarioAdmin es false -->
+    <ion-button *ngIf="!tipoUsuarioAdmin" expand="block" color="success" (click)="ejecutarSolicitud()">
+      Ejecutar Solicitud
+    </ion-button>
+
+    <ion-button *ngIf="!tipoUsuarioAdmin" expand="block" color="tertiary" (click)="solicitudAtendida()">
+      Marcar como Atendida
+    </ion-button>
+
+    <ion-button *ngIf="solicitud.imageUrl" expand="block" color="secondary" (click)="verImagen()">
+      Ver Imagen
+    </ion-button>
+
   </ion-card>
+
 
   <!-- Modal de usuarios -->
   <ion-modal [isOpen]="modalAbierto">
@@ -52,13 +65,12 @@
       </ion-header>
       <ion-content>
         <ion-list>
-          <ion-item *ngFor="let usuario of usuarios" 
-                    [class.selected]="usuario === usuarioSeleccionado" 
-                    (click)="usuarioSeleccionado = usuario">
+          <ion-item *ngFor="let usuario of usuarios" [class.selected]="usuario === usuarioSeleccionado"
+            (click)="usuarioSeleccionado = usuario">
             {{ usuario.nombre }} {{ usuario.papellido }} {{ usuario.sapellido }}
           </ion-item>
         </ion-list>
-  
+
         <!-- Botón para asignar la solicitud al usuario seleccionado -->
         <ion-button *ngIf="usuarioSeleccionado" expand="full" color="success" (click)="asignarSolicitud()">
           Asignar
@@ -66,5 +78,5 @@
       </ion-content>
     </ng-template>
   </ion-modal>
-  
+
 </ion-content>

@@ -5,7 +5,8 @@ import { LoginService } from 'src/app/services/loginService/login.service';
 import { mostrarFormularioRegistro } from 'src/app/utils/formulario-registro';
 import { LoadingController } from '@ionic/angular';
 import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
-import { MENSAJE_CARGANDO } from 'src/constantes';
+import { KEY_USER_INFO, MENSAJE_CARGANDO, RUTA_LOGIN } from 'src/constantes';
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -14,17 +15,17 @@ import { MENSAJE_CARGANDO } from 'src/constantes';
   styleUrls: ['./home.page.scss'],
 })
 export class HomePage {
+  user: any = {};
 
   constructor(
     private _usuarioService: UsuarioService,
     private loadingController: LoadingController,
-    private _encriptadorService: EncriptadorService
+    private _encriptadorService: EncriptadorService,
+    private router: Router
 
   ) { }
 
   async ngOnInit() {
-    await Preferences.clear();
-    await this.presentLoading();
   }
 
   async mostrarFormularioRegistro() {
@@ -37,5 +38,9 @@ export class HomePage {
       duration: 500,
     });
     await loading.present();
+  }
+
+  public navLogin() {
+    this.router.navigate([RUTA_LOGIN]);
   }
 }

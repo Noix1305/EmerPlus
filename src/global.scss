@@ -121,21 +121,21 @@ ion-toolbar {
     --background: linear-gradient(135deg, white, #FFC107, white, #FFC107, white);
 }
 
-ion-content{
+ion-content {
     --background: linear-gradient(135deg, #00bfff 0%, #d3d3d3 50%, #b0e0e6 100%);
 }
 
 ion-item-sliding {
     // Cambia el fondo del sliding
     background-color: #f0f0f0;
-  
+
     // Añade un efecto de sombra
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-  }
+}
 
-  ion-item-options {
+ion-item-options {
     // Estilos para los botones de las opciones
     --background: #3880ff; // Cambia el color de fondo
     --color: white; // Cambia el color del texto
-  }
+}

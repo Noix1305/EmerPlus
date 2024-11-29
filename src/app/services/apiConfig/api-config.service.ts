@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -15,8 +15,10 @@ export class ApiConfigService {
 
   private getHeaders(): HttpHeaders {
     return new HttpHeaders({
+      'Content-Type': 'application/json',
       'apiKey': environment.API_KEY_SUPABASE,
-      'Authorization': 'Bearer ' + environment.API_KEY_SUPABASE
+      'Authorization': 'Bearer ' + environment.API_KEY_SUPABASE,
+      'Prefer': 'return=representation'
     });
   }
 
@@ -37,20 +39,27 @@ export class ApiConfigService {
   }
 
   post<T>(path: string, data: any): Observable<HttpResponse<T>> {
-    const url = `${this.urlBase}/rest/v1/${path}`; // Agregar '/rest/v1/' a la URL
+    const url = `${this.urlBase}/rest/v1/${path}`;
     console.log('URL de la solicitud:', url);
 
     return this.httpClient.post<T>(
       url,
       data,
       {
-        headers: this.getHeaders(),
+        headers: this.getHeaders(),  // Aquí aplicamos los headers
         observe: 'response'
       }
     ).pipe(
+      map((response) => {
+        if (Array.isArray(response.body)) {
+          response = response.clone({ body: response.body[0] });
+        }
+        return response;
+      }),
       catchError(this.handleError)
     );
-  }
+}
+
 
   patch<T>(path: string, data: any, options: { headers?: HttpHeaders, observe?: 'response', params?: HttpParams } = {}): Observable<HttpResponse<T>> {
     return this.httpClient.patch<T>(
@@ -65,7 +74,7 @@ export class ApiConfigService {
       catchError(this.handleError)
     );
   }
-  
+
 
   patchParcial<T>(path: string, userModel: Partial<T>, params?: HttpParams): Observable<HttpResponse<T>> {
     return this.httpClient.patch<T>(`${this.urlBase}/rest/v1/${path}`, // Agregar '/rest/v1/' a la URL

@@ -1,0 +1,130 @@
+/* Estilo para el mensaje cuando no hay tickets */
+.no-tickets-message {
+    text-align: center;
+    font-size: 1.2rem;
+    margin-top: 20px;
+    color: rgba(0, 0, 0, 0.7);
+}
+
+/* Estilo para la lista de tickets */
+.ticket-list {
+    margin: 20px;
+    padding-left: 0;
+    background-color: transparent;
+}
+
+/* Estilo para cada ítem de la lista (separación y transparencia) */
+.ticket-card {
+    border-radius: 12px;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: rgb(207, 229, 248);
+}
+
+/* Efecto al pasar el mouse (o tap) sobre un ticket */
+.ticket-card:hover,
+.ticket-card:active {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para el título del ticket */
+.ticket-title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 10px;  /* Separación inferior */
+    color: rgba(0, 0, 0, 0.8);
+}
+
+/* Estilo para el tipo de problema */
+.ticket-problem-type {
+    font-size: 1rem;
+    margin-bottom: 8px;  /* Separación inferior */
+    color: rgba(0, 0, 0, 0.6);
+}
+
+/* Estilo para la descripción del ticket */
+.ticket-description {
+    font-size: 0.9rem;
+    margin-bottom: 12px;  /* Separación inferior */
+    color: rgba(0, 0, 0, 0.5);
+}
+
+/* Estilo para los badges de estado */
+.ticket-status {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;  /* Separación superior */
+    color: rgba(0, 0, 0, 0.7);
+}
+
+/* Separación adicional para la información de resolvedor */
+.resolved-info {
+    margin-top: 15px;  /* Separación entre resolvedor y otros elementos */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;  /* Espacio entre botón e información */
+}
+
+/* Ajuste del botón dentro de la tarjeta */
+.resolved-info ion-button {
+    align-self: flex-start;
+}
+
+.rating-container {
+    display: flex;
+    justify-content: center; /* Centra las estrellas horizontalmente */
+    align-items: center;
+    flex-wrap: nowrap; /* Evita que las estrellas pasen a la siguiente línea */
+    
+    ion-icon {
+      color: gray;
+      margin: 0 5px; /* Espaciado entre estrellas */
+      transition: color 0.3s ease;
+      
+      &.selected {
+        color: gold; /* Color dorado para las estrellas seleccionadas */
+      }
+    }
+}
+
+ion-row {
+  & + ion-row {
+    margin-top: 10px; /* Espaciado entre las estrellas y el botón */
+  }
+
+  /* Agregar margen al contenedor del botón "Valorar" */
+  .rating-button-container {
+    margin-top: 15px; /* Separación del botón con respecto a las estrellas */
+    display: flex;
+    justify-content: center; /* Centrado del botón */
+  }
+}
+
+ion-button {
+  font-size: 0.8rem; /* Aumenta ligeramente el tamaño del texto */
+}
+
+/* Estilo para los tickets de la lista */
+.ticket-card {
+    border-radius: 12px;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background-color: rgb(207, 229, 248);
+    margin-bottom: 20px;
+}
+
+/* Añadir margen a los botones "Gestionar" y "Asignar" para que no estén pegados */
+ion-button {
+    margin-top: 10px;
+    margin-bottom: 10px; /* Separación adicional */
+}
+  
+  
+  

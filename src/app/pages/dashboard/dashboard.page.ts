@@ -2,7 +2,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Preferences } from '@capacitor/preferences';
-import { AlertController, LoadingController, PopoverController } from '@ionic/angular';
+import { LoadingController, PopoverController } from '@ionic/angular';
 import { firstValueFrom } from 'rxjs';
 import { NotificacionPopoverComponent } from 'src/app/components/notificacionPopover/notificacion-popover/notificacion-popover.component';
 import { Contacto } from 'src/app/models/contacto';
@@ -16,8 +16,8 @@ import { SolicitudDeEmergenciaService } from 'src/app/services/solicitudEmergenc
 import { Geolocation } from '@capacitor/geolocation';
 
 import Swal, { SweetAlertIcon } from 'sweetalert2';
-import { EncriptadorService } from 'src/app/services/encriptador/encriptador.service';
-import { ACCIDENTE, ESTADO_ENVIADA, INCENDIO, KEY_USER_INFO, MENSAJE_CARGANDO, NAV_USUARIO, ROBO, SWAL_ERROR, SWAL_INFO, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
+import { ACCIDENTE, AMBULANCIA, BOMBERO, ESTADO_ENVIADA, INCENDIO, POLICIA, ROBO, SWAL_ERROR, SWAL_INFO, SWAL_SUCCESS, SWAL_WARN } from 'src/constantes';
+import { UsuarioService } from 'src/app/services/usuarioService/usuario.service';
 
 
 @Component({
@@ -31,60 +31,46 @@ export class DashboardPage implements OnInit {
   notificacion: number = 0;
   defaultEstado: number = 4;
   notificaciones: Notificacion[] = []
+  intervalId: any;
+  isLoadingNotificaciones: boolean = false;
 
   constructor(
     private emergenciaService: SolicitudDeEmergenciaService,
-    private router: Router,
+    private _usuarioService: UsuarioService,
     private _notificacionService: NotificacionService,
     private _contactoService: ContactosemergenciaService,
     private popoverController: PopoverController,
     private _gestorArchivos: GestorArchivosService,
-    private _encriptadorService: EncriptadorService,
     private loadingController: LoadingController
   ) { }
 
   async ngOnInit() {
-    // Intenta obtener el usuario desde la navegación anterior
+
     const loading = await this.loadingController.create({
-      message: MENSAJE_CARGANDO,
+      message: 'Cargando...',
     });
     await loading.present();
-    this.usuario = this.router.getCurrentNavigation()?.extras?.state?.[NAV_USUARIO];
 
-    if (!this.usuario) {
-      const { value } = await Preferences.get({ key: KEY_USER_INFO });
+    await this._usuarioService.cargarUsuario(); // Cargar el usuario desde el servicio
+    this.usuario = this._usuarioService.getUsuario();
 
-      if (value) {
-        try {
-          // Desencriptar el valor usando el servicio de desencriptación
-          const decryptedData = this._encriptadorService.decrypt(value);
+    // Cargar las notificaciones solo si no está en proceso de carga
+    if (!this.isLoadingNotificaciones) {
+      this.isLoadingNotificaciones = true;
+      await this.cargarNotificacionesNuevas();
+      this.isLoadingNotificaciones = false; // Restablecer el estado
+    }
 
-          if (decryptedData) {
-            this.usuario = JSON.parse(decryptedData) as Usuario; // Convierte el JSON desencriptado a Usuario
-          } else {
-            console.error('Error al desencriptar los datos');
-            this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
-          }
-        } catch (error) {
-          console.error('Error al parsear JSON o desencriptar:', error);
-          this.mostrarSwal(SWAL_ERROR, 'Error', 'Hubo un problema al cargar los datos del usuario.');
-        }
-      } else {
-        console.log('No se encontró el usuario en Preferences.');
+    // Iniciar el intervalo para cargar notificaciones cada 10 segundos (10,000 ms)
+    setInterval(() => {
+      console.log('Cargando Notificaciones');
+      if (!this.isLoadingNotificaciones) {
+        this.isLoadingNotificaciones = true;
+        this.cargarNotificacionesNuevas().then(() => {
+          this.isLoadingNotificaciones = false;
+        });
       }
-    } else {
-      console.log('Usuario obtenido desde la navegación:', this.usuario);
-    }
-
-    // Cargar las notificaciones
-    await this.cargarNotificacionesNuevas();
-
-    // Verificar que 'notificaciones' tiene al menos un elemento antes de acceder a su primer elemento
-    if (this.notificaciones.length > 0) {
-      console.log(this.notificaciones[0].fecha);
-    } else {
-      console.log('No hay notificaciones disponibles.');
-    }
+    }, 10000);
 
     loading.dismiss();
   }
@@ -116,17 +102,17 @@ export class DashboardPage implements OnInit {
 
   carabineros(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia(ROBO, entidad, 4)
+    this.enviarSolicitudDeEmergencia(ROBO, entidad, POLICIA)
   }
 
   bomberos(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia(INCENDIO, entidad, 3)
+    this.enviarSolicitudDeEmergencia(INCENDIO, entidad, BOMBERO)
   }
 
   ambulancia(entidad: string) {
     // Lógica para realizar una llamada a emergencias
-    this.enviarSolicitudDeEmergencia(ACCIDENTE, entidad, 5)
+    this.enviarSolicitudDeEmergencia(ACCIDENTE, entidad, AMBULANCIA)
 
   }
 
@@ -367,34 +353,40 @@ export class DashboardPage implements OnInit {
     });
   }
   async cargarNotificacionesNuevas() {
-    const rut = this.usuario?.rut; // Utiliza el operador de encadenamiento opcional
-
-    if (!rut) {
+    if (!this.usuario?.rut) {
       console.error('El RUT del usuario es indefinido.');
       return Promise.reject('RUT indefinido');
     }
 
-    return new Promise<void>((resolve, reject) => {
-      this._notificacionService.obtenerNotificacionesUsuario(rut).subscribe({
-        next: (response: HttpResponse<Notificacion[]>) => {
-          // Verifica que las notificaciones sean válidas antes de asignarlas
-          if (Array.isArray(response.body)) {
-            this.notificaciones = response.body;
-          } else {
-            console.error('Respuesta de notificaciones inválida:', response.body);
-            reject('Notificaciones inválidas');
-          }
-        },
-        error: (error) => {
-          console.error('Error al cargar las notificaciones:', error);
-          reject(error);
-        },
-        complete: () => {
-          console.log('Carga de notificaciones completa.');
-          resolve();
+    try {
+      const response = await firstValueFrom(this._notificacionService.obtenerNotificacionesUsuario(this.usuario.rut));
+
+      // Acceder a `body` que es donde está el array
+      const notificaciones = response.body;
+
+      if (Array.isArray(notificaciones)) {
+        const cantidadAnterior = this.notificaciones.length;  // Cantidad antes de cargar nuevas
+        this.notificaciones = notificaciones;  // Guardar las nuevas notificaciones
+        this.notificacion = this.notificaciones.length;  // Actualizar el contador de notificaciones
+
+        // Comparar las longitudes de los arrays
+        if (this.notificaciones.length > cantidadAnterior) {
+          // Si el número de notificaciones nuevas es mayor, mostrar una alerta
+          const nuevaNotificacion = this.notificaciones.length - cantidadAnterior;  // Cuántas nuevas notificaciones
+          Swal.fire({
+            title: '¡Nuevas Notificaciones!',
+            text: `Tienes ${nuevaNotificacion} nueva(s) notificación(es).`,
+            icon: 'info',
+            heightAuto: false,
+            confirmButtonText: 'Ok',
+          });
         }
-      });
-    });
+      } else {
+        console.error('Las notificaciones no están en formato de array:', notificaciones);
+      }
+    } catch (error) {
+      console.error('Error al cargar las notificaciones:', error);
+    }
   }
 
 

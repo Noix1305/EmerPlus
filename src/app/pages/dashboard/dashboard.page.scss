@@ -1,17 +1,10 @@
-:root {
-    --ion-color-primary: #4CAF50;
-    /* Verde vibrante */
-    --ion-color-secondary: #FF5722;
-    /* Naranja vibrante */
-    --ion-color-warning: #FFC107;
-    /* Amarillo para alertas */
-    --ion-color-danger: #f44336;
-    /* Rojo para botones de peligro */
-    --ion-color-light: #f1f1f1;
-    /* Fondo claro */
-    --ion-color-dark: #212121;
-    /* Texto oscuro */
+.custom-badge {
+    --mat-badge-background-color: red;
+    /* Cambia el color de fondo a rojo */
+    --mat-badge-color: white;
+    /* Cambia el color del texto (número) a blanco */
 }
+
 
 /* Estilo de los botones de acción rápida */
 .colorVerdeMusgo {
@@ -60,7 +53,7 @@
 ion-button {
     height: 100%;
     border-radius: 15px;
-    font-size: 15px !important;
+    font-size: 12px !important;
     font-weight: bold;
     --background: transparent;
     color: white;
@@ -134,8 +127,6 @@ ion-content {
 
 }
 
-
-
 /* Ajustes para pantallas pequeñas */
 @media (max-width: 600px) {
     .button-square {
@@ -164,7 +155,7 @@ ion-content {
 
     ion-button {
         border: none;
-        font-size: 1.25rem;
+        font-size: 1rem;
         /* Los botones ocupan el 100% del ancho en pantallas pequeñas */
     }
 
