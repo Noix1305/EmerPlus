@@ -15,7 +15,7 @@ export class EncriptadorService {
   // Encriptar un texto
   encrypt(text: string): string {
     //Solo para agregar usuarios manualmente en la base de datos
-    // const secretKey = ''; // Asegúrate de usar la misma clave secreta que en tu servicio
+    // const secretKey = 'Emerplus.2025'; // Asegúrate de usar la misma clave secreta que en tu servicio
     // const password = 'admin123'; // Aquí pondrías la contraseña que quieres encriptar
 
     // // Encriptar la contraseña
