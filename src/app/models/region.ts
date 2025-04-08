@@ -1,5 +1,4 @@
 export interface Region {
-    id: number;
-    nombre: string;
-    comunaid: number;
+    regionid: number;
+    nombre_region: string;
   }

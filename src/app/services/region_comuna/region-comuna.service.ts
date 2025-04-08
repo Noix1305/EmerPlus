@@ -63,7 +63,7 @@ export class RegionComunaService {
   }
 
   getComunaPorId(idComuna: number): Observable<HttpResponse<Comuna[]>> {
-    const params = new HttpParams().set('id', `eq.${idComuna}`);
+    const params = new HttpParams().set('comunaid', `eq.${idComuna}`);
     return this.apiConfig.get<Comuna[]>(this.pathComuna, params).pipe(
       catchError((error) => {
         console.error('Error al obtener comuna por ID:', error);
@@ -74,7 +74,7 @@ export class RegionComunaService {
 
 
   getRegionPorId(idRegion: number): Observable<HttpResponse<Region[]>> {
-    const params = new HttpParams().set('id', `eq.${idRegion}`);
+    const params = new HttpParams().set('regionid', `eq.${idRegion}`);
     return this.apiConfig.get<Region[]>(this.pathRegion, params).pipe(
       catchError((error) => {
         console.error('Error al obtener region por ID:', error);

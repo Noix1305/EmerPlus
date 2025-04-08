@@ -230,8 +230,8 @@ export class UserInfoPage {
       sapellido: formData.get('sApellido') as string,
       correo: formData.get('correo') as string,
       telefono: Number(formData.get('telefono')),
-      comunaid: this.selectedComuna ? this.selectedComuna.id : undefined,
-      regionid: this.selectedRegion ? this.selectedRegion.id : undefined,
+      comunaid: this.selectedComuna ? this.selectedComuna.comunaid : undefined,
+      regionid: this.selectedRegion ? this.selectedRegion.regionid : undefined,
       password: this.usuario.password,
       rol: [this.usuario.rol[0]],
       estado: 1
@@ -323,15 +323,18 @@ export class UserInfoPage {
 
   async cargarRegiones() {
     this.regiones = await this._regionComunaService.obtenerRegiones();
+    console.log('Regiones:', this.regiones);
   }
 
   async cargarComunas() {
     this.comunas = await this._regionComunaService.obtenerComunas();
+    console.log('Comunas:', this.comunas);
+
   }
 
   async onRegionChange() {
     if (this.selectedRegion) {
-      const regionId = this.selectedRegion.id;
+      const regionId = this.selectedRegion.regionid;
 
       // Obtener las comunas desde el servicio
       this._regionComunaService.getComunaPorRegion(regionId).subscribe({

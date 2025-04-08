@@ -48,7 +48,7 @@
 
       <ion-item>
         <ion-label><strong>Región:</strong></ion-label>
-        <ion-text>{{ regionUsuario ? regionUsuario.nombre : 'Sin información...' }}</ion-text>
+        <ion-text>{{ regionUsuario ? regionUsuario.nombre_region : 'Sin información...' }}</ion-text>
       </ion-item>
 
       <ion-item>
@@ -173,7 +173,7 @@
               <ion-label>Región</ion-label>
               <ion-select name="region" [(ngModel)]="selectedRegion" required (ionChange)="onRegionChange()">
                 <ion-select-option *ngFor="let region of regiones" [value]="region">
-                  {{ region.nombre }}
+                  {{ region.nombre_region }}
                 </ion-select-option>
               </ion-select>
               <ion-note *ngIf="editUserForm.submitted && !editUserForm.controls['region']?.valid" color="danger">
